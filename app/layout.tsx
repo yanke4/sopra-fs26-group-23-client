@@ -1,11 +1,27 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import {
+  Geist,
+  Geist_Mono,
+  Bruno_Ace_SC,
+  Audiowide,
+  Inter,
+} from "next/font/google";
 import { App as AntdApp, ConfigProvider, theme } from "antd";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import "@/styles/globals.css";
+import Navbar from "@/components/navbar";
+import { cn } from "@/lib/utils";
+
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const audiowide = Audiowide({
+  variable: "--font-audiowide",
+  weight: "400",
   subsets: ["latin"],
 });
 
@@ -14,9 +30,16 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const brunoAceSC = Bruno_Ace_SC({
+  variable: "--font-bruno",
+  weight: "400",
+  subsets: ["latin"],
+});
+
 export const metadata: Metadata = {
-  title: "Student XX-XXX-XXX",
-  description: "sopra-fs26-template-client",
+  title: "Conquest of Europe",
+  description:
+    "A competitive multiplayer game where players build and manage their own empires, engaging in strategic battles to conquer territories and dominate the map.",
 };
 
 export default function RootLayout({
@@ -25,8 +48,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+    <html
+      lang="en"
+      className={cn(
+        "bg-[#0e0c06] overscroll-none",
+        "font-sans",
+        inter.variable,
+      )}
+    >
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} ${brunoAceSC.variable} ${audiowide.variable} overscroll-none`}
+      >
         <ConfigProvider
           theme={{
             algorithm: theme.defaultAlgorithm,
@@ -61,7 +93,17 @@ export default function RootLayout({
           }}
         >
           <AntdRegistry>
-            <AntdApp>{children}</AntdApp>
+            <AntdApp>
+              <div className="relative min-h-screen bg-linear-to-b from-[#0e0c06] via-[#23200f] to-[#3a3118]">
+                <img
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuCB_QY1bE9pEqSG54YVxNGRHsysiKiEzydl30HkImz6sfDlbbO-aegmnUY9oF3mYuVDEW1XaalPYPHRjWDD7BjG41BaSwBzxE2mtWWPAfQCX3u1dIZw1igHzKAEhATPiGxR3oNswUwPAEOhLy7JWebMVbleyELyxQh0PxJzXY3jxzsAN_nETp7b-pkKlx4IK84tDL6rQER7F7QtAt5YBsodV9Ypk6K5HVmgwsB2sYsUvdakCkaqu5RvJEC6UkBvkm0T-JsRqaMcEOjE"
+                  alt=""
+                  className="absolute inset-0 w-full h-full object-cover opacity-5 pointer-events-none select-none"
+                />
+                <Navbar />
+                {children}
+              </div>
+            </AntdApp>
           </AntdRegistry>
         </ConfigProvider>
       </body>
