@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Swords, Shield, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { useRouter } from "next/navigation";
 
 const features = [
   {
@@ -25,6 +26,12 @@ const features = [
 ];
 
 export default function Hero() {
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+
+
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen text-center gap-10 px-6 py-5 -mt-14">
       <div className="flex flex-col items-center gap-5 px-16 py-14 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.65)_0%,transparent_70%)]">
@@ -52,7 +59,10 @@ export default function Hero() {
       </div>
 
       <div className="flex gap-4 -mt-12">
-        <Button className="px-9 py-3 font-audiowide text-sm tracking-widest uppercase rounded-md bg-[#FFD900] text-[#0e0c06] font-bold border-none shadow-[0_0_24px_rgba(255,217,0,0.3)] hover:bg-[#ffe44d] hover:shadow-[0_0_36px_rgba(255,217,0,0.55)] active:scale-95 cursor-pointer">
+        <Button onClick={() => {
+                  setDropdownOpen(false);
+                  router.push("/lobby");
+                }} className="px-9 py-3 font-audiowide text-sm tracking-widest uppercase rounded-md bg-[#FFD900] text-[#0e0c06] font-bold border-none shadow-[0_0_24px_rgba(255,217,0,0.3)] hover:bg-[#ffe44d] hover:shadow-[0_0_36px_rgba(255,217,0,0.55)] active:scale-95 cursor-pointer">
           Create Lobby
         </Button>
         <Button className="px-9 py-3 font-audiowide text-sm tracking-widest uppercase rounded-md bg-transparent border border-[#FFD900]/40 text-[#FFD900] hover:bg-[#FFD900]/8 hover:border-[#FFD900] hover:text-[#FFD900] hover:shadow-[0_0_20px_rgba(255,217,0,0.15)] active:scale-95 cursor-pointer">
