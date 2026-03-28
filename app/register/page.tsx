@@ -42,7 +42,7 @@ const Register: React.FC = () => {
       router.push("/");
     } catch (error:any) {
       if (error) {
-        setError(`Email or username already exists`);
+        setError(`Username already exists`);
       } else {
         setError("Something went wrong. Please try again.");
       }
@@ -59,15 +59,7 @@ const Register: React.FC = () => {
         onFinish={handleRegister}
         layout="vertical"
       >
-        <Form.Item
-          name="email"
-          label="Email"
-          validateStatus={error ? "error" : ""}
-          help={error}
-          rules={[{ required: true, message: "Please enter your email!" }]}
-        >
-          <Input placeholder="Enter email" />
-        </Form.Item>
+        
         <Form.Item
           name="username"
           label="Username"
