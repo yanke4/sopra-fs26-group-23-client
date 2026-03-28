@@ -7,6 +7,7 @@
 @theme {
   --font-bruno: "Bruno Ace SC", sans-serif;
   --font-audiowide: "Audiowide", sans-serif;
+  --breakpoint-nav: 56.25rem; /* 900px */
 }
 
 @theme inline {

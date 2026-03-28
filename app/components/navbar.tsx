@@ -1,10 +1,13 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
-import { User, LogIn, UserPlus, Swords } from "lucide-react";
+import { User, LogIn, UserPlus, Swords, Menu, X } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 export default function Navbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [wide, setWide] = useState(true);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
@@ -21,22 +24,33 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    const update = () => setWide(window.innerWidth >= 900);
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
+  const navLinks = ["Home", "Leaderboard", "Settings"];
+
   return (
-    <nav className="relative flex items-center px-8 py-0 h-14 border-b border-[#FFD900]/10 bg-[rgba(14,12,6,0.75)] backdrop-blur-sm">
+    <nav className="relative flex items-center px-4 sm:px-8 py-0 h-14 border-b border-[#FFD900]/10 bg-[rgba(14,12,6,0.75)] backdrop-blur-sm">
       <div className="flex-1">
         <span className="flex items-center gap-1 font-extrabold text-base uppercase text-[#FFD900] [text-shadow:0_0_12px_rgba(255,217,0,0.6),0_0_24px_rgba(255,217,0,0.2)]">
           <Swords
             size={18}
             className="filter-[drop-shadow(0_0_6px_rgba(255,217,0,0.8))_drop-shadow(0_0_12px_rgba(255,217,0,0.4))]"
           />
-          <span className="tracking-tight font-audiowide">
-            Conquest of Europe
-          </span>
+          {wide && (
+            <span className="tracking-tight font-audiowide text-xs sm:text-base">
+              Conquest of Europe
+            </span>
+          )}
         </span>
       </div>
 
-      <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-1">
-        {["Home", "Leaderboard", "Settings"].map((label) => (
+      <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-1">
+        {navLinks.map((label) => (
           <a
             key={label}
             href="#"
@@ -50,7 +64,7 @@ export default function Navbar() {
         ))}
       </div>
 
-      <div className="flex-1 flex justify-end">
+      <div className="flex-1 flex justify-end items-center gap-2">
         <div className="relative" ref={dropdownRef}>
           <div
             onClick={() => setDropdownOpen((prev) => !prev)}
@@ -67,7 +81,7 @@ export default function Navbar() {
             }`}
           >
             <div className="p-1.5">
-              <button
+              <Button
                 onClick={() => {
                   setDropdownOpen(false);
                   router.push("/profile");
@@ -80,9 +94,9 @@ export default function Navbar() {
                 <span className="font-audiowide text-[11px] tracking-[0.15em] uppercase text-white/70 transition-all duration-200 group-hover:text-[#FFD900] group-hover:[text-shadow:0_0_10px_rgba(255,217,0,0.5)]">
                   Profile
                 </span>
-              </button>
+              </Button>
               <div className="mx-3 my-0.5 h-px bg-linear-to-r from-transparent via-[#FFD900]/15 to-transparent" />
-              <button
+              <Button
                 onClick={() => {
                   setDropdownOpen(false);
                   router.push("/login");
@@ -95,11 +109,11 @@ export default function Navbar() {
                 <span className="font-audiowide text-[11px] tracking-[0.15em] uppercase text-white/70 transition-all duration-200 group-hover:text-[#FFD900] group-hover:[text-shadow:0_0_10px_rgba(255,217,0,0.5)]">
                   Log In
                 </span>
-              </button>
+              </Button>
 
               <div className="mx-3 my-0.5 h-px bg-linear-to-r from-transparent via-[#FFD900]/15 to-transparent" />
 
-              <button
+              <Button
                 onClick={() => {
                   setDropdownOpen(false);
                   router.push("/register");
@@ -112,9 +126,37 @@ export default function Navbar() {
                 <span className="font-audiowide text-[11px] tracking-[0.15em] uppercase text-white/70 transition-all duration-200 group-hover:text-[#FFD900] group-hover:[text-shadow:0_0_10px_rgba(255,217,0,0.5)]">
                   Register
                 </span>
-              </button>
+              </Button>
             </div>
           </div>
+        </div>
+
+        <Button
+          className="md:hidden p-2 rounded cursor-pointer transition-all duration-200 border border-[rgba(255,217,0,0.4)] text-white hover:border-[#FFD900] hover:text-[#FFD900] hover:shadow-[0_0_10px_rgba(255,217,0,0.4)]"
+          onClick={() => setMenuOpen((prev) => !prev)}
+          aria-label="Toggle menu"
+        >
+          {menuOpen ? <X size={18} /> : <Menu size={18} />}
+        </Button>
+      </div>
+
+      <div
+        className={`absolute top-14 left-0 right-0 md:hidden bg-[rgba(14,12,6,0.97)] border-b border-[#FFD900]/10 backdrop-blur-md z-40 transition-all duration-200 overflow-hidden ${
+          menuOpen
+            ? "max-h-60 opacity-100"
+            : "max-h-0 opacity-0 pointer-events-none"
+        }`}
+      >
+        <div className="flex flex-col items-center py-2">
+          {navLinks.map((label) => (
+            <Button
+              key={label}
+              onClick={() => setMenuOpen(false)}
+              className="w-full text-center py-3 text-sm font-semibold uppercase tracking-widest text-[#FFD900]/70 border-b border-[#FFD900]/10 last:border-0 hover:text-[#FFD900] hover:bg-[rgba(255,217,0,0.05)] hover:[text-shadow:0_0_8px_rgba(255,217,0,0.8)] transition-all duration-200"
+            >
+              {label}
+            </Button>
+          ))}
         </div>
       </div>
     </nav>
