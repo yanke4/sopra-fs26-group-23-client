@@ -11,3 +11,7 @@ export function getApiDomain(): string {
   const devUrl = "http://localhost:8080";
   return isProduction() ? prodUrl : devUrl;
 }
+export function getWebSocketUrl(): string {
+  const httpUrl = getApiDomain();
+  return httpUrl.replace(/\/$/, "").replace(/^http/, "ws") + "/ws";
+}

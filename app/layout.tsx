@@ -58,6 +58,7 @@ export default function RootLayout({
     >
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${brunoAceSC.variable} ${audiowide.variable} overscroll-none`}
+        suppressHydrationWarning
       >
         <ConfigProvider
           theme={{
