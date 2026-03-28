@@ -46,25 +46,18 @@ useEffect(() => {
       .catch((err) => setError(err.message));
   }, [router]);
 
-  // 2. Handle incoming WebSocket updates
   const handleLobbyUpdate = useCallback((updated: LobbyWebSocketDTO) => {
-    setLobby((prev) =>
-      prev
-        ? {
-            ...prev,
-            status: updated.status,
-            joinCode: updated.joinCode,
-          }
-        : prev
-    );
-  }, []);
+    apiService
+      .get<LobbyGetDTO>(`/lobbies/${updated.lobbyId}`)
+      .then((fresh) => setLobby(fresh))
+      .catch((err) => console.error("Failed to refresh lobby:", err));
+  }, []); 
 
-  // 3. Subscribe to the lobby's WebSocket topic
-  useLobbySocket({
+  useLobbySocket({  
     lobbyId: lobby?.lobbyId ?? null,
     onLobbyUpdate: handleLobbyUpdate,
   });
-
+  
   const copyToClipboard = () => {
     if (!lobby) return;
     navigator.clipboard.writeText(String(lobby.joinCode));
