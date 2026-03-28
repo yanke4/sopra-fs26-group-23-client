@@ -14,7 +14,7 @@ interface FormFieldProps {
   value: string;
 }
 
-const Login: React.FC = () => {
+const Register: React.FC = () => {
   const router = useRouter();
   const apiService = useApi();
   const [form] = Form.useForm();
@@ -28,10 +28,10 @@ const Login: React.FC = () => {
   } = useLocalStorage<string>("token", ""); // note that the key we are selecting is "token" and the default value we are setting is an empty string
   // if you want to pick a different token, i.e "usertoken", the line above would look as follows: } = useLocalStorage<string>("usertoken", "");
   const [error, setError] = useState<string | null>(null);
-  const handleLogin = async (values: FormFieldProps) => {
+  const handleRegister = async (values: FormFieldProps) => {
     try {
       // Call the API service and let it handle JSON serialization and error handling
-      const response = await apiService.post<User>("/login", values);
+      const response = await apiService.post<User>("/users", values);
 
       // Use the useLocalStorage hook that returned a setter function (setToken in line 41) to store the token if available
       if (response.token) {
@@ -42,7 +42,7 @@ const Login: React.FC = () => {
       router.push("/");
     } catch (error:any) {
       if (error) {
-        setError(`Invalid username or password`);
+        setError(`Email or username already exists`);
       } else {
         setError("Something went wrong. Please try again.");
       }
@@ -53,33 +53,40 @@ const Login: React.FC = () => {
     <div className="login-container">
       <Form
         form={form}
-        name="login"
+        name="register"
         size="large"
         variant="outlined"
-        onFinish={handleLogin}
+        onFinish={handleRegister}
         layout="vertical"
       >
         <Form.Item
-          name="username"
-          label="Username"
+          name="email"
+          label="Email"
           validateStatus={error ? "error" : ""}
           help={error}
-          rules={[{ required: true, message: "Please input your username!" }]}
+          rules={[{ required: true, message: "Please enter your email!" }]}
+        >
+          <Input placeholder="Enter email" />
+        </Form.Item>
+        <Form.Item
+          name="username"
+          label="Username"
+          validateStatus={error ? "error": ""}
+          help =  {error}
+          rules={[{ required: true, message: "Please create your username!" }]}
         >
           <Input placeholder="Enter username" />
         </Form.Item>
         <Form.Item
           name="password"
           label="Password"
-          validateStatus={error ? "error": ""}
-          help =  {error}
-          rules={[{ required: true, message: "Please input your password!" }]}
+          rules={[{ required: true, message: "Please enter your password!" }]}
         >
-          <Input placeholder="Enter Password" />
+          <Input placeholder="Enter password" />
         </Form.Item>
         <Form.Item>
           <Button type="primary" htmlType="submit" className="login-button">
-            Login
+            Register
           </Button>
         </Form.Item>
       </Form>
@@ -87,4 +94,4 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login;
+export default Register;
