@@ -26,6 +26,9 @@ const Login: React.FC = () => {
     set: setToken, // we need this method to set the value of the token to the one we receive from the POST request to the backend server API
     // clear: clearToken, // is commented out because we do not need to clear the token when logging in
   } = useLocalStorage<string>("token", ""); // note that the key we are selecting is "token" and the default value we are setting is an empty string
+  const {
+    set: setUser,
+  } = useLocalStorage<User | null>("user", null);
   // if you want to pick a different token, i.e "usertoken", the line above would look as follows: } = useLocalStorage<string>("usertoken", "");
   const [error, setError] = useState<string | null>(null);
   const handleLogin = async (values: FormFieldProps) => {
@@ -38,8 +41,10 @@ const Login: React.FC = () => {
         setToken(response.token);
       }
 
+      setUser(response);
+
       // Navigate to the user overview
-      router.push("/");
+      router.push("/profile");
     } catch (error:any) {
       if (error) {
         setError(`Invalid username or password`);

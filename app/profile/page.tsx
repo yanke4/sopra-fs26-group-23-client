@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   User,
-  Mail,
   KeyRound,
   LogOut,
   Swords,
@@ -11,12 +10,12 @@ import {
   Trophy,
   Percent,
 } from "lucide-react";
+import { User as UserType } from "@/types/user";
 import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
+import useLocalStorage from "@/hooks/useLocalStorage";
 
-const mockUser = {
-  username: "Napoleon",
-  email: "test@conquest.eu",
+const mockStats = {
   stats: {
     gamesPlayed: 47,
     wins: 31,
@@ -32,8 +31,49 @@ export default function ProfilePage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [pwError, setPwError] = useState("");
   const [pwSuccess, setPwSuccess] = useState(false);
+  const { value: user, clear: clearUser } = useLocalStorage<UserType | null>(
+    "user",
+    null,
+  );
+  
+  const { value:token, clear: clearToken } = useLocalStorage<string>("token", "");
 
-  const handlePasswordChange = (e: React.FormEvent) => {
+  const [loading, setLoading] = useState(true);
+
+  useEffect (() =>{
+    if(!token ||!user?.id){
+      router.replace("/auth/login");
+      return;
+    }
+
+    const fetchUser = async ()=> {
+      try {
+        const res = await fetch(`http://localhost:8080/users/${user?.id}`, { 
+          headers: {
+            token: token,
+          },
+        }
+      );
+
+        if (res.status === 401) {
+          throw new Error("Unauthorized");
+        }
+
+        const data = await res.json();
+        console.log("User loaded:", data); 
+      } catch (err) {
+        clearToken();
+        clearUser();
+        router.replace("/auth/login");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, [token, user]);
+  
+  const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
     setPwError("");
     setPwSuccess(false);
@@ -51,15 +91,40 @@ export default function ProfilePage() {
       return;
     }
 
-    setPwSuccess(true);
-    setCurrentPassword("");
-    setNewPassword("");
-    setConfirmPassword("");
+    try {
+      const res = await fetch(`http://localhost:8080/users/${user?.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          token: token,
+        },
+        body: JSON.stringify({
+          currentPassword,
+          newPassword,
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error();
+      }
+
+      setPwSuccess(true);
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    }catch (err){
+      setPwError("Password update failed.");
+    }
   };
 
   const handleLogout = () => {
-    router.push("/");
+    clearToken();
+    clearUser();
+    router.push("/auth/login");
   };
+  if (loading) {
+    return <div className="text-white">Loading...</div>;
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-6 py-16 gap-8">
@@ -99,23 +164,11 @@ export default function ProfilePage() {
                 Username
               </label>
               <div className="px-3 py-2.5 rounded border border-[#FFD900]/10 bg-[rgba(14,12,6,0.4)] text-white/70 text-sm">
-                {mockUser.username}
-              </div>
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <label className="font-audiowide text-[10px] tracking-widest text-white/40 uppercase flex items-center gap-1.5">
-                <span className="text-[#FFD900]/40">
-                  <Mail size={13} />
-                </span>
-                Email
-              </label>
-              <div className="px-3 py-2.5 rounded border border-[#FFD900]/10 bg-[rgba(14,12,6,0.4)] text-white/70 text-sm">
-                {mockUser.email}
+                {user?.username ?? "Unknown User"}
               </div>
             </div>
           </CardContent>
         </Card>
-
         <Card className="rounded-md border border-[#FFD900]/12 bg-[rgba(14,12,6,0.55)] backdrop-blur-sm gap-0">
           <div className="flex flex-row items-center gap-2.5 px-6 py-4 border-b border-[#FFD900]/10">
             <div className="flex items-center justify-center p-1.5 border border-[#FFD900]/20 text-[#FFD900]/60">
@@ -129,25 +182,25 @@ export default function ProfilePage() {
             {[
               {
                 label: "Games Played",
-                value: mockUser.stats.gamesPlayed,
+                value: mockStats.stats.gamesPlayed,
                 icon: <Swords size={14} />,
                 highlight: false,
               },
               {
                 label: "Victories",
-                value: mockUser.stats.wins,
+                value: mockStats.stats.wins,
                 icon: <Trophy size={14} />,
                 highlight: false,
               },
               {
                 label: "Win Rate",
-                value: mockUser.stats.winRate,
+                value: mockStats.stats.winRate,
                 icon: <Percent size={14} />,
                 highlight: false,
               },
               {
                 label: "Territories",
-                value: mockUser.stats.territoriesConquered,
+                value: mockStats.stats.territoriesConquered,
                 icon: <Shield size={14} />,
                 highlight: false,
               },
