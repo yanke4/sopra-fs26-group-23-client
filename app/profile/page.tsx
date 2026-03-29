@@ -40,9 +40,17 @@ export default function ProfilePage() {
 
   const [loading, setLoading] = useState(true);
 
+  const [storageReady, setStorageReady] = useState(false);
+
+  useEffect(() => {
+    setStorageReady(true);
+  }, []);
+
+  
   useEffect (() =>{
+    if(!storageReady) return; 
     if(!token ||!user?.id){
-      router.replace("/auth/login");
+      router.replace("/login");
       return;
     }
 
@@ -64,14 +72,14 @@ export default function ProfilePage() {
       } catch (err) {
         clearToken();
         clearUser();
-        router.replace("/auth/login");
+        router.replace("/login");
       } finally {
         setLoading(false);
       }
     };
 
     fetchUser();
-  }, [token, user]);
+  }, [storageReady, token, user, router, clearToken, clearUser]);
   
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -120,7 +128,7 @@ export default function ProfilePage() {
   const handleLogout = () => {
     clearToken();
     clearUser();
-    router.push("/auth/login");
+    router.push("/login");
   };
   if (loading) {
     return <div className="text-white">Loading...</div>;
