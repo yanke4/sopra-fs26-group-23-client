@@ -107,8 +107,7 @@ export default function ProfilePage() {
           token: token,
         },
         body: JSON.stringify({
-          currentPassword,
-          newPassword,
+          password: newPassword
         }),
       });
 
@@ -120,6 +119,8 @@ export default function ProfilePage() {
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
+
+      router.push("/login")
     }catch (err){
       setPwError("Password update failed.");
     }
