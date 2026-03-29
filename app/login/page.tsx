@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { User } from "@/types/user";
+import { ApplicationError } from "@/types/error";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Swords, LogIn, UserPlus } from "lucide-react";
@@ -39,9 +40,10 @@ const Login: React.FC = () => {
 
       setUser(response);
       router.push("/profile");
-    } catch (error: any) {
-      if (error) {
-        setError("Invalid username or password");
+    } catch (error: unknown) {
+      if (error instanceof Error && "status" in error) {
+        const appError = error as ApplicationError;
+        setError(appError.info || "Invalid username or password");
       } else {
         setError("Something went wrong. Please try again.");
       }

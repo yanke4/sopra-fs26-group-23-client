@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import { ApiService } from "@/api/apiService";
+import { ApplicationError } from "@/types/error";
 
 const apiService = new ApiService();
 
@@ -28,10 +29,15 @@ export default function JoinLobbyPage() {
 
     try {
       await apiService.put(`/lobbies/${pin}`, { userId: Number(userId) });
-      
+
       router.push(`/lobby?pin=${pin}`);
-    } catch (err: any) {
-      setError(err.message || "Failed to find Lobby Check your code.");
+    } catch (err: unknown) {
+      if (err instanceof Error && "status" in err) {
+        const appError = err as ApplicationError;
+        setError(appError.info || "Failed to find Lobby. Check your code.");
+      } else {
+        setError("Something went wrong. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
@@ -47,7 +53,7 @@ export default function JoinLobbyPage() {
               Military Access
             </span>
           </div>
-          <button 
+          <button
             onClick={() => router.push("/")}
             className="text-white/40 hover:text-[#FFD900] transition-colors"
           >
@@ -76,7 +82,10 @@ export default function JoinLobbyPage() {
                 className="w-full bg-black/40 border border-[#FFD900]/20 rounded-md py-4 text-center font-audiowide text-3xl tracking-[0.3em] text-[#FFD900] placeholder:text-[#FFD900]/10 focus:outline-none focus:border-[#FFD900]/50 transition-all"
                 required
               />
-              <UserPlus className="absolute left-4 top-1/2 -translate-y-1/2 text-[#FFD900]/20" size={20} />
+              <UserPlus
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-[#FFD900]/20"
+                size={20}
+              />
             </div>
 
             {error && (

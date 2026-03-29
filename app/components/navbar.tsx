@@ -2,6 +2,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { User, LogIn, UserPlus, Swords, Menu, X } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function Navbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -39,7 +40,7 @@ export default function Navbar() {
   return (
     <nav className="sticky top-0 z-50 flex items-center px-4 sm:px-8 py-0 h-14 border-b border-[#FFD900]/10 bg-[rgba(14,12,6,0.75)] backdrop-blur-sm">
       <div className="flex-1">
-        <a
+        <Link
           href="/"
           className="flex items-center gap-1 font-extrabold text-base uppercase text-[#FFD900] [text-shadow:0_0_12px_rgba(255,217,0,0.6),0_0_24px_rgba(255,217,0,0.2)]"
         >
@@ -52,12 +53,12 @@ export default function Navbar() {
               Conquest of Europe
             </span>
           )}
-        </a>
+        </Link>
       </div>
 
       <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-1">
         {navLinks.map(({ label, path }) => (
-          <a
+          <Link
             key={label}
             href={path}
             className="relative px-4 py-1.5 text-sm font-semibold uppercase tracking-widest text-white group"
@@ -66,7 +67,7 @@ export default function Navbar() {
               {label}
             </span>
             <span className="absolute inset-0 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-[rgba(255,217,0,0.05)]" />
-          </a>
+          </Link>
         ))}
       </div>
 
@@ -143,7 +144,10 @@ export default function Navbar() {
           {navLinks.map(({ label, path }) => (
             <button
               key={label}
-              onClick={() => { setMenuOpen(false); router.push(path); }}
+              onClick={() => {
+                setMenuOpen(false);
+                router.push(path);
+              }}
               className="group flex items-center gap-3 w-full px-4 py-3 rounded-md bg-transparent border-none outline-none cursor-pointer transition-all duration-200 hover:bg-[rgba(255,217,0,0.08)] active:scale-[0.98]"
             >
               <span className="font-audiowide text-[11px] tracking-[0.15em] uppercase text-white/60 transition-all duration-200 group-hover:text-white group-hover:[text-shadow:0_0_10px_rgba(255,217,0,0.3)]">

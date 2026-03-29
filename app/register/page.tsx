@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { User } from "@/types/user";
+import { ApplicationError } from "@/types/error";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Swords, UserPlus, LogIn } from "lucide-react";
@@ -37,9 +38,10 @@ const Register: React.FC = () => {
       }
 
       router.push("/");
-    } catch (error: any) {
-      if (error) {
-        setError("Username already exists");
+    } catch (error: unknown) {
+      if (error instanceof Error && "status" in error) {
+        const appError = error as ApplicationError;
+        setError(appError.info || "Username already exists");
       } else {
         setError("Something went wrong. Please try again.");
       }
