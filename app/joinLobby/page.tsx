@@ -21,16 +21,20 @@ export default function JoinLobbyPage() {
     setLoading(true);
     setError(null);
 
-    const userId = localStorage.getItem("userId");
-    if (!userId) {
+    const stored = localStorage.getItem("user");
+    const user = stored ? JSON.parse(stored) : null;
+    if (!user?.id) {
       router.push("/login");
       return;
     }
 
     try {
-      await apiService.put(`/lobbies/${pin}`, { userId: Number(userId) });
+  
+      const lobby = await apiService.put<{ lobbyId: number }>(`/lobbies/${pin}`, {
+        userId: Number(user.id),
+      });
 
-      router.push(`/lobby?pin=${pin}`);
+      router.push(`/lobby?lobbyId=${lobby.lobbyId}`);
     } catch (err: unknown) {
       if (err instanceof Error && "status" in err) {
         const appError = err as ApplicationError;

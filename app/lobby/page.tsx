@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ApiService } from "@/api/apiService";
 import { useLobbySocket, LobbyWebSocketDTO } from "@/hooks/useLobbySocket";
 
@@ -26,27 +26,42 @@ interface LobbyGetDTO {
 
 const apiService = new ApiService();
 
+
 export default function LobbyPage() {
   const router = useRouter();
   const [copied, setCopied] = useState(false);
   const [lobby, setLobby] = useState<LobbyGetDTO | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const searchParams = useSearchParams();
 
 useEffect(() => {
   const stored = localStorage.getItem("user");
   const user = stored ? JSON.parse(stored) : null;
-  const hostId = user?.id;
 
-  if (!hostId) {
+  if (!user?.id) {
     router.push("/login");
     return;
   }
+  const lobbyIdParam = searchParams.get("lobbyId");
+
+  if (lobbyIdParam) {
+    
+  apiService
+      .get<LobbyGetDTO>(`/lobbies/${lobbyIdParam}`)
+      .then((fetched) => setLobby(fetched))
+      .catch((err) => setError(err.message));
+  } else {
 
   apiService
-    .post<LobbyGetDTO>("/lobbies", { hostId: Number(hostId) })
-    .then((created) => setLobby(created))
-    .catch((err) => setError(err.message));
-}, [router]);
+    .post<LobbyGetDTO>("/lobbies", { hostId: Number(user.id) })
+      .then((created) => {
+        router.replace(`/lobby?lobbyId=${created.lobbyId}`);
+      setLobby(created);
+    })
+      
+      .catch((err) => setError(err.message));
+  }
+  }, [router, searchParams]);
 
   const handleLobbyUpdate = useCallback((updated: LobbyWebSocketDTO) => {
     apiService
@@ -202,10 +217,21 @@ useEffect(() => {
             </Button>
 
             <button
-              onClick={() => router.push("/")}
-              className="flex-1 flex items-center justify-center gap-2 px-6 h-12 font-audiowide text-xs tracking-widest uppercase rounded-md bg-transparent border border-red-500/30 text-red-400/70 hover:bg-red-500/8 hover:border-red-500/60 hover:text-red-400 hover:shadow-[0_0_16px_rgba(239,68,68,0.12)] active:scale-95 transition-all duration-200 cursor-pointer"
-            >
-              <LogOut size={14} className="rotate-180" />
+            onClick={async () => {
+              const stored = localStorage.getItem("user");
+              const user = stored ? JSON.parse(stored) : null;
+              if (lobby && user?.id) {
+                try {
+                  await apiService.delete(`/lobbies/${lobby.lobbyId}/members/${user.id}`);
+                } catch (err) {
+                  console.error("Failed to leave lobby:", err);
+                }
+              }
+              router.push("/");
+            }}
+            className="flex-1 flex items-center justify-center gap-2 px-6 h-12 font-audiowide text-xs tracking-widest uppercase rounded-md bg-transparent border border-red-500/30 text-red-400/70 hover:bg-red-500/8 hover:border-red-500/60 hover:text-red-400 hover:shadow-[0_0_16px_rgba(239,68,68,0.12)] active:scale-95 transition-all duration-200 cursor-pointer"
+          >
+            <LogOut size={14} className="rotate-180" />
               Leave
             </button>
           </div>
