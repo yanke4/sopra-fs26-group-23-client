@@ -32,19 +32,21 @@ export default function LobbyPage() {
   const [lobby, setLobby] = useState<LobbyGetDTO | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // 1. Create the lobby via REST on mount
 useEffect(() => {
-    const hostId = localStorage.getItem("userId");
-      if (!hostId) {
-        router.push("/login");
-        return;
-      }
-    
-    apiService
-      .post<LobbyGetDTO>("/lobbies", { hostId: Number(hostId) })
-      .then((created) => setLobby(created))
-      .catch((err) => setError(err.message));
-  }, [router]);
+  const stored = localStorage.getItem("user");
+  const user = stored ? JSON.parse(stored) : null;
+  const hostId = user?.id;
+
+  if (!hostId) {
+    router.push("/login");
+    return;
+  }
+
+  apiService
+    .post<LobbyGetDTO>("/lobbies", { hostId: Number(hostId) })
+    .then((created) => setLobby(created))
+    .catch((err) => setError(err.message));
+}, [router]);
 
   const handleLobbyUpdate = useCallback((updated: LobbyWebSocketDTO) => {
     apiService
