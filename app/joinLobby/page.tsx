@@ -29,10 +29,12 @@ export default function JoinLobbyPage() {
     }
 
     try {
-  
-      const lobby = await apiService.put<{ lobbyId: number }>(`/lobbies/${pin}`, {
-        userId: Number(user.id),
-      });
+      const lobby = await apiService.put<{ lobbyId: number }>(
+        `/lobbies/${pin}`,
+        {
+          userId: Number(user.id),
+        },
+      );
 
       router.push(`/lobby?lobbyId=${lobby.lobbyId}`);
     } catch (err: unknown) {

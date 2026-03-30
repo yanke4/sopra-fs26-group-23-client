@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, Suspense } from "react";
 import {
   Clipboard,
   CheckCircle2,
@@ -28,6 +28,14 @@ const apiService = new ApiService();
 
 
 export default function LobbyPage() {
+  return (
+    <Suspense fallback={<div className="h-screen flex items-center justify-center text-white/40 font-audiowide tracking-widest text-sm uppercase">Loading…</div>}>
+      <LobbyContent />
+    </Suspense>
+  );
+}
+
+function LobbyContent() {
   const router = useRouter();
   const [copied, setCopied] = useState(false);
   const [lobby, setLobby] = useState<LobbyGetDTO | null>(null);
