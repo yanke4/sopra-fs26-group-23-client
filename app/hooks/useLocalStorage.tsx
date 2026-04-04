@@ -25,19 +25,30 @@ export default function useLocalStorage<T>(
   key: string,
   defaultValue: T,
 ): LocalStorage<T> {
-  const [value, setValue] = useState<T>(defaultValue);
-
-  // On mount, try to read the stored value
-  useEffect(() => {
-    if (typeof window === "undefined") return; // SSR safeguard
+  const [value, setValue] = useState<T>(() => {
+    if (typeof window === "undefined") return defaultValue;
     try {
       const stored = globalThis.localStorage.getItem(key);
       if (stored) {
-        setValue(JSON.parse(stored) as T);
+        return JSON.parse(stored) as T;
       }
     } catch (error) {
       console.error(`Error reading localStorage key "${key}":`, error);
     }
+    return defaultValue;
+  });
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const handleUpdate = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail.key === key) {
+        setValue(detail.value as T);
+      }
+    };
+    window.addEventListener("localStorage-update", handleUpdate);
+    return () =>
+      window.removeEventListener("localStorage-update", handleUpdate);
   }, [key]);
 
   // Simple setter that updates both state and localStorage
@@ -45,6 +56,11 @@ export default function useLocalStorage<T>(
     setValue(newVal);
     if (typeof window !== "undefined") {
       globalThis.localStorage.setItem(key, JSON.stringify(newVal));
+      window.dispatchEvent(
+        new CustomEvent("localStorage-update", {
+          detail: { key, value: newVal },
+        }),
+      );
     }
   };
 
@@ -53,6 +69,11 @@ export default function useLocalStorage<T>(
     setValue(defaultValue);
     if (typeof window !== "undefined") {
       globalThis.localStorage.removeItem(key);
+      window.dispatchEvent(
+        new CustomEvent("localStorage-update", {
+          detail: { key, value: defaultValue },
+        }),
+      );
     }
   };
 

@@ -7,7 +7,7 @@ import { User } from "@/types/user";
 import { ApplicationError } from "@/types/error";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { Swords, LogIn, UserPlus } from "lucide-react";
+import { Swords, LogIn, UserPlus, Eye, EyeOff } from "lucide-react";
 
 const Login: React.FC = () => {
   const router = useRouter();
@@ -19,6 +19,7 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,7 +44,13 @@ const Login: React.FC = () => {
     } catch (error: unknown) {
       if (error instanceof Error && "status" in error) {
         const appError = error as ApplicationError;
-        setError(appError.info || "Invalid username or password");
+        if (appError.status === 401) {
+          setError("Invalid username or password.");
+        } else if (appError.status === 404) {
+          setError("User not found.");
+        } else {
+          setError("Something went wrong. Please try again.");
+        }
       } else {
         setError("Something went wrong. Please try again.");
       }
@@ -97,16 +104,25 @@ const Login: React.FC = () => {
           <label className="font-audiowide text-xs tracking-widest text-[#FFD900]/60 uppercase">
             Password
           </label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => {
-              setPassword(e.target.value);
-              setError(null);
-            }}
-            placeholder="Enter your password"
-            className="w-full px-4 py-3 rounded-md bg-[rgba(14,12,6,0.55)] border border-[#FFD900]/20 text-white placeholder-white/30 font-sans text-sm tracking-wide outline-none backdrop-blur-sm transition-all duration-300 focus:border-[#FFD900]/60 focus:shadow-[0_0_16px_rgba(255,217,0,0.1)]"
-          />
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                setError(null);
+              }}
+              placeholder="Enter your password"
+              className="w-full px-4 py-3 pr-11 rounded-md bg-[rgba(14,12,6,0.55)] border border-[#FFD900]/20 text-white placeholder-white/30 font-sans text-sm tracking-wide outline-none backdrop-blur-sm transition-all duration-300 focus:border-[#FFD900]/60 focus:shadow-[0_0_16px_rgba(255,217,0,0.1)]"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-[#FFD900] transition-colors duration-200 bg-transparent border-none outline-none cursor-pointer"
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
         </div>
 
         {error && (

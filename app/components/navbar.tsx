@@ -1,8 +1,9 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
-import { User, LogIn, UserPlus, Swords, Menu, X } from "lucide-react";
+import { User, LogIn, UserPlus, LogOut, Swords, Menu, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import useLocalStorage from "@/hooks/useLocalStorage";
 
 export default function Navbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -10,6 +11,14 @@ export default function Navbar() {
   const [wide, setWide] = useState(true);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const { value: token, clear: clearToken } = useLocalStorage<string>(
+    "token",
+    "",
+  );
+  const { value: user, clear: clearUser } = useLocalStorage<{
+    username?: string;
+  } | null>("user", null);
+  const isLoggedIn = !!token;
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -75,9 +84,15 @@ export default function Navbar() {
         <div className="relative" ref={dropdownRef}>
           <div
             onClick={() => setDropdownOpen((prev) => !prev)}
-            className="p-2 rounded-full cursor-pointer transition-all duration-200 border border-[rgba(255,217,0,0.4)] text-white hover:border-[#FFD900] hover:text-[#FFD900] hover:shadow-[0_0_10px_rgba(255,217,0,0.4)]"
+            className="flex items-center gap-2 px-3 py-2 rounded-full cursor-pointer transition-all duration-200 border border-[rgba(255,217,0,0.4)] text-white hover:border-[#FFD900] hover:text-[#FFD900] hover:shadow-[0_0_10px_rgba(255,217,0,0.4)]"
           >
-            <User size={18} />
+            {isLoggedIn && user?.username ? (
+              <span className="font-audiowide text-[11px] tracking-wider uppercase">
+                {user.username}
+              </span>
+            ) : (
+              <User size={18} />
+            )}
           </div>
 
           <div
@@ -93,28 +108,69 @@ export default function Navbar() {
               </span>
             </div>
             <div className="p-1.5 flex flex-col gap-0.5">
-              {[
-                { icon: User, label: "Profile", path: "/profile" },
-                { icon: LogIn, label: "Log In", path: "/login" },
-                { icon: UserPlus, label: "Register", path: "/register" },
-              ].map(({ icon: Icon, label, path }) => (
-                <button
-                  key={label}
-                  onClick={() => {
-                    setDropdownOpen(false);
-                    router.push(path);
-                  }}
-                  className="group flex items-center gap-3 w-full px-3 py-2.5 rounded-md bg-transparent border-none outline-none cursor-pointer transition-all duration-200 hover:bg-[rgba(255,217,0,0.08)] active:scale-[0.98]"
-                >
-                  <Icon
-                    size={15}
-                    className="text-[#FFD900]/40 transition-all duration-200 group-hover:text-[#FFD900] group-hover:filter-[drop-shadow(0_0_6px_rgba(255,217,0,0.5))]"
-                  />
-                  <span className="font-audiowide text-[11px] tracking-[0.15em] uppercase text-white/60 transition-all duration-200 group-hover:text-white group-hover:[text-shadow:0_0_10px_rgba(255,217,0,0.3)]">
-                    {label}
-                  </span>
-                </button>
-              ))}
+              {isLoggedIn ? (
+                <>
+                  {[{ icon: User, label: "Profile", path: "/profile" }].map(
+                    ({ icon: Icon, label, path }) => (
+                      <button
+                        key={label}
+                        onClick={() => {
+                          setDropdownOpen(false);
+                          router.push(path);
+                        }}
+                        className="group flex items-center gap-3 w-full px-3 py-2.5 rounded-md bg-transparent border-none outline-none cursor-pointer transition-all duration-200 hover:bg-[rgba(255,217,0,0.08)] active:scale-[0.98]"
+                      >
+                        <Icon
+                          size={15}
+                          className="text-[#FFD900]/40 transition-all duration-200 group-hover:text-[#FFD900] group-hover:filter-[drop-shadow(0_0_6px_rgba(255,217,0,0.5))]"
+                        />
+                        <span className="font-audiowide text-[11px] tracking-[0.15em] uppercase text-white/60 transition-all duration-200 group-hover:text-white group-hover:[text-shadow:0_0_10px_rgba(255,217,0,0.3)]">
+                          {label}
+                        </span>
+                      </button>
+                    ),
+                  )}
+                  <button
+                    onClick={() => {
+                      setDropdownOpen(false);
+                      clearToken();
+                      clearUser();
+                      router.push("/login");
+                    }}
+                    className="group flex items-center gap-3 w-full px-3 py-2.5 rounded-md bg-transparent border-none outline-none cursor-pointer transition-all duration-200 hover:bg-[rgba(255,217,0,0.08)] active:scale-[0.98]"
+                  >
+                    <LogOut
+                      size={15}
+                      className="text-[#FFD900]/40 transition-all duration-200 group-hover:text-[#FFD900] group-hover:filter-[drop-shadow(0_0_6px_rgba(255,217,0,0.5))]"
+                    />
+                    <span className="font-audiowide text-[11px] tracking-[0.15em] uppercase text-white/60 transition-all duration-200 group-hover:text-white group-hover:[text-shadow:0_0_10px_rgba(255,217,0,0.3)]">
+                      Log Out
+                    </span>
+                  </button>
+                </>
+              ) : (
+                [
+                  { icon: LogIn, label: "Log In", path: "/login" },
+                  { icon: UserPlus, label: "Register", path: "/register" },
+                ].map(({ icon: Icon, label, path }) => (
+                  <button
+                    key={label}
+                    onClick={() => {
+                      setDropdownOpen(false);
+                      router.push(path);
+                    }}
+                    className="group flex items-center gap-3 w-full px-3 py-2.5 rounded-md bg-transparent border-none outline-none cursor-pointer transition-all duration-200 hover:bg-[rgba(255,217,0,0.08)] active:scale-[0.98]"
+                  >
+                    <Icon
+                      size={15}
+                      className="text-[#FFD900]/40 transition-all duration-200 group-hover:text-[#FFD900] group-hover:filter-[drop-shadow(0_0_6px_rgba(255,217,0,0.5))]"
+                    />
+                    <span className="font-audiowide text-[11px] tracking-[0.15em] uppercase text-white/60 transition-all duration-200 group-hover:text-white group-hover:[text-shadow:0_0_10px_rgba(255,217,0,0.3)]">
+                      {label}
+                    </span>
+                  </button>
+                ))
+              )}
             </div>
           </div>
         </div>
