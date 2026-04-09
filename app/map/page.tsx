@@ -260,6 +260,16 @@ const GamePage = () => {
               {PLAYER_NAMES[currentPlayer]}&apos;s Turn
             </span>
           </div>
+          <div className="w-px h-4 bg-amber-900/40" />
+          <div className="flex items-center gap-1.5 bg-amber-700/20 border border-amber-500/30 rounded px-2.5 py-1">
+            <Users size={14} className="text-amber-400" />
+            <span className="text-amber-200 text-sm font-bold font-mono">
+              {playerStats[currentPlayer].troops}
+            </span>
+            <span className="text-amber-400/60 text-[10px] uppercase tracking-wider">
+              troops
+            </span>
+          </div>
         </div>
 
         <div className="flex items-center gap-1">
@@ -284,7 +294,7 @@ const GamePage = () => {
 
         <button
           onClick={nextPhase}
-          className="px-5 py-1.5 bg-amber-700/50 hover:bg-amber-600/60 text-amber-100 rounded text-xs font-bold uppercase tracking-wide border border-amber-500/30 transition-all hover:shadow-lg hover:shadow-amber-900/30"
+          className="w-36 px-5 py-1.5 bg-amber-700/50 hover:bg-amber-600/60 text-amber-100 rounded text-xs font-bold uppercase tracking-wide border border-amber-500/30 transition-all hover:shadow-lg hover:shadow-amber-900/30"
         >
           {phaseIndex < PHASES.length - 1 ? "Next Phase" : "End Turn"} &rarr;
         </button>
