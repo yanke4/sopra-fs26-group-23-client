@@ -34,7 +34,7 @@ const Register: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      await apiService.post<User>("/auth/register", {
+      await apiService.post<User>("/users", {
         username,
         password,
       });
@@ -54,13 +54,40 @@ const Register: React.FC = () => {
     } catch (error: unknown) {
       if (error instanceof Error && "status" in error) {
         const appError = error as ApplicationError;
-        if (appError.status === 400) {
-          setError("Username already exists.");
-        } else {
-          setError("Something went wrong. Please try again.");
+        switch (appError.status) {
+          case 400:
+            setError(
+              "Invalid registration data. Please check your username and password.",
+            );
+            break;
+          case 409:
+            setError(
+              "This username is already taken. Please choose a different one.",
+            );
+            break;
+          case 422:
+            setError(
+              "Username or password does not meet the requirements. Username must be unique and password at least 8 characters.",
+            );
+            break;
+          case 429:
+            setError("Too many attempts. Please wait a moment and try again.");
+            break;
+          case 500:
+            setError("Server error. Please try again later.");
+            break;
+          default:
+            setError(
+              `Registration failed (Error ${appError.status}). Please try again.`,
+            );
+            break;
         }
+      } else if (error instanceof TypeError) {
+        setError(
+          "Unable to reach the server. Please check your internet connection.",
+        );
       } else {
-        setError("Something went wrong. Please try again.");
+        setError("An unexpected error occurred. Please try again.");
       }
     } finally {
       setLoading(false);

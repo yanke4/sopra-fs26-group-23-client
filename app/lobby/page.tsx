@@ -26,10 +26,15 @@ interface LobbyGetDTO {
 
 const apiService = new ApiService();
 
-
 export default function LobbyPage() {
   return (
-    <Suspense fallback={<div className="h-screen flex items-center justify-center text-white/40 font-audiowide tracking-widest text-sm uppercase">Loading…</div>}>
+    <Suspense
+      fallback={
+        <div className="h-screen flex items-center justify-center text-white/40 font-audiowide tracking-widest text-sm uppercase">
+          Loading…
+        </div>
+      }
+    >
       <LobbyContent />
     </Suspense>
   );
@@ -40,35 +45,35 @@ function LobbyContent() {
   const [copied, setCopied] = useState(false);
   const [lobby, setLobby] = useState<LobbyGetDTO | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
   const searchParams = useSearchParams();
 
-useEffect(() => {
-  const stored = localStorage.getItem("user");
-  const user = stored ? JSON.parse(stored) : null;
+  useEffect(() => {
+    const stored = localStorage.getItem("user");
+    const user = stored ? JSON.parse(stored) : null;
 
-  if (!user?.id) {
-    router.push("/login");
-    return;
-  }
-  const lobbyIdParam = searchParams.get("lobbyId");
+    if (!user?.id) {
+      router.push("/login");
+      return;
+    }
+    setCurrentUserId(Number(user.id));
+    const lobbyIdParam = searchParams.get("lobbyId");
 
-  if (lobbyIdParam) {
-    
-  apiService
-      .get<LobbyGetDTO>(`/lobbies/${lobbyIdParam}`)
-      .then((fetched) => setLobby(fetched))
-      .catch((err) => setError(err.message));
-  } else {
+    if (lobbyIdParam) {
+      apiService
+        .get<LobbyGetDTO>(`/lobbies/${lobbyIdParam}`)
+        .then((fetched) => setLobby(fetched))
+        .catch((err) => setError(err.message));
+    } else {
+      apiService
+        .post<LobbyGetDTO>("/lobbies", { hostId: Number(user.id) })
+        .then((created) => {
+          router.replace(`/lobby?lobbyId=${created.lobbyId}`);
+          setLobby(created);
+        })
 
-  apiService
-    .post<LobbyGetDTO>("/lobbies", { hostId: Number(user.id) })
-      .then((created) => {
-        router.replace(`/lobby?lobbyId=${created.lobbyId}`);
-      setLobby(created);
-    })
-      
-      .catch((err) => setError(err.message));
-  }
+        .catch((err) => setError(err.message));
+    }
   }, [router, searchParams]);
 
   const handleLobbyUpdate = useCallback((updated: LobbyWebSocketDTO) => {
@@ -76,13 +81,13 @@ useEffect(() => {
       .get<LobbyGetDTO>(`/lobbies/${updated.lobbyId}`)
       .then((fresh) => setLobby(fresh))
       .catch((err) => console.error("Failed to refresh lobby:", err));
-  }, []); 
+  }, []);
 
-  useLobbySocket({  
+  useLobbySocket({
     lobbyId: lobby?.lobbyId ?? null,
     onLobbyUpdate: handleLobbyUpdate,
   });
-  
+
   const copyToClipboard = () => {
     if (!lobby) return;
     navigator.clipboard.writeText(String(lobby.joinCode));
@@ -109,6 +114,7 @@ useEffect(() => {
   const allUsers = [lobby.host, ...lobby.jointUsers];
   const maxPlayers = 4;
   const canStart = allUsers.length >= 2;
+  const isHost = currentUserId === lobby.host.id;
   const accessCode = String(lobby.joinCode).replace(/(\d{3})(\d{3})/, "$1 $2");
 
   return (
@@ -167,19 +173,28 @@ useEffect(() => {
             <div className="grid gap-2">
               {allUsers.map((user, i) => {
                 const isHost = user.id === lobby.host.id;
-                const avatarColors = ["bg-sky-600", "bg-rose-600", "bg-emerald-600", "bg-violet-600"];
+                const avatarColors = [
+                  "bg-sky-600",
+                  "bg-rose-600",
+                  "bg-emerald-600",
+                  "bg-violet-600",
+                ];
                 return (
                   <div
                     key={user.id}
                     className="flex items-center justify-between px-4 py-2.5 rounded border border-[#FFD900]/10 bg-[rgba(255,217,0,0.02)]"
                   >
                     <div className="flex items-center gap-3">
-                      <div className={`w-9 h-9 rounded ${avatarColors[i % avatarColors.length]} flex items-center justify-center font-black text-white/90`}>
+                      <div
+                        className={`w-9 h-9 rounded ${avatarColors[i % avatarColors.length]} flex items-center justify-center font-black text-white/90`}
+                      >
                         {user.username[0].toUpperCase()}
                       </div>
                       <div className="flex flex-col">
                         <div className="flex items-center gap-2">
-                          <span className="font-audiowide text-sm text-white">{user.username}</span>
+                          <span className="font-audiowide text-sm text-white">
+                            {user.username}
+                          </span>
                           {isHost && (
                             <span className="text-[8px] px-1.5 py-0.5 border border-[#FFD900]/30 text-[#FFD900]/70 uppercase font-audiowide">
                               Host
@@ -196,50 +211,65 @@ useEffect(() => {
                 );
               })}
 
-              {Array.from({ length: maxPlayers - allUsers.length }).map((_, i) => (
-                <div
-                  key={i}
-                  className="flex items-center gap-3 px-4 py-2.5 rounded border border-dashed border-white/5 bg-transparent opacity-40"
-                >
-                  <div className="w-9 h-9 rounded border border-dashed border-white/20 flex items-center justify-center text-white/20">
-                    <Plus size={16} />
+              {Array.from({ length: maxPlayers - allUsers.length }).map(
+                (_, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center gap-3 px-4 py-2.5 rounded border border-dashed border-white/5 bg-transparent opacity-40"
+                  >
+                    <div className="w-9 h-9 rounded border border-dashed border-white/20 flex items-center justify-center text-white/20">
+                      <Plus size={16} />
+                    </div>
+                    <span className="font-audiowide text-xs text-white/20 uppercase tracking-widest">
+                      Open Slot
+                    </span>
                   </div>
-                  <span className="font-audiowide text-xs text-white/20 uppercase tracking-widest">
-                    Open Slot
-                  </span>
-                </div>
-              ))}
+                ),
+              )}
             </div>
           </div>
 
           <div className="flex flex-row-reverse gap-3 mt-2">
-            <Button
-              disabled={!canStart}
-              className={`flex-[3] h-12 font-audiowide tracking-[0.2em] transition-all cursor-pointer ${
-                canStart
-                  ? "bg-[#FFD900] text-[#0e0c06] shadow-[0_0_20px_rgba(255,217,0,0.2)] hover:shadow-[0_0_30px_rgba(255,217,0,0.4)]"
-                  : "bg-white/5 text-white/20 border border-white/10"
-              }`}
-            >
-              START CONQUEST
-            </Button>
+            {isHost && (
+              <Button
+                onClick={async () => {
+                  try {
+                    await apiService.put(`/lobbies/${lobby.lobbyId}/start`, {
+                      userId: lobby.host.id,
+                    });
+                  } catch (err) {
+                    console.error("Failed to start game:", err);
+                  }
+                }}
+                disabled={!canStart}
+                className={`flex-3 h-12 font-audiowide tracking-[0.2em] transition-all cursor-pointer ${
+                  canStart
+                    ? "bg-[#FFD900] text-[#0e0c06] shadow-[0_0_20px_rgba(255,217,0,0.2)] hover:shadow-[0_0_30px_rgba(255,217,0,0.4)]"
+                    : "bg-white/5 text-white/20 border border-white/10"
+                }`}
+              >
+                START CONQUEST
+              </Button>
+            )}
 
             <button
-            onClick={async () => {
-              const stored = localStorage.getItem("user");
-              const user = stored ? JSON.parse(stored) : null;
-              if (lobby && user?.id) {
-                try {
-                  await apiService.delete(`/lobbies/${lobby.lobbyId}/members/${user.id}`);
-                } catch (err) {
-                  console.error("Failed to leave lobby:", err);
+              onClick={async () => {
+                const stored = localStorage.getItem("user");
+                const user = stored ? JSON.parse(stored) : null;
+                if (lobby && user?.id) {
+                  try {
+                    await apiService.delete(
+                      `/lobbies/${lobby.lobbyId}/members/${user.id}`,
+                    );
+                  } catch (err) {
+                    console.error("Failed to leave lobby:", err);
+                  }
                 }
-              }
-              router.push("/");
-            }}
-            className="flex-1 flex items-center justify-center gap-2 px-6 h-12 font-audiowide text-xs tracking-widest uppercase rounded-md bg-transparent border border-red-500/30 text-red-400/70 hover:bg-red-500/8 hover:border-red-500/60 hover:text-red-400 hover:shadow-[0_0_16px_rgba(239,68,68,0.12)] active:scale-95 transition-all duration-200 cursor-pointer"
-          >
-            <LogOut size={14} className="rotate-180" />
+                router.push("/");
+              }}
+              className="flex-1 flex items-center justify-center gap-2 px-6 h-12 font-audiowide text-xs tracking-widest uppercase rounded-md bg-transparent border border-red-500/30 text-red-400/70 hover:bg-red-500/8 hover:border-red-500/60 hover:text-red-400 hover:shadow-[0_0_16px_rgba(239,68,68,0.12)] active:scale-95 transition-all duration-200 cursor-pointer"
+            >
+              <LogOut size={14} className="rotate-180" />
               Leave
             </button>
           </div>
