@@ -50,7 +50,7 @@ const Register: React.FC = () => {
       }
 
       setUser(loginResponse);
-      router.push("/profile");
+      router.push("/");
     } catch (error: unknown) {
       if (error instanceof Error && "status" in error) {
         const appError = error as ApplicationError;
