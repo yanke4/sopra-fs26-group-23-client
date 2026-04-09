@@ -99,9 +99,11 @@ const EuropeMap: React.FC<EuropeMapProps> = ({
     (name: string) => {
       const territory = territories[name];
       if (!territory) return "#2a2a2a";
-      return playerColors[territory.owner] || "#2a2a2a";
+      const baseColor = playerColors[territory.owner] || "#2a2a2a";
+      if (name === selectedTerritory) return darkenColor(baseColor, 12);
+      return baseColor;
     },
-    [territories, playerColors],
+    [territories, playerColors, selectedTerritory],
   );
 
   const getStroke = useCallback(() => "#0d0d0d", []);
@@ -123,6 +125,16 @@ const EuropeMap: React.FC<EuropeMapProps> = ({
           "radial-gradient(ellipse at 50% 45%, #111010 0%, #0a0908 50%, #050404 100%)",
       }}
     >
+      <style>{`
+        .risk-map path {
+          outline: none !important;
+          -webkit-tap-highlight-color: transparent;
+        }
+        .risk-map path:focus,
+        .risk-map path:focus-visible {
+          outline: none !important;
+        }
+      `}</style>
       <svg className="absolute inset-0 w-full h-full opacity-[0.06] pointer-events-none">
         <defs>
           <pattern
@@ -184,7 +196,7 @@ const EuropeMap: React.FC<EuropeMapProps> = ({
           center: createCoordinates(15, 54),
           scale: 580,
         }}
-        className="w-full h-full relative z-1 mt-5 ml-15"
+        className="risk-map w-full h-full relative z-1 mt-5 ml-15"
         style={{ transform: "scaleX(1.15)", transformOrigin: "center center" }}
       >
         <Line
@@ -280,7 +292,11 @@ const EuropeMap: React.FC<EuropeMapProps> = ({
                 <Geography
                   key={geo.id || index}
                   geography={geo}
-                  onClick={() => onTerritoryClick(name)}
+                  onClick={(e: React.MouseEvent) => {
+                    (e.target as SVGElement).blur();
+                    onTerritoryClick(name);
+                  }}
+                  tabIndex={-1}
                   style={{
                     default: {
                       fill,
@@ -297,7 +313,7 @@ const EuropeMap: React.FC<EuropeMapProps> = ({
                       cursor: "pointer",
                     },
                     pressed: {
-                      fill,
+                      fill: darkenColor(fill, 8),
                       stroke,
                       strokeWidth,
                       outline: "none",

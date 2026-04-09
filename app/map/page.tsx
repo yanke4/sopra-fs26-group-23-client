@@ -175,45 +175,25 @@ const GamePage = () => {
     const territory = MOCK_TERRITORIES[name];
     if (!territory) return;
 
-    if (currentPhase === "Deploy") {
-      // In deploy, just select own territories
-      if (territory.owner === currentPlayer) {
-        setSelectedTerritory(name === selectedTerritory ? null : name);
-      }
-      setTargetTerritory(null);
-    } else if (currentPhase === "Attack") {
-      if (!selectedTerritory) {
-        // First click: select own territory with >1 troops
-        if (territory.owner === currentPlayer && territory.troops > 1) {
-          setSelectedTerritory(name);
-          setTargetTerritory(null);
-        }
-      } else if (name === selectedTerritory) {
-        // Deselect
-        setSelectedTerritory(null);
-        setTargetTerritory(null);
-      } else if (validTargets.includes(name)) {
-        // Second click: select enemy neighbor as target
-        setTargetTerritory(name === targetTerritory ? null : name);
-      } else if (territory.owner === currentPlayer && territory.troops > 1) {
-        // Switch source
-        setSelectedTerritory(name);
-        setTargetTerritory(null);
+    // Toggle selection on any territory
+    setSelectedTerritory(name === selectedTerritory ? null : name);
+    setTargetTerritory(null);
+
+    if (currentPhase === "Attack") {
+      if (
+        selectedTerritory &&
+        selectedTerritory !== name &&
+        validTargets.includes(name)
+      ) {
+        setTargetTerritory(name);
       }
     } else if (currentPhase === "Fortify") {
-      if (!selectedTerritory) {
-        if (territory.owner === currentPlayer && territory.troops > 1) {
-          setSelectedTerritory(name);
-          setTargetTerritory(null);
-        }
-      } else if (name === selectedTerritory) {
-        setSelectedTerritory(null);
-        setTargetTerritory(null);
-      } else if (validTargets.includes(name)) {
-        setTargetTerritory(name === targetTerritory ? null : name);
-      } else if (territory.owner === currentPlayer && territory.troops > 1) {
-        setSelectedTerritory(name);
-        setTargetTerritory(null);
+      if (
+        selectedTerritory &&
+        selectedTerritory !== name &&
+        validTargets.includes(name)
+      ) {
+        setTargetTerritory(name);
       }
     }
   };
