@@ -265,17 +265,6 @@ const EuropeMap: React.FC<EuropeMapProps> = ({
           style={{ pointerEvents: "none" }}
         />
 
-        <Line
-          from={createCoordinates(12.6, 42.5)}
-          to={createCoordinates(22.0, 39.0)}
-          stroke="#fbbf24"
-          strokeWidth={1}
-          strokeLinecap="round"
-          strokeDasharray="4 3"
-          strokeOpacity={0.35}
-          style={{ pointerEvents: "none" }}
-        />
-
         <Geographies geography={geoData}>
           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           {({ geographies }: { geographies: any[] }) =>
