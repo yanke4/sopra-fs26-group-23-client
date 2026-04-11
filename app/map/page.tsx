@@ -133,10 +133,6 @@ const GamePage = () => {
   );
   const [targetTerritory, setTargetTerritory] = useState<string | null>(null);
 
-  const apiService = new ApiService();
-  const gameId = Number(localStorage.getItem("gameId"));
-  const myPlayerId = Number(localStorage.getItem("userId"));
-
   const currentPlayer = 0; // visual only
   const currentTurn = 3;
   const reinforcements = 5;
