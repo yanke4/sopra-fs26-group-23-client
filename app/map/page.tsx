@@ -210,27 +210,6 @@ const GamePage = () => {
 const handleAttack = async () => {
   if (!selectedTerritory || !targetTerritory) return;
 
-const payload: AttackPayload = {
-    playerId: myPlayerId,
-    attacks: [
-      {
-        attackingField: selectedTerritory,
-        troops: MOCK_TERRITORIES[selectedTerritory]?.troops ?? 1,
-        defendingField: targetTerritory,
-      },
-    ],
-  };
-
-  try {
-    await apiService.post(`/games/${gameId}/turns/attack`, payload);
-  
-    console.log("Attack submitted successfully");
-  } catch (err) {
-    console.error("Attack failed:", err);
-    alert((err as Error).message);
-  }
-};
-
   const nextPhase = () => {
     const next =
       phaseIndex < PHASES.length - 1 ? PHASES[phaseIndex + 1] : PHASES[0];
