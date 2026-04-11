@@ -208,7 +208,7 @@ const GamePage = () => {
   };
 
 const handleAttack = async () => {
-  if (!selectedTerritory || !targetTerritory) return;
+  if (!selectedTerritory || !targetTerritory) return;};
 
   const nextPhase = () => {
     const next =
