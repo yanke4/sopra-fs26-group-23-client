@@ -3,6 +3,8 @@
 import EuropeMap, { TerritoryState } from "@/components/europe-map";
 import React, { useState, useMemo } from "react";
 import { Swords, Shield, Flag, Dice5, Users, MapPin } from "lucide-react";
+import { ApiService } from "@/api/apiService";
+import type { AttackPayload } from "@/types/game";
 
 const PHASES = ["Deploy", "Attack", "Fortify"] as const;
 type Phase = (typeof PHASES)[number];
@@ -131,9 +133,14 @@ const GamePage = () => {
   );
   const [targetTerritory, setTargetTerritory] = useState<string | null>(null);
 
+  const apiService = new ApiService();
+  const gameId = Number(localStorage.getItem("gameId"));
+  const myPlayerId = Number(localStorage.getItem("userId"));
+
   const currentPlayer = 0; // visual only
   const currentTurn = 3;
   const reinforcements = 5;
+
 
   const phaseIndex = PHASES.indexOf(currentPhase);
 
@@ -203,6 +210,30 @@ const GamePage = () => {
     setSelectedTerritory(null);
     setTargetTerritory(null);
   };
+
+const handleAttack = async () => {
+  if (!selectedTerritory || !targetTerritory) return;
+
+const payload: AttackPayload = {
+    playerId: myPlayerId,
+    attacks: [
+      {
+        attackingField: selectedTerritory,
+        troops: MOCK_TERRITORIES[selectedTerritory]?.troops ?? 1,
+        defendingField: targetTerritory,
+      },
+    ],
+  };
+
+  try {
+    await apiService.post(`/games/${gameId}/turns/attack`, payload);
+  
+    console.log("Attack submitted successfully");
+  } catch (err) {
+    console.error("Attack failed:", err);
+    alert((err as Error).message);
+  }
+};
 
   const nextPhase = () => {
     const next =
@@ -403,7 +434,9 @@ const GamePage = () => {
                   </div>
                   {selectedTerritory && targetTerritory && (
                     <div className="flex gap-1.5">
-                      <button className="flex-1 py-2 bg-red-900/30 hover:bg-red-800/40 text-red-300 rounded text-[11px] font-bold border border-red-500/30 transition-all flex items-center justify-center gap-1">
+                      <button 
+                      onClick={handleAttack}
+                      className="flex-1 py-2 bg-red-900/30 hover:bg-red-800/40 text-red-300 rounded text-[11px] font-bold border border-red-500/30 transition-all flex items-center justify-center gap-1">
                         <Dice5 size={12} /> Roll
                       </button>
                       <button className="flex-1 py-2 bg-white/5 hover:bg-white/10 text-white/40 rounded text-[11px] font-bold border border-white/10 transition-all">
