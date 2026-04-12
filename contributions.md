@@ -76,8 +76,11 @@ reason).
 |                    | 12/04/2026   | [[Link to Commit 7]](https://github.com/yanke4/sopra-fs26-group-23-server/commit/6e87e62e5b04fdb199901721174737cc163a9a44) | Implemented the check, whether the fields are owned by the active player | Players can only deploy or move troops inbetween fields the already own|
 | **[@githubUser3]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
 |                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
-| **[@githubUser4]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
-|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **[@MatteoLozano]** | [07/04/2026]   | [[Link to Commit 1]](https://github.com/yanke4/sopra-fs26-group-23-server/commit/59e3632581e7dfdb140b67493760aa8084af3a8c) | Implement Player Class | Important for differenciating User data and player data |
+|                    | [09/04/2026]   | [[Link to Commit 2]](https://github.com/yanke4/sopra-fs26-group-23-server/commit/b566d2ed3b4a4a5db5e46b7f9a57440f22768fb7) | Implement turn flow logic with deploy, attack and move phases. | The server needs to respond correctly when the client calls the different actions and calculate the outcomes. |
+| | [12/04/2026] | [[Link to Commit 3]](https://github.com/yanke4/sopra-fs26-group-23-server/commit/958c32f1bfeb86c396ce77e49f0f9f31854a6176) | Implement TurnController | Exposes dedicated deploy, attack, and move endpoints so client turn actions are routed correctly to backend. |
+| | [12/04/2026] | [[Link to Commit 4]](https://github.com/yanke4/sopra-fs26-group-23-server/commit/7146c1eecf4795ac1204a4abdf0c4839961cb742) | Broadcast game start and update game logic | Adds structured game-state DTOs and websocket broadcasts so all players receive synchronized start and turn-state updates in real time. |
+| | [12/04/2026] | [[Link to Commit 5]](https://github.com/yanke4/sopra-fs26-group-23-server/commit/5225df8a8ba4bc9bae09a3b68aec80ec1261b57b) | Close issues #38 and #42 after integration verification | Mark previously implemented game-start broadcast and troop-count updates as completed. |
 
 ---
 
