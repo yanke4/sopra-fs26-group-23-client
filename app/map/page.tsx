@@ -1,9 +1,11 @@
 "use client";
 
 import EuropeMap, { TerritoryState } from "@/components/europe-map";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { Swords, Shield, Flag, Dice5, Users, MapPin } from "lucide-react";
 import { ApiService } from "@/api/apiService";
+import { useGameSocket } from "@/hooks/useGameSocket";
+import type { GameStateDTO } from "@/types/game";
 import type { AttackPayload } from "@/types/game";
 
 const PHASES = ["Deploy", "Attack", "Fortify"] as const;
@@ -133,6 +135,23 @@ const GamePage = () => {
   );
   const [targetTerritory, setTargetTerritory] = useState<string | null>(null);
 
+const gameId =
+  typeof window !== "undefined"
+    ? Number(localStorage.getItem("gameId")) || null
+    : null;
+const myPlayerId =
+  typeof window !== "undefined"
+    ? Number(localStorage.getItem("playerId")) || null
+    : null;
+
+const [gameState, setGameState] = useState<GameStateDTO | null>(null);
+
+const handleGameUpdate = useCallback((state: GameStateDTO) => {
+  setGameState(state);
+}, []);
+
+useGameSocket({ gameId, onGameUpdate: handleGameUpdate });
+
   const currentPlayer = 0; // visual only
   const currentTurn = 3;
   const reinforcements = 5;
@@ -208,7 +227,25 @@ const GamePage = () => {
   };
 
 const handleAttack = async () => {
-  if (!selectedTerritory || !targetTerritory) return;};
+  if (!selectedTerritory || !targetTerritory || !gameId || !myPlayerId) return;
+  try {
+    const apiService = new ApiService();
+    await apiService.post(`/games/${gameId}/turns/attack`, {
+      playerId: myPlayerId,
+      attacks: [
+        {
+          attackingField: selectedTerritory,
+          troops: MOCK_TERRITORIES[selectedTerritory]?.troops ?? 1,
+          defendingField: targetTerritory,
+        },
+      ],
+    });
+    setSelectedTerritory(null);
+    setTargetTerritory(null);
+  } catch (e) {
+    console.error("Attack failed:", e);
+  }
+};
 
   const nextPhase = () => {
     const next =
