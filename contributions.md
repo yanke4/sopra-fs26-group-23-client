@@ -30,7 +30,7 @@ reason).
 
 ---
 
-## Contributions Week 1 - 23.03.2026 to 30.03.2026
+## Contributions Week 1 - 23/03/2026 to 30/03/2026
 
 | **Student**        | **Date** | **Link to Commit**                | **Description**                 | **Relevance**                       |
 | ------------------ | -------- | ----------------------------------| ------------------------------- | ----------------------------------- |
@@ -42,19 +42,31 @@ reason).
 |                    |29.03.2026| [Commit6] ([text](https://github.com/yanke4/sopra-fs26-group-23-server/commit/13182fc950b6c5cd29733648e5a9691dde966300))  | Removed email field in profile and register | We only want to use the username |
 |                    |29.03.2026| [Commit7] ([text](https://github.com/yanke4/sopra-fs26-group-23-server/commit/5ab4737a907951ebb9b4b5affde86408be2dab60)) | Authentication for the registration | A person that registers for the first time needs to have a token to be able to logout |
 |                    |29.03.2026| [Commmit8] ([text](https://github.com/yanke4/sopra-fs26-group-23-client/commit/31b54ee6e088b0a882c124d8e7091dcf0f5b4840)) | Authentication for profile and working logout button #20 | When the user wants to see his profile, he needs to be authenticated because there's also the updatePassword option|
-|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
-| **[@githubUser4]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
-|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
-| **[@githubUser4]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
-|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **devnida** | 24/03/2026   | [[Link to Commit 1]](https://github.com/yanke4/sopra-fs26-group-23-client/commit/9ed5c55b772e8f86408d606a76eeb79386fd5379) | Homepage UI | The homepage is needed to start a lobby, get informations and to access the profile. |
+|                    | 24/03/2026 | [[Link to Commit 2] ](https://github.com/yanke4/sopra-fs26-group-23-client/commit/9f2983c75635b8f81f456956145a2abff448b268)| Navbar UI| Add navbar to every page, which is useful to get to the relevant pages. |
+|                    | 24/03/2026   | [[Link to Commit 3] ](https://github.com/yanke4/sopra-fs26-group-23-client/commit/af18884e033678aa3ce8617e8c37a70508bf9470)| User profile UI  | User can access to personal informations and change password. |
+|                    | 28/03/2026   | [[Link to Commit 4] ](https://github.com/yanke4/sopra-fs26-group-23-client/commit/670eae16112f94611a06bd99d5ef43b664615dd7)| Fix responsiveness | Responsiveness is important so that the website looks good on every device.|
+|                    | 29/03/2026   | [[Link to Commit 5]](https://github.com/yanke4/sopra-fs26-group-23-client/commit/15b6212981a6c2c8b4328a7c64ed02821c5d25fd) | Login page UI | This page is relevant in order to allow users to login. |
+|                    | 29/03/2026   | [[Link to Commit 6]](https://github.com/yanke4/sopra-fs26-group-23-client/commit/0cbbb3a0267447e380edbe40544b0e54a48a28db) | Register page UI | This page is relevant in order to allow users to register. |
+| **yanke4** | 28/03/2026  | [[Link to Commit 1]](https://github.com/yanke4/sopra-fs26-group-23-client/commit/f0d1bfc2b23b80dd97c29c04a2a227865da5fed3) | Created WebSocket for Lobby | The WebSocket is needed in order for the lobby page to be updated automatically |
+|                    | 28/03/2026   | [[Link to Commit 2]](https://github.com/yanke4/sopra-fs26-group-23-client/commit/0f58da2e6e329ae82ad6bd44e409d0c2d0848f71) | Broadcast users in lobby | new users automatically show up in lobby page |
+|                    | 29/03/2026   | [[Link to Commit 3]](https://github.com/yanke4/sopra-fs26-group-23-client/commit/83dbaebb62c5e30f71e9ff5363f508077b5cfa66) | Fix join lobby | Users can properly join Lobby via code |
+| **MatteoLozano** | 24.03.2026 | [[Link to Commit 1]](https://github.com/yanke4/sopra-fs26-group-23-server/commit/abd053b58944844f517a61c4821217b9a55adcfc) | Set up general server structure (as BeliaL) | Initial establishment of the server-side directory structure and Spring Boot configurations. |
+|                  | 25.03.2026 | [[Link to Commit 2]](https://github.com/yanke4/sopra-fs26-group-23-server/commit/9d6c5c7beb4609c11cd0488ac98f04e3676cb983) | Implement Lobby class (as BeliaL) | Designed the primary Lobby entity for data persistence. |
+|                  | 26.03.2026 | [[Link to Commit 3]](https://github.com/yanke4/sopra-fs26-group-23-server/commit/99464c7e137aa35e11f5da45c4a08b3f340ca014) | Implement LobbyDTO objects (as BeliaL)| Created DTOs to safely expose lobby data to the client via the REST API. |
+|                  | 28.03.2026 | [[Link to Commit 4]](https://github.com/yanke4/sopra-fs26-group-23-server/commit/1ab133e08f8ee20335e9413244bec37e30865cd0) | Finish Lobby service logic | Commit to close the task. Actual logic done before. |
+|                  | 30.03.2026 | [[Link to Commit 5]](https://github.com/yanke4/sopra-fs26-group-23-server/commit/cf0b05167bef39a3066054687321fbaf4b853c5e) | Implement 6-digit PIN and host assignment #29 | Finalized unique PIN generation and automatic host assignment for session creators. |
+
 ---
 
-## Contributions Week 2 - [Begin Date] to [End Date]
+## Contributions Week 2 - 30/03/2026 to 13/04/2026
 
 | **Student**        | **Date** | **Link to Commit** | **Description**                 | **Relevance**                       |
 | ------------------ | -------- | ------------------ | ------------------------------- | ----------------------------------- |
-| **[@githubUser1]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
-|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **yanke4** | 11/04/2026 | [[Link to Commit 1]](https://github.com/yanke4/sopra-fs26-group-23-server/commit/c358684adf29f7ca88a94807246cc48db5f6cfe2) | Attack validation | User can only attack adjacent fields |
+|                    | 11/04/2026   | [[Link to Commit 2]](https://github.com/yanke4/sopra-fs26-group-23-server/commit/382df9d05216719e5b5ca0053d7571d89e99c847) | Attack outcome | attack is simulated with multiple dice roll until winner is decided |
+|                    | 11/04/2026 | [[Link to Commit 3]](https://github.com/yanke4/sopra-fs26-group-23-server/commit/d0f17eb48fbbbc9114c9d8f9dfa3aeeac13aac32) | field ownership transfer | upon successfull attack the field gets a new owner |
+|                    | 13/04/2026   | [[Link to Commit 4]](https://github.com/yanke4/sopra-fs26-group-23-server/commit/4011010509eb65e069e2abea1d05776522b6d788) | websocket update after each attack | outcome of attack gets displayed for all users |
 | **[@githubUser2]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
 |                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
 | **[@githubUser3]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
