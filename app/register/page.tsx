@@ -27,6 +27,22 @@ const Register: React.FC = () => {
       setError("Please fill in all fields.");
       return;
     }
+    if (/\s/.test(username)) {
+      setError("Username must not contain spaces.");
+      return;
+    }
+    if (username.length < 3 || username.length > 20) {
+      setError("Username must be between 3 and 20 characters.");
+      return;
+    }
+    if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+      setError("Username can only contain letters, numbers, and underscores.");
+      return;
+    }
+    if (/\s/.test(password)) {
+      setError("Password must not contain spaces.");
+      return;
+    }
     if (password.length < 8) {
       setError("Password must be at least 8 characters.");
       return;
