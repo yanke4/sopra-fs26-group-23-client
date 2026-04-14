@@ -1,7 +1,7 @@
 "use client";
 
 import EuropeMap, { TerritoryState } from "@/components/europe-map";
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { Swords, Shield, Flag, Dice5, Users, MapPin } from "lucide-react";
 import { ApiService } from "@/api/apiService";
 import { useGameSocket } from "@/hooks/useGameSocket";
@@ -14,6 +14,13 @@ type Phase = (typeof PHASES)[number];
 
 const PLAYER_COLORS = ["#E63946", "#4361EE", "#2D6A4F", "#FFD60A"];
 const PLAYER_NAMES = ["You", "Player 2", "Player 3", "Player 4"];
+
+const COLOR_MAP: Record<string, string> = {
+  RED: "#E63946",
+  BLUE: "#4361EE",
+  GREEN: "#2D6A4F",
+  YELLOW: "#FFD60A",
+};
 
 const ADJACENCY: Record<string, string[]> = {
   Spain: ["Portugal", "France"],
@@ -139,30 +146,67 @@ const GamePage = () => {
   );
   const [targetTerritory, setTargetTerritory] = useState<string | null>(null);
 
-const userId =
-  typeof window !== "undefined"
-    ? (() => { const stored = localStorage.getItem("user"); return stored ? Number(JSON.parse(stored).id) : null; })()
-    : null;
+  const userId =
+    typeof window !== "undefined"
+      ? (() => {
+          const stored = localStorage.getItem("user");
+          return stored ? Number(JSON.parse(stored).id) : null;
+        })()
+      : null;
 
-const [gameState, setGameState] = useState<GameStateDTO | null>(null);
+  const [gameState, setGameState] = useState<GameStateDTO | null>(null);
 
-const myPlayerId = gameState?.players.find(p => p.userId === userId)?.playerId ?? null;
+  const myPlayerId =
+    gameState?.players.find((p) => p.userId === userId)?.playerId ?? null;
 
-const handleGameUpdate = useCallback((state: GameStateDTO) => {
-  setGameState(state);
-}, []);
+  const handleGameUpdate = useCallback((state: GameStateDTO) => {
+    setGameState(state);
+  }, []);
 
-useGameSocket({ gameId, onGameUpdate: handleGameUpdate });
+  useGameSocket({ gameId, onGameUpdate: handleGameUpdate });
 
-  const currentPlayer = 0; // visual only
+  useEffect(() => {
+    if (gameId === null) return;
+    const apiService = new ApiService();
+    apiService
+      .get<GameStateDTO>(`/games/${gameId}`)
+      .then((state) => {
+        console.log(
+          "Game state players:",
+          JSON.stringify(state.players, null, 2),
+        );
+        console.log(
+          "Game state fields:",
+          JSON.stringify(state.fields, null, 2),
+        );
+        setGameState(state);
+      })
+      .catch((err) =>
+        console.error("Failed to fetch initial game state:", err),
+      );
+  }, [gameId]);
+
   const currentTurn = 3;
   const reinforcements = 5;
 
-
   const phaseIndex = PHASES.indexOf(currentPhase);
 
-  // Compute player stats from territories
+  // Compute player stats from game state (real players) or fallback to mock
   const playerStats = useMemo(() => {
+    if (gameState) {
+      return gameState.players.map((p) => {
+        const ownedFields = gameState.fields.filter(
+          (f) => f.ownerPlayerId === p.playerId,
+        );
+        return {
+          name: p.userId === userId ? "You" : p.username,
+          color: COLOR_MAP[p.color] ?? PLAYER_COLORS[0],
+          territories: ownedFields.length,
+          troops: ownedFields.reduce((sum, f) => sum + f.troops, 0),
+          playerId: p.playerId,
+        };
+      });
+    }
     return PLAYER_NAMES.map((name, i) => {
       const owned = Object.values(MOCK_TERRITORIES).filter(
         (t) => t.owner === i,
@@ -172,9 +216,14 @@ useGameSocket({ gameId, onGameUpdate: handleGameUpdate });
         color: PLAYER_COLORS[i],
         territories: owned.length,
         troops: owned.reduce((sum, t) => sum + t.troops, 0),
+        playerId: i,
       };
     });
-  }, []);
+  }, [gameState, userId]);
+
+  const currentPlayer = gameState
+    ? playerStats.findIndex((p) => p.playerId === gameState.currentPlayerId)
+    : 0;
 
   // Compute valid targets based on phase and selection
   const validTargets = useMemo(() => {
@@ -228,26 +277,27 @@ useGameSocket({ gameId, onGameUpdate: handleGameUpdate });
     setTargetTerritory(null);
   };
 
-const handleAttack = async () => {
-  if (!selectedTerritory || !targetTerritory || !gameId || !myPlayerId) return;
-  try {
-    const apiService = new ApiService();
-    await apiService.post(`/games/${gameId}/turns/attack`, {
-      playerId: myPlayerId,
-      attacks: [
-        {
-          attackingField: selectedTerritory,
-          troops: MOCK_TERRITORIES[selectedTerritory]?.troops ?? 1,
-          defendingField: targetTerritory,
-        },
-      ],
-    });
-    setSelectedTerritory(null);
-    setTargetTerritory(null);
-  } catch (e) {
-    console.error("Attack failed:", e);
-  }
-};
+  const handleAttack = async () => {
+    if (!selectedTerritory || !targetTerritory || !gameId || !myPlayerId)
+      return;
+    try {
+      const apiService = new ApiService();
+      await apiService.post(`/games/${gameId}/turns/attack`, {
+        playerId: myPlayerId,
+        attacks: [
+          {
+            attackingField: selectedTerritory,
+            troops: MOCK_TERRITORIES[selectedTerritory]?.troops ?? 1,
+            defendingField: targetTerritory,
+          },
+        ],
+      });
+      setSelectedTerritory(null);
+      setTargetTerritory(null);
+    } catch (e) {
+      console.error("Attack failed:", e);
+    }
+  };
 
   const nextPhase = () => {
     const next =
@@ -449,8 +499,9 @@ const handleAttack = async () => {
                   {selectedTerritory && targetTerritory && (
                     <div className="flex gap-1.5">
                       <button
-                      onClick={handleAttack}
-                      className="flex-1 py-2 bg-red-900/30 hover:bg-red-800/40 text-red-300 rounded text-[11px] font-bold border border-red-500/30 transition-all flex items-center justify-center gap-1">
+                        onClick={handleAttack}
+                        className="flex-1 py-2 bg-red-900/30 hover:bg-red-800/40 text-red-300 rounded text-[11px] font-bold border border-red-500/30 transition-all flex items-center justify-center gap-1"
+                      >
                         <Dice5 size={12} /> Roll
                       </button>
                       <button className="flex-1 py-2 bg-white/5 hover:bg-white/10 text-white/40 rounded text-[11px] font-bold border border-white/10 transition-all">

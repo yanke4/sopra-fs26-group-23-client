@@ -90,7 +90,7 @@ function LobbyContent() {
   const handleGameStart = useCallback(
     (data: GameStartDTO) => {
       localStorage.setItem("gameId", String(data.gameId));
-      router.push("/map");
+      router.push(`/game/${data.gameId}`);
     },
     [router],
   );
