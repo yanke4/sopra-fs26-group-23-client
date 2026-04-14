@@ -13,9 +13,15 @@ export interface LobbyWebSocketDTO {
   jointUserIds: number[];
 }
 
+export interface GameStartDTO {
+  lobbyId: number;
+  gameId: number;
+}
+
 interface UseLobbySocketOptions {
   lobbyId: number | null;
   onLobbyUpdate: (lobby: LobbyWebSocketDTO) => void;
+  onGameStart?: (data: GameStartDTO) => void;
 }
 
 /**
@@ -23,14 +29,19 @@ interface UseLobbySocketOptions {
  * /topic/lobby/{lobbyId}. Calls onLobbyUpdate whenever a message arrives.
  * Automatically cleans up the connection when the component unmounts.
  */
-export function useLobbySocket({ lobbyId, onLobbyUpdate }: UseLobbySocketOptions) {
+export function useLobbySocket({ lobbyId, onLobbyUpdate, onGameStart }: UseLobbySocketOptions) {
   const clientRef = useRef<Client | null>(null);
   const onLobbyUpdateRef = useRef(onLobbyUpdate);
+  const onGameStartRef = useRef(onGameStart);
 
-  // Keep the callback ref current without triggering reconnects
+  // Keep the callback refs current without triggering reconnects
   useEffect(() => {
     onLobbyUpdateRef.current = onLobbyUpdate;
   }, [onLobbyUpdate]);
+
+  useEffect(() => {
+    onGameStartRef.current = onGameStart;
+  }, [onGameStart]);
 
   useEffect(() => {
     if (lobbyId === null) return;
@@ -44,8 +55,13 @@ export function useLobbySocket({ lobbyId, onLobbyUpdate }: UseLobbySocketOptions
       onConnect: () => {
         client.subscribe(`/topic/lobby/${lobbyId}`, (message: IMessage) => {
           try {
-            const data: LobbyWebSocketDTO = JSON.parse(message.body);
-            onLobbyUpdateRef.current(data);
+            const data = JSON.parse(message.body);
+            // GameStartDTO has gameId but no status field
+            if ("gameId" in data && onGameStartRef.current) {
+              onGameStartRef.current(data as GameStartDTO);
+            } else {
+              onLobbyUpdateRef.current(data as LobbyWebSocketDTO);
+            }
           } catch (e) {
             console.error("Failed to parse WebSocket message:", e);
           }

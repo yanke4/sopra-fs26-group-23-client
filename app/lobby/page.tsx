@@ -13,7 +13,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ApiService } from "@/api/apiService";
-import { useLobbySocket, LobbyWebSocketDTO } from "@/hooks/useLobbySocket";
+import {
+  useLobbySocket,
+  LobbyWebSocketDTO,
+  GameStartDTO,
+} from "@/hooks/useLobbySocket";
 
 // Matches LobbyGetDTO from the server
 interface LobbyGetDTO {
@@ -83,9 +87,18 @@ function LobbyContent() {
       .catch((err) => console.error("Failed to refresh lobby:", err));
   }, []);
 
+  const handleGameStart = useCallback(
+    (data: GameStartDTO) => {
+      localStorage.setItem("gameId", String(data.gameId));
+      router.push("/map");
+    },
+    [router],
+  );
+
   useLobbySocket({
     lobbyId: lobby?.lobbyId ?? null,
     onLobbyUpdate: handleLobbyUpdate,
+    onGameStart: handleGameStart,
   });
 
   const copyToClipboard = () => {
