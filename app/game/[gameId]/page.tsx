@@ -22,6 +22,8 @@ const COLOR_MAP: Record<string, string> = {
   YELLOW: "#FFD60A",
 };
 
+const NEUTRAL_COLOR = "#555555";
+
 const ADJACENCY: Record<string, string[]> = {
   Spain: ["Portugal", "France"],
   Portugal: ["Spain"],
@@ -88,8 +90,8 @@ const ADJACENCY: Record<string, string[]> = {
   Turkey: ["Bulgaria", "Greece"],
 };
 
-// Mock territory distribution for visual display
-const MOCK_TERRITORIES: Record<string, TerritoryState> = {
+// Fallback territory distribution for when game state is not yet loaded
+const FALLBACK_TERRITORIES: Record<string, TerritoryState> = {
   Spain: { owner: 0, troops: 4 },
   Portugal: { owner: 0, troops: 2 },
   France: { owner: 0, troops: 6 },
@@ -208,7 +210,7 @@ const GamePage = () => {
       });
     }
     return PLAYER_NAMES.map((name, i) => {
-      const owned = Object.values(MOCK_TERRITORIES).filter(
+      const owned = Object.values(FALLBACK_TERRITORIES).filter(
         (t) => t.owner === i,
       );
       return {
@@ -225,27 +227,52 @@ const GamePage = () => {
     ? playerStats.findIndex((p) => p.playerId === gameState.currentPlayerId)
     : 0;
 
+  // Build territories + colors from real game state, fallback to mock
+  const { territories, mapColors } = useMemo(() => {
+    if (!gameState) {
+      return { territories: FALLBACK_TERRITORIES, mapColors: PLAYER_COLORS };
+    }
+    const playerIdToIndex: Record<number, number> = {};
+    gameState.players.forEach((p, i) => {
+      playerIdToIndex[p.playerId] = i;
+    });
+    const neutralIndex = gameState.players.length;
+
+    const terr: Record<string, TerritoryState> = {};
+    for (const f of gameState.fields) {
+      terr[f.fieldName] = {
+        owner:
+          f.ownerPlayerId != null
+            ? (playerIdToIndex[f.ownerPlayerId] ?? neutralIndex)
+            : neutralIndex,
+        troops: f.troops,
+      };
+    }
+    const colors = [...playerStats.map((p) => p.color), NEUTRAL_COLOR];
+    return { territories: terr, mapColors: colors };
+  }, [gameState, playerStats]);
+
   // Compute valid targets based on phase and selection
   const validTargets = useMemo(() => {
     if (!selectedTerritory) return [];
     const neighbors = ADJACENCY[selectedTerritory] || [];
-    const selectedOwner = MOCK_TERRITORIES[selectedTerritory]?.owner;
+    const selectedOwner = territories[selectedTerritory]?.owner;
 
     if (currentPhase === "Attack") {
       return neighbors.filter(
-        (n) => MOCK_TERRITORIES[n]?.owner !== selectedOwner,
+        (n) => territories[n]?.owner !== selectedOwner,
       );
     }
     if (currentPhase === "Fortify") {
       return neighbors.filter(
-        (n) => MOCK_TERRITORIES[n]?.owner === selectedOwner,
+        (n) => territories[n]?.owner === selectedOwner,
       );
     }
     return [];
-  }, [selectedTerritory, currentPhase]);
+  }, [selectedTerritory, currentPhase, territories]);
 
   const handleTerritoryClick = (name: string) => {
-    const territory = MOCK_TERRITORIES[name];
+    const territory = territories[name];
     if (!territory) return;
 
     // Toggle selection on any territory
@@ -287,7 +314,7 @@ const GamePage = () => {
         attacks: [
           {
             attackingField: selectedTerritory,
-            troops: MOCK_TERRITORIES[selectedTerritory]?.troops ?? 1,
+            troops: territories[selectedTerritory]?.troops ?? 1,
             defendingField: targetTerritory,
           },
         ],
@@ -306,9 +333,9 @@ const GamePage = () => {
   };
 
   const selectedInfo = selectedTerritory
-    ? MOCK_TERRITORIES[selectedTerritory]
+    ? territories[selectedTerritory]
     : null;
-  const targetInfo = targetTerritory ? MOCK_TERRITORIES[targetTerritory] : null;
+  const targetInfo = targetTerritory ? territories[targetTerritory] : null;
 
   const phaseIcon = (phase: Phase) => {
     switch (phase) {
@@ -349,17 +376,17 @@ const GamePage = () => {
           <div className="flex items-center gap-1.5">
             <div
               className="w-2.5 h-2.5 rounded-full"
-              style={{ backgroundColor: PLAYER_COLORS[currentPlayer] }}
+              style={{ backgroundColor: playerStats[currentPlayer]?.color }}
             />
             <span className="text-amber-200/80 text-sm font-semibold">
-              {PLAYER_NAMES[currentPlayer]}&apos;s Turn
+              {playerStats[currentPlayer]?.name}&apos;s Turn
             </span>
           </div>
           <div className="w-px h-4 bg-amber-900/40" />
           <div className="flex items-center gap-1.5 bg-amber-700/20 border border-amber-500/30 rounded px-2.5 py-1">
             <Users size={14} className="text-amber-400" />
             <span className="text-amber-200 text-sm font-bold font-mono">
-              {playerStats[currentPlayer].troops}
+              {playerStats[currentPlayer]?.troops}
             </span>
             <span className="text-amber-400/60 text-[10px] uppercase tracking-wider">
               troops
@@ -460,8 +487,8 @@ const GamePage = () => {
 
         <div className="flex-1 relative overflow-hidden">
           <EuropeMap
-            territories={MOCK_TERRITORIES}
-            playerColors={PLAYER_COLORS}
+            territories={territories}
+            playerColors={mapColors}
             selectedTerritory={selectedTerritory}
             targetTerritory={targetTerritory}
             onTerritoryClick={handleTerritoryClick}
@@ -536,7 +563,7 @@ const GamePage = () => {
                   <div
                     className="w-3 h-3 rounded-full"
                     style={{
-                      backgroundColor: PLAYER_COLORS[selectedInfo.owner],
+                      backgroundColor: mapColors[selectedInfo.owner],
                     }}
                   />
                   <span className="text-sm text-white/90 font-semibold">
@@ -546,8 +573,8 @@ const GamePage = () => {
                 <div className="flex gap-3 text-[11px] text-white/50">
                   <span>
                     Owner:{" "}
-                    <span style={{ color: PLAYER_COLORS[selectedInfo.owner] }}>
-                      {PLAYER_NAMES[selectedInfo.owner]}
+                    <span style={{ color: mapColors[selectedInfo.owner] }}>
+                      {playerStats[selectedInfo.owner]?.name ?? "Neutral"}
                     </span>
                   </span>
                 </div>
@@ -572,7 +599,7 @@ const GamePage = () => {
                       <div
                         className="w-2.5 h-2.5 rounded-full"
                         style={{
-                          backgroundColor: PLAYER_COLORS[targetInfo.owner],
+                          backgroundColor: mapColors[targetInfo.owner],
                         }}
                       />
                       <span className="text-xs text-white/80">
