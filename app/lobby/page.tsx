@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ApiService } from "@/api/apiService";
+import { getApiDomain } from "@/utils/domain";
 import {
   useLobbySocket,
   LobbyWebSocketDTO,
@@ -80,12 +81,19 @@ function LobbyContent() {
     }
   }, [router, searchParams]);
 
-  const handleLobbyUpdate = useCallback((updated: LobbyWebSocketDTO) => {
+ const handleLobbyUpdate = useCallback(
+  (updated: LobbyWebSocketDTO) => {
+    if (updated.status === "CLOSED") {
+      router.push("/");
+      return;
+    }
     apiService
       .get<LobbyGetDTO>(`/lobbies/${updated.lobbyId}`)
       .then((fresh) => setLobby(fresh))
       .catch((err) => console.error("Failed to refresh lobby:", err));
-  }, []);
+  },
+  [router],
+);
 
   const handleGameStart = useCallback(
     (data: GameStartDTO) => {
@@ -100,6 +108,26 @@ function LobbyContent() {
     onLobbyUpdate: handleLobbyUpdate,
     onGameStart: handleGameStart,
   });
+
+  useEffect(() => {
+  if (!lobby || !currentUserId) return;
+
+  const handleBeforeUnload = () => {
+    const stored = localStorage.getItem("user");
+    const user = stored ? JSON.parse(stored) : null;
+    if (!user?.id || !lobby) return;
+
+
+    const baseUrl = getApiDomain().replace(/\/$/, "");
+    fetch(`${baseUrl}/lobbies/${lobby.lobbyId}/members/${user.id}`, {
+      method: "DELETE",
+      keepalive: true,
+    });
+  };
+
+  window.addEventListener("beforeunload", handleBeforeUnload);
+  return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+}, [lobby, currentUserId]);
 
   const copyToClipboard = () => {
     if (!lobby) return;
