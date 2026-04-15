@@ -8,135 +8,17 @@ import { useGameSocket } from "@/hooks/useGameSocket";
 import type { GameStateDTO, GamePhase } from "@/types/game";
 import type { AttackPayload } from "@/types/game";
 import { useParams } from "next/navigation";
-
-const PHASES = ["Deploy", "Attack", "Fortify"] as const;
-type Phase = (typeof PHASES)[number];
-
-const PLAYER_COLORS = ["#E63946", "#4361EE", "#2D6A4F", "#FFD60A"];
-const PLAYER_NAMES = ["You", "Player 2", "Player 3", "Player 4"];
-
-const COLOR_MAP: Record<string, string> = {
-  RED: "#E63946",
-  BLUE: "#4361EE",
-  GREEN: "#2D6A4F",
-  YELLOW: "#FFD60A",
-};
-
-const NEUTRAL_COLOR = "#555555";
-
-const ADJACENCY: Record<string, string[]> = {
-  Spain: ["Portugal", "France"],
-  Portugal: ["Spain"],
-  France: [
-    "Spain",
-    "Belgium",
-    "Germany",
-    "Switzerland",
-    "Italy",
-    "Great Britain",
-  ],
-  Belgium: ["France", "Netherlands", "Germany"],
-  Netherlands: ["Belgium", "Germany", "Great Britain"],
-  Germany: [
-    "France",
-    "Belgium",
-    "Netherlands",
-    "Denmark",
-    "Poland",
-    "Czechia",
-    "Austria",
-    "Switzerland",
-  ],
-  Switzerland: ["France", "Germany", "Austria", "Italy"],
-  Italy: ["France", "Switzerland", "Austria", "Balkans"],
-  Austria: [
-    "Germany",
-    "Switzerland",
-    "Italy",
-    "Czechia",
-    "Slovakia",
-    "Hungary",
-    "Balkans",
-  ],
-  Czechia: ["Germany", "Poland", "Slovakia", "Austria"],
-  Poland: [
-    "Germany",
-    "Denmark",
-    "Lithuania",
-    "Belarus",
-    "Ukraine",
-    "Slovakia",
-    "Czechia",
-  ],
-  Denmark: ["Germany", "Sweden", "Norway", "Poland"],
-  Sweden: ["Denmark", "Norway", "Finland"],
-  Norway: ["Denmark", "Sweden", "Finland", "Iceland", "Great Britain"],
-  Finland: ["Sweden", "Norway", "Estonia"],
-  Iceland: ["Norway", "Great Britain"],
-  "Great Britain": ["Ireland", "France", "Netherlands", "Norway", "Iceland"],
-  Ireland: ["Great Britain"],
-  Estonia: ["Finland", "Latvia"],
-  Latvia: ["Estonia", "Lithuania", "Belarus"],
-  Lithuania: ["Latvia", "Poland", "Belarus"],
-  Belarus: ["Lithuania", "Latvia", "Poland", "Ukraine"],
-  Ukraine: ["Poland", "Belarus", "Moldova", "Romania", "Hungary", "Slovakia"],
-  Slovakia: ["Poland", "Czechia", "Austria", "Hungary", "Ukraine"],
-  Hungary: ["Austria", "Slovakia", "Ukraine", "Romania", "Balkans"],
-  Romania: ["Ukraine", "Moldova", "Bulgaria", "Balkans", "Hungary"],
-  Moldova: ["Ukraine", "Romania"],
-  Bulgaria: ["Romania", "Greece", "Turkey", "Balkans"],
-  Balkans: ["Italy", "Austria", "Hungary", "Romania", "Bulgaria", "Greece"],
-  Greece: ["Balkans", "Bulgaria", "Turkey"],
-  Turkey: ["Bulgaria", "Greece"],
-};
-
-// Fallback territory distribution for when game state is not yet loaded
-const FALLBACK_TERRITORIES: Record<string, TerritoryState> = {
-  Spain: { owner: 0, troops: 4 },
-  Portugal: { owner: 0, troops: 2 },
-  France: { owner: 0, troops: 6 },
-  Belgium: { owner: 0, troops: 2 },
-  Italy: { owner: 0, troops: 5 },
-  Switzerland: { owner: 0, troops: 3 },
-  Ireland: { owner: 0, troops: 1 },
-  "Great Britain": { owner: 0, troops: 3 },
-  Netherlands: { owner: 1, troops: 3 },
-  Germany: { owner: 1, troops: 7 },
-  Denmark: { owner: 1, troops: 2 },
-  Poland: { owner: 1, troops: 4 },
-  Czechia: { owner: 1, troops: 2 },
-  Austria: { owner: 1, troops: 3 },
-  Iceland: { owner: 1, troops: 1 },
-  Norway: { owner: 2, troops: 4 },
-  Sweden: { owner: 2, troops: 3 },
-  Finland: { owner: 2, troops: 2 },
-  Estonia: { owner: 2, troops: 1 },
-  Latvia: { owner: 2, troops: 2 },
-  Lithuania: { owner: 2, troops: 2 },
-  Belarus: { owner: 2, troops: 3 },
-  Slovakia: { owner: 3, troops: 2 },
-  Hungary: { owner: 3, troops: 3 },
-  Romania: { owner: 3, troops: 4 },
-  Moldova: { owner: 3, troops: 1 },
-  Bulgaria: { owner: 3, troops: 2 },
-  Balkans: { owner: 3, troops: 3 },
-  Greece: { owner: 3, troops: 2 },
-  Turkey: { owner: 3, troops: 3 },
-  Ukraine: { owner: 3, troops: 5 },
-};
-
-const MOCK_LOGS = [
-  { text: "You deployed 3 troops to Italy", icon: "deploy" as const },
-  { text: "Player 2 attacked France from Germany", icon: "attack" as const },
-  { text: "Player 3 fortified Norway", icon: "fortify" as const },
-  { text: "You conquered Switzerland!", icon: "conquer" as const },
-  { text: "Player 4 deployed 2 troops to Ukraine", icon: "deploy" as const },
-  {
-    text: "Player 2 attacked Belgium from Netherlands",
-    icon: "attack" as const,
-  },
-  { text: "You defended France successfully!", icon: "defend" as const },
-];
+import {
+  PHASES,
+  PLAYER_COLORS,
+  PLAYER_NAMES,
+  COLOR_MAP,
+  NEUTRAL_COLOR,
+  ADJACENCY,
+  FALLBACK_TERRITORIES,
+  MOCK_LOGS,
+} from "./gameData";
+import type { Phase } from "./gameData";
 
 const GamePage = () => {
   const params = useParams();
@@ -194,12 +76,10 @@ const GamePage = () => {
   };
 
   const currentPhase: Phase = gameState
-    ? PHASE_MAP[gameState.currentPhase] ?? "Deploy"
+    ? (PHASE_MAP[gameState.currentPhase] ?? "Deploy")
     : "Deploy";
 
-  const isMyTurn = gameState
-    ? gameState.currentPlayerId === myPlayerId
-    : false;
+  const isMyTurn = gameState ? gameState.currentPlayerId === myPlayerId : false;
 
   const currentTurn = 3;
   const reinforcements = 5;
@@ -265,24 +145,26 @@ const GamePage = () => {
     return { territories: terr, mapColors: colors };
   }, [gameState, playerStats]);
 
-  // Compute valid targets based on phase and selection
+  const myOwnerIndex = gameState
+    ? playerStats.findIndex((p) => p.playerId === myPlayerId)
+    : 0;
+
   const validTargets = useMemo(() => {
     if (!selectedTerritory) return [];
-    const neighbors = ADJACENCY[selectedTerritory] || [];
     const selectedOwner = territories[selectedTerritory]?.owner;
 
+    if (selectedOwner !== myOwnerIndex) return [];
+
+    const neighbors = ADJACENCY[selectedTerritory] || [];
+
     if (currentPhase === "Attack") {
-      return neighbors.filter(
-        (n) => territories[n]?.owner !== selectedOwner,
-      );
+      return neighbors.filter((n) => territories[n]?.owner !== selectedOwner);
     }
     if (currentPhase === "Fortify") {
-      return neighbors.filter(
-        (n) => territories[n]?.owner === selectedOwner,
-      );
+      return neighbors.filter((n) => territories[n]?.owner === selectedOwner);
     }
     return [];
-  }, [selectedTerritory, currentPhase, territories]);
+  }, [selectedTerritory, currentPhase, territories, myOwnerIndex]);
 
   const handleTerritoryClick = (name: string) => {
     const territory = territories[name];

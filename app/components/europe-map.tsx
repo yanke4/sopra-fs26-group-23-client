@@ -321,34 +321,48 @@ const EuropeMap: React.FC<EuropeMapProps> = ({
             const to = COUNTRY_CENTERS[target];
             if (!from || !to) return null;
 
-            // Shorten the line so it stops before the troop circle
             const dx = to[0] - from[0];
             const dy = to[1] - from[1];
             const len = Math.sqrt(dx * dx + dy * dy);
-            const shortenFrac = len > 0 ? Math.min(1.2 / len, 0.35) : 0;
-            const toX = to[0] - dx * shortenFrac;
-            const toY = to[1] - dy * shortenFrac;
+            const shortenFrom = len > 0 ? Math.min(1.0 / len, 0.25) : 0;
+            const shortenTo = len > 0 ? Math.min(1.4 / len, 0.35) : 0;
+            const fromX = from[0] + dx * shortenFrom;
+            const fromY = from[1] + dy * shortenFrom;
+            const toX = to[0] - dx * shortenTo;
+            const toY = to[1] - dy * shortenTo;
+            const angle = (Math.atan2(-dy, dx) * 180) / Math.PI + 90;
 
             return (
               <React.Fragment key={`arrow-${selectedTerritory}-${target}`}>
                 <Line
-                  from={createCoordinates(from[0], from[1])}
+                  from={createCoordinates(fromX, fromY)}
                   to={createCoordinates(toX, toY)}
-                  stroke="#ef4444"
-                  strokeWidth={2}
+                  stroke="#fbbf24"
+                  strokeWidth={6}
                   strokeLinecap="round"
-                  strokeOpacity={0.7}
+                  strokeOpacity={0.08}
+                  style={{ pointerEvents: "none" }}
+                />
+                <Line
+                  from={createCoordinates(fromX, fromY)}
+                  to={createCoordinates(toX, toY)}
+                  stroke="#fbbf24"
+                  strokeWidth={1.5}
+                  strokeLinecap="round"
+                  strokeDasharray="6 4"
+                  strokeOpacity={0.6}
                   style={{ pointerEvents: "none" }}
                 />
                 <Marker coordinates={createCoordinates(toX, toY)}>
                   <g
                     style={{ pointerEvents: "none" }}
-                    transform={`rotate(${(Math.atan2(-dy, dx) * 180) / Math.PI + 90})`}
+                    transform={`rotate(${angle})`}
                   >
                     <polygon
-                      points="0,-6 4,4 -4,4"
-                      fill="#ef4444"
-                      opacity={0.85}
+                      points="0,-7 4.5,4 -4.5,4"
+                      fill="#fbbf24"
+                      opacity={0.75}
+                      strokeLinejoin="round"
                     />
                   </g>
                 </Marker>
