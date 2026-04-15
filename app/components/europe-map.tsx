@@ -314,6 +314,48 @@ const EuropeMap: React.FC<EuropeMapProps> = ({
           }
         </Geographies>
 
+        {selectedTerritory &&
+          COUNTRY_CENTERS[selectedTerritory] &&
+          validTargets.map((target) => {
+            const from = COUNTRY_CENTERS[selectedTerritory];
+            const to = COUNTRY_CENTERS[target];
+            if (!from || !to) return null;
+
+            // Shorten the line so it stops before the troop circle
+            const dx = to[0] - from[0];
+            const dy = to[1] - from[1];
+            const len = Math.sqrt(dx * dx + dy * dy);
+            const shortenFrac = len > 0 ? Math.min(1.2 / len, 0.35) : 0;
+            const toX = to[0] - dx * shortenFrac;
+            const toY = to[1] - dy * shortenFrac;
+
+            return (
+              <React.Fragment key={`arrow-${selectedTerritory}-${target}`}>
+                <Line
+                  from={createCoordinates(from[0], from[1])}
+                  to={createCoordinates(toX, toY)}
+                  stroke="#ef4444"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeOpacity={0.7}
+                  style={{ pointerEvents: "none" }}
+                />
+                <Marker coordinates={createCoordinates(toX, toY)}>
+                  <g
+                    style={{ pointerEvents: "none" }}
+                    transform={`rotate(${(Math.atan2(-dy, dx) * 180) / Math.PI + 90})`}
+                  >
+                    <polygon
+                      points="0,-6 4,4 -4,4"
+                      fill="#ef4444"
+                      opacity={0.85}
+                    />
+                  </g>
+                </Marker>
+              </React.Fragment>
+            );
+          })}
+
         {Object.entries(territories).map(([name, territory]) => {
           const center = COUNTRY_CENTERS[name];
           if (!center) return null;

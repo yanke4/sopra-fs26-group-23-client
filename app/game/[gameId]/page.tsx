@@ -5,7 +5,7 @@ import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { Swords, Shield, Flag, Dice5, Users, MapPin } from "lucide-react";
 import { ApiService } from "@/api/apiService";
 import { useGameSocket } from "@/hooks/useGameSocket";
-import type { GameStateDTO } from "@/types/game";
+import type { GameStateDTO, GamePhase } from "@/types/game";
 import type { AttackPayload } from "@/types/game";
 import { useParams } from "next/navigation";
 
@@ -142,7 +142,6 @@ const GamePage = () => {
   const params = useParams();
   const gameId = Number(params.gameId) || null;
 
-  const [currentPhase, setCurrentPhase] = useState<Phase>("Deploy");
   const [selectedTerritory, setSelectedTerritory] = useState<string | null>(
     null,
   );
@@ -187,6 +186,20 @@ const GamePage = () => {
         console.error("Failed to fetch initial game state:", err),
       );
   }, [gameId]);
+
+  const PHASE_MAP: Record<GamePhase, Phase> = {
+    DEPLOY: "Deploy",
+    ATTACK: "Attack",
+    FORTIFY: "Fortify",
+  };
+
+  const currentPhase: Phase = gameState
+    ? PHASE_MAP[gameState.currentPhase] ?? "Deploy"
+    : "Deploy";
+
+  const isMyTurn = gameState
+    ? gameState.currentPlayerId === myPlayerId
+    : false;
 
   const currentTurn = 3;
   const reinforcements = 5;
@@ -298,10 +311,18 @@ const GamePage = () => {
     }
   };
 
-  const handlePhaseChange = (phase: Phase) => {
-    setCurrentPhase(phase);
-    setSelectedTerritory(null);
-    setTargetTerritory(null);
+  const advancePhase = async () => {
+    if (!gameId || !myPlayerId || !isMyTurn) return;
+    try {
+      const apiService = new ApiService();
+      await apiService.post(`/games/${gameId}/turns/advance-phase`, {
+        playerId: myPlayerId,
+      });
+      setSelectedTerritory(null);
+      setTargetTerritory(null);
+    } catch (e) {
+      console.error("Failed to advance phase:", e);
+    }
   };
 
   const handleAttack = async () => {
@@ -327,9 +348,7 @@ const GamePage = () => {
   };
 
   const nextPhase = () => {
-    const next =
-      phaseIndex < PHASES.length - 1 ? PHASES[phaseIndex + 1] : PHASES[0];
-    handlePhaseChange(next);
+    advancePhase();
   };
 
   const selectedInfo = selectedTerritory
@@ -396,9 +415,8 @@ const GamePage = () => {
 
         <div className="flex items-center gap-1">
           {PHASES.map((phase, i) => (
-            <button
+            <div
               key={phase}
-              onClick={() => handlePhaseChange(phase)}
               className={`flex items-center gap-1.5 px-4 py-1.5 rounded text-xs font-bold uppercase tracking-wide transition-all
                 ${
                   currentPhase === phase
@@ -410,13 +428,18 @@ const GamePage = () => {
             >
               {phaseIcon(phase)}
               {phase}
-            </button>
+            </div>
           ))}
         </div>
 
         <button
           onClick={nextPhase}
-          className="w-36 px-5 py-1.5 bg-amber-700/50 hover:bg-amber-600/60 text-amber-100 rounded text-xs font-bold uppercase tracking-wide border border-amber-500/30 transition-all hover:shadow-lg hover:shadow-amber-900/30"
+          disabled={!isMyTurn}
+          className={`w-36 px-5 py-1.5 rounded text-xs font-bold uppercase tracking-wide border transition-all ${
+            isMyTurn
+              ? "bg-amber-700/50 hover:bg-amber-600/60 text-amber-100 border-amber-500/30 hover:shadow-lg hover:shadow-amber-900/30 cursor-pointer"
+              : "bg-white/5 text-white/20 border-white/10 cursor-not-allowed"
+          }`}
         >
           {phaseIndex < PHASES.length - 1 ? "Next Phase" : "End Turn"} &rarr;
         </button>
