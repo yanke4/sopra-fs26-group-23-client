@@ -1,4 +1,5 @@
 export type GameStatus = "RUNNING" | "FINISHED";
+export type GamePhase = "DEPLOY" | "ATTACK" | "FORTIFY";
 export type PlayerColor = "RED" | "BLUE" | "GREEN" | "YELLOW";
 export interface AttackPayload {
   playerId: number;
@@ -34,6 +35,7 @@ export interface GameStateDTO {
   status: GameStatus;
   currentPlayerIndex: number;
   currentPlayerId: number;
+  currentPhase: GamePhase;
   players: PlayerStateDTO[];
   fields: FieldStateDTO[];
 }
