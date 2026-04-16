@@ -1,6 +1,7 @@
 "use client";
 
 import EuropeMap, { TerritoryState } from "@/components/europe-map";
+import VictoryScreen from "@/components/victory-screen";
 import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { Swords, Shield, Flag, Dice5, Users, MapPin } from "lucide-react";
 import { ApiService } from "@/api/apiService";
@@ -548,6 +549,10 @@ const GamePage = () => {
           </div>
         </div>
       </div>
+
+      {gameState?.status === "FINISHED" && (
+        <VictoryScreen gameState={gameState} currentUserId={userId} />
+      )}
     </div>
   );
 };
