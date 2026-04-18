@@ -190,7 +190,7 @@ export default function GameChat({ gameId, currentUser, apiUrl }: GameChatProps)
       });
 
       channel.bind("new-message", (msg: ChatMessage) => {
-        if (msg.playerId === currentUser.id) return;
+        if (String(msg.playerId) === String(currentUser.id)) return;
         setMessages((prev) => [...prev, msg]);
       });
     };
