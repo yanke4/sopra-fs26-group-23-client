@@ -54,7 +54,7 @@ const GamePage = () => {
   const currentUser = useMemo(() => ({
     id: String(myPlayerId ?? "0"), 
     name: gameState?.players.find(p => p.userId === userId)?.username ?? "Player", 
-    color: gameState?.players.find(p => p.userId === userId)?.color ?? "RED".toLowerCase(),
+    color: (gameState?.players.find(p => p.userId === userId)?.color ?? "RED").toLowerCase(),
   }), [gameState, userId, myPlayerId]);
       
 
@@ -378,6 +378,18 @@ const GamePage = () => {
     }
   };
 
+  const handleSurrender = async () => {
+  if (!gameId || !myPlayerId) return;
+  const confirmed = window.confirm("Are you sure you want to surrender?");
+  if (!confirmed) return;
+  try {
+    const apiService = new ApiService();
+    await apiService.post(`/games/${gameId}/players/${myPlayerId}/surrender`, {});
+  } catch (e) {
+    console.error("Surrender failed:", e);
+  }
+};
+
   const handleFortify = async () => {
     if (
       !canFortifySelectedTarget ||
@@ -514,6 +526,19 @@ const GamePage = () => {
         >
           {phaseIndex < PHASES.length - 1 ? "Next Phase" : "End Turn"} &rarr;
         </button>
+
+        <button
+          onClick={handleSurrender}
+          disabled={!myPlayerId}
+          className={`px-4 py-1.5 rounded text-xs font-bold uppercase tracking-wide border transition-all ${
+            myPlayerId
+              ? "bg-red-900/40 hover:bg-red-800/50 text-red-300 border-red-500/30 cursor-pointer"
+              : "bg-white/5 text-white/20 border-white/10 cursor-not-allowed"
+          }`}
+        >
+          Surrender
+        </button>
+
       </div>
 
       <div className="flex flex-1 overflow-hidden">
@@ -880,11 +905,13 @@ const GamePage = () => {
           <div className="flex-1 flex flex-col overflow-hidden">
             <div className="px-3 py-2 border-b border-amber-900/20">
             <div className="h-64 border-t border-amber-900/30">
-            <GameChat
-              gameId={String(gameId ?? "0")}
-              currentUser={currentUser}
-              apiUrl={process.env.NEXT_PUBLIC_PROD_API_URL ?? "http://localhost:8080"}
-            />
+            {myPlayerId &&(
+              <GameChat
+                key={gameId} // Reset chat when gameId changes, but not on every render
+                gameId={String(gameId ?? "0")}
+                currentUser={currentUser}
+                apiUrl={process.env.NEXT_PUBLIC_PROD_API_URL ?? "http://localhost:8080"}
+            />)}
           </div>
             </div>
           </div>

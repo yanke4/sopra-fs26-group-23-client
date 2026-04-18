@@ -40,7 +40,7 @@ const COLOR_MAP: Record<string, { bg: string; light: string }> = {
 };
 
 function getColor(color: string) {
-  return COLOR_MAP[color] ?? COLOR_MAP.blue;
+  return COLOR_MAP[color.toLowerCase()] ?? COLOR_MAP.blue;
 }
 
 function Avatar({ name, color, size = 28 }: { name: string; color: string; size?: number }) {
@@ -126,8 +126,17 @@ export default function GameChat({ gameId, currentUser, apiUrl }: GameChatProps)
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const channelRef = useRef<any>(null);
   const pusherRef = useRef<any>(null);
+  const currentUserRef = useRef<CurrentUser>(currentUser);
 
   useEffect(() => {
+    currentUserRef.current = currentUser;
+  }, [currentUser]);
+
+  useEffect(() => {
+    console.log("useEffect running, pusherRef:", pusherRef.current);
+    if (pusherRef.current) return;
+    pusherRef.current = true; // temporary to prevent double init in strict mode, will be replaced with actual pusher client
+    
     const pusherKey = process.env.NEXT_PUBLIC_PUSHER_KEY ?? "d10223ce93fd20bcd040";
     const pusherCluster = process.env.NEXT_PUBLIC_PUSHER_CLUSTER ?? "eu";
 
@@ -190,7 +199,8 @@ export default function GameChat({ gameId, currentUser, apiUrl }: GameChatProps)
       });
 
       channel.bind("new-message", (msg: ChatMessage) => {
-        if (String(msg.playerId) === String(currentUser.id)) return;
+        console.log("received playerId:", msg.playerId, "my id:", currentUserRef.current.id, "types:", typeof msg.playerId, typeof currentUserRef.current.id);
+        if (String(msg.playerId) === String(currentUserRef.current.id)) return;
         setMessages((prev) => [...prev, msg]);
       });
     };
@@ -198,13 +208,17 @@ export default function GameChat({ gameId, currentUser, apiUrl }: GameChatProps)
     initPusher();
 
     return () => {
-      if (channelRef.current) channelRef.current.unbind_all();
-      if (pusherRef.current) {
+      if (channelRef.current) {
+        channelRef.current.unbind_all();
+        channelRef.current = null;
+      }
+      if (pusherRef.current && pusherRef.current.disconnect) {
         pusherRef.current.unsubscribe(`presence-game-${gameId}`);
         pusherRef.current.disconnect();
+        pusherRef.current = null;
       }
     };
-  }, [gameId, currentUser, apiUrl]);
+  }, [gameId]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
