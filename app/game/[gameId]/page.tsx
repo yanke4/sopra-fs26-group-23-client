@@ -3,7 +3,7 @@
 import EuropeMap, { TerritoryState } from "@/components/europe-map";
 import VictoryScreen from "@/components/victory-screen";
 import React, { useState, useMemo, useCallback, useEffect } from "react";
-import { Swords, Shield, Flag, Dice5, Users, MapPin } from "lucide-react";
+import { Swords, Shield, Users, MapPin, Flag, Dice5 } from "lucide-react";
 import { ApiService } from "@/api/apiService";
 import { useGameSocket } from "@/hooks/useGameSocket";
 import type { GameStateDTO, GamePhase } from "@/types/game";
@@ -18,7 +18,6 @@ import {
   NEUTRAL_COLOR,
   ADJACENCY,
   FALLBACK_TERRITORIES,
-  MOCK_LOGS,
 } from "./gameData";
 import type { Phase } from "./gameData";
 
@@ -32,6 +31,8 @@ const GamePage = () => {
   const [targetTerritory, setTargetTerritory] = useState<string | null>(null);
   const [deployTroops, setDeployTroops] = useState<number>(1);
   const [reinforcements, setReinforcements] = useState<number>(0);
+  const [attackTroops, setAttackTroops] = useState<number>(1);
+  const [fortifyTroops, setFortifyTroops] = useState<number>(1);
 
   const userId =
     typeof window !== "undefined"
@@ -206,31 +207,99 @@ const GamePage = () => {
     return [];
   }, [selectedTerritory, currentPhase, territories, myOwnerIndex]);
 
+  const selectedOwnerIndex = selectedTerritory
+    ? (territories[selectedTerritory]?.owner ?? null)
+    : null;
+  const targetOwnerIndex = targetTerritory
+    ? (territories[targetTerritory]?.owner ?? null)
+    : null;
+
+  const selectedTroops = selectedTerritory
+    ? (territories[selectedTerritory]?.troops ?? 0)
+    : 0;
+  const maxAttackTroops = Math.max(0, selectedTroops - 1);
+  const maxFortifyTroops = Math.max(0, selectedTroops - 1);
+
+  const hasAttackSelection =
+    currentPhase === "Attack" &&
+    isMyTurn &&
+    !!selectedTerritory &&
+    !!targetTerritory &&
+    selectedOwnerIndex === myOwnerIndex &&
+    targetOwnerIndex !== null &&
+    targetOwnerIndex !== myOwnerIndex;
+
+  const canAttackSelectedTarget = hasAttackSelection && maxAttackTroops > 0;
+
+  const hasFortifySelection =
+    currentPhase === "Fortify" &&
+    isMyTurn &&
+    !!selectedTerritory &&
+    !!targetTerritory &&
+    selectedOwnerIndex === myOwnerIndex &&
+    targetOwnerIndex === myOwnerIndex;
+
+  const canFortifySelectedTarget =
+    hasFortifySelection && maxFortifyTroops > 0;
+
+  useEffect(() => {
+    if (currentPhase !== "Attack") {
+      setAttackTroops(1);
+      return;
+    }
+
+    setAttackTroops((prev) => {
+      const max = Math.max(1, maxAttackTroops);
+      return Math.max(1, Math.min(prev || 1, max));
+    });
+  }, [currentPhase, maxAttackTroops, selectedTerritory, targetTerritory]);
+
+  useEffect(() => {
+    if (currentPhase !== "Fortify") {
+      setFortifyTroops(1);
+      return;
+    }
+
+    setFortifyTroops((prev) => {
+      const max = Math.max(1, maxFortifyTroops);
+      return Math.max(1, Math.min(prev || 1, max));
+    });
+  }, [currentPhase, maxFortifyTroops, selectedTerritory, targetTerritory]);
+
   const handleTerritoryClick = (name: string) => {
     const territory = territories[name];
     if (!territory) return;
 
-    // Toggle selection on any territory
+    if (currentPhase === "Attack" || currentPhase === "Fortify") {
+      const isMine = territory.owner === myOwnerIndex;
+
+      if (!selectedTerritory) {
+        if (!isMine) return; // source must be yours
+        setSelectedTerritory(name);
+        setTargetTerritory(null);
+        return;
+      }
+
+      if (name === selectedTerritory) {
+        setSelectedTerritory(null);
+        setTargetTerritory(null);
+        return;
+      }
+
+      if (validTargets.includes(name)) {
+        setTargetTerritory(name);
+        return;
+      }
+
+      if (isMine) {
+        setSelectedTerritory(name);
+      }
+      setTargetTerritory(null);
+      return;
+    }
+
     setSelectedTerritory(name === selectedTerritory ? null : name);
     setTargetTerritory(null);
-
-    if (currentPhase === "Attack") {
-      if (
-        selectedTerritory &&
-        selectedTerritory !== name &&
-        validTargets.includes(name)
-      ) {
-        setTargetTerritory(name);
-      }
-    } else if (currentPhase === "Fortify") {
-      if (
-        selectedTerritory &&
-        selectedTerritory !== name &&
-        validTargets.includes(name)
-      ) {
-        setTargetTerritory(name);
-      }
-    }
   };
 
   const advancePhase = async () => {
@@ -249,12 +318,17 @@ const GamePage = () => {
 
   const handleAttack = async () => {
     if (
+      !canAttackSelectedTarget ||
       !selectedTerritory ||
       !targetTerritory ||
       gameId === null ||
       myPlayerId === null
-    )
+    ) {
       return;
+    }
+
+    const troops = Math.min(Math.max(1, attackTroops || 1), maxAttackTroops);
+
     try {
       const apiService = new ApiService();
       await apiService.post(`/games/${gameId}/turns/attack`, {
@@ -262,13 +336,15 @@ const GamePage = () => {
         attacks: [
           {
             attackingField: selectedTerritory,
-            troops: territories[selectedTerritory]?.troops ?? 1,
+            troops,
             defendingField: targetTerritory,
           },
         ],
       });
+
       setSelectedTerritory(null);
       setTargetTerritory(null);
+      setAttackTroops(1);
     } catch (e) {
       console.error("Attack failed:", e);
     }
@@ -299,6 +375,46 @@ const GamePage = () => {
       setDeployTroops(1);
     } catch (e) {
       console.error("Deploy failed:", e);
+    }
+  };
+
+  const handleFortify = async () => {
+    if (
+      !canFortifySelectedTarget ||
+      !selectedTerritory ||
+      !targetTerritory ||
+      gameId === null ||
+      myPlayerId === null
+    ) {
+      return;
+    }
+
+    const troops = Math.min(Math.max(1, fortifyTroops || 1), maxFortifyTroops);
+
+    try {
+      const apiService = new ApiService();
+
+      // backend endpoint for fortify/move
+      await apiService.post(`/games/${gameId}/turns/move`, {
+        playerId: myPlayerId,
+        moves: [
+          {
+            fromField: selectedTerritory,
+            toField: targetTerritory,
+            troops,
+          },
+        ],
+      });
+
+      // ensure UI is updated even if socket is delayed
+      const freshState = await apiService.get<GameStateDTO>(`/games/${gameId}`);
+      setGameState(freshState);
+
+      setSelectedTerritory(null);
+      setTargetTerritory(null);
+      setFortifyTroops(1);
+    } catch (e) {
+      console.error("Move/Fortify failed:", e);
     }
   };
 
@@ -523,6 +639,158 @@ const GamePage = () => {
               )}
             </div>
           )}
+          {/* attack panel only during your attack phase */}
+          {currentPhase === "Attack" && isMyTurn && hasAttackSelection && (
+            <div className="p-3 border-t border-amber-900/20 bg-red-950/20 space-y-2">
+              <div className="text-[10px] text-red-400/70 font-bold uppercase tracking-wider mb-1">
+                Attack
+              </div>
+
+              <div className="text-[10px] text-red-400/70 font-bold uppercase tracking-wider">
+                From
+              </div>
+              <div className="text-sm text-red-200 font-semibold truncate">
+                {selectedTerritory}
+              </div>
+
+              <div className="text-[10px] text-red-400/70 font-bold uppercase tracking-wider">
+                Target
+              </div>
+              <div className="text-sm text-red-200 font-semibold truncate">
+                {targetTerritory}
+              </div>
+
+              <div className="text-[10px] text-red-400/70 font-bold uppercase tracking-wider pt-1">
+                Attack troops
+              </div>
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={() =>
+                    setAttackTroops((v) => Math.max(1, (v || 1) - 1))
+                  }
+                  className="w-7 h-7 rounded bg-red-900/30 hover:bg-red-800/40 border border-red-500/30 text-red-200 font-bold"
+                >
+                  -
+                </button>
+                <input
+                  type="number"
+                  min={1}
+                  max={Math.max(1, maxAttackTroops)}
+                  value={attackTroops}
+                  onChange={(e) => {
+                    const next = Number(e.target.value);
+                    if (Number.isNaN(next)) {
+                      setAttackTroops(1);
+                      return;
+                    }
+                    setAttackTroops(
+                      Math.max(1, Math.min(next, Math.max(1, maxAttackTroops))),
+                    );
+                  }}
+                  className="w-full h-7 px-2 rounded bg-black/30 border border-red-500/30 text-red-100 text-sm font-mono"
+                />
+                <button
+                  onClick={() =>
+                    setAttackTroops((v) =>
+                      Math.min(Math.max(1, maxAttackTroops), (v || 1) + 1),
+                    )
+                  }
+                  className="w-7 h-7 rounded bg-red-900/30 hover:bg-red-800/40 border border-red-500/30 text-red-200 font-bold"
+                >
+                  +
+                </button>
+              </div>
+
+              <div className="text-[10px] text-red-300/60">
+                Max available: {maxAttackTroops}
+              </div>
+
+              <button
+                onClick={handleAttack}
+                disabled={!canAttackSelectedTarget}
+                className={`w-full py-1.5 rounded text-[11px] font-bold border transition-all ${
+                  canAttackSelectedTarget
+                    ? "bg-red-900/40 hover:bg-red-800/50 text-red-200 border-red-500/30"
+                    : "bg-white/5 text-white/30 border-white/10 cursor-not-allowed"
+                }`}
+              >
+                Attack
+              </button>
+            </div>
+          )}
+
+          {currentPhase === "Fortify" && isMyTurn && hasFortifySelection && (
+            <div className="p-3 border-t border-amber-900/20 bg-blue-950/20 space-y-2">
+              <div className="text-[10px] text-blue-400/70 font-bold uppercase tracking-wider mb-1">
+                Reinforce
+              </div>
+
+              <div className="text-[10px] text-blue-400/70 font-bold uppercase tracking-wider">
+                Move
+              </div>
+              <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 text-sm text-blue-200 font-semibold">
+                <span className="truncate">{selectedTerritory}</span>
+                <span className="text-blue-300/70">→</span>
+                <span className="truncate">{targetTerritory}</span>
+              </div>
+
+              <div className="text-[10px] text-blue-400/70 font-bold uppercase tracking-wider pt-1">
+                Troops to move
+              </div>
+
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={() => setFortifyTroops((v) => Math.max(1, (v || 1) - 1))}
+                  className="w-7 h-7 rounded bg-blue-900/30 hover:bg-blue-800/40 border border-blue-500/30 text-blue-200 font-bold"
+                >
+                  -
+                </button>
+                <input
+                  type="number"
+                  min={1}
+                  max={Math.max(1, maxFortifyTroops)}
+                  value={fortifyTroops}
+                  onChange={(e) => {
+                    const next = Number(e.target.value);
+                    if (Number.isNaN(next)) {
+                      setFortifyTroops(1);
+                      return;
+                    }
+                    setFortifyTroops(
+                      Math.max(1, Math.min(next, Math.max(1, maxFortifyTroops))),
+                    );
+                  }}
+                  className="w-full h-7 px-2 rounded bg-black/30 border border-blue-500/30 text-blue-100 text-sm font-mono"
+                />
+                <button
+                  onClick={() =>
+                    setFortifyTroops((v) =>
+                      Math.min(Math.max(1, maxFortifyTroops), (v || 1) + 1),
+                    )
+                  }
+                  className="w-7 h-7 rounded bg-blue-900/30 hover:bg-blue-800/40 border border-blue-500/30 text-blue-200 font-bold"
+                >
+                  +
+                </button>
+              </div>
+
+              <div className="text-[10px] text-blue-300/60">
+                Max available: {maxFortifyTroops}
+              </div>
+
+              <button
+                onClick={handleFortify}
+                disabled={!canFortifySelectedTarget}
+                className={`w-full py-1.5 rounded text-[11px] font-bold border transition-all ${
+                  canFortifySelectedTarget
+                    ? "bg-blue-900/40 hover:bg-blue-800/50 text-blue-200 border-blue-500/30"
+                    : "bg-white/5 text-white/30 border-white/10 cursor-not-allowed"
+                }`}
+              >
+                Move troops
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="flex-1 relative overflow-hidden">
@@ -537,28 +805,6 @@ const GamePage = () => {
         </div>
 
         <div className="w-56 bg-black/40 border-l border-amber-900/30 flex flex-col">
-          <div className="border-b border-amber-900/20">
-            <div className="p-3">
-              {currentPhase === "Attack" && (
-                <div className="space-y-2">
-                  {selectedTerritory && targetTerritory && (
-                    <div className="flex gap-1.5">
-                      <button
-                        onClick={handleAttack}
-                        className="flex-1 py-2 bg-red-900/30 hover:bg-red-800/40 text-red-300 rounded text-[11px] font-bold border border-red-500/30 transition-all flex items-center justify-center gap-1"
-                      >
-                        <Dice5 size={12} /> Roll
-                      </button>
-                      <button className="flex-1 py-2 bg-white/5 hover:bg-white/10 text-white/40 rounded text-[11px] font-bold border border-white/10 transition-all">
-                        Skip
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-
           <div className="border-b border-amber-900/20">
             <div className="px-3 py-2 border-b border-amber-900/20">
               <h3 className="text-amber-400/70 text-[10px] font-bold uppercase tracking-widest">
