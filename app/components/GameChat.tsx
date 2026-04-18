@@ -9,10 +9,11 @@ interface CurrentUser {
 }
 
 interface ChatMessage {
-  senderId: string;
-  senderName: string;
+  playerId: string;
+  username: string;
   color: string;
-  text: string;
+  message: string;
+  gameId: string;
   timestamp: number;
   isSystem?: boolean;
 }
@@ -71,14 +72,14 @@ function Message({ msg, isOwn }: { msg: ChatMessage; isOwn: boolean }) {
       maxWidth: "78%",
       alignSelf: isOwn ? "flex-end" : "flex-start",
     }}>
-      {!isOwn && <Avatar name={msg.senderName} color={msg.color} />}
+      {!isOwn && <Avatar name={msg.username} color={msg.color} />}
       <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
         {!isOwn && (
           <span style={{
             fontSize: 11, fontWeight: 600, color: bg,
             paddingLeft: 4, letterSpacing: "0.04em",
           }}>
-            {msg.senderName}
+            {msg.username}
           </span>
         )}
         <div style={{
@@ -88,7 +89,7 @@ function Message({ msg, isOwn }: { msg: ChatMessage; isOwn: boolean }) {
           color: isOwn ? "#fff" : "#1c1917",
           fontSize: 14, lineHeight: 1.5, wordBreak: "break-word",
         }}>
-          {msg.text}
+          {msg.message}
         </div>
         <span style={{
           fontSize: 10, color: "#a8a29e",
@@ -159,11 +160,19 @@ export default function GameChat({ gameId, currentUser, apiUrl }: GameChatProps)
       });
 
       channel.bind("pusher:member_added", (member: any) => {
-        setOnlinePlayers((prev) => [...prev, { id: member.id, ...member.info }]);
+        setOnlinePlayers((prev) => {
+          if(prev.some(p => p.id === member.id)) 
+            return prev;
+          return [...prev, { id: member.id, ...member.info }];
+      });
         setMessages((prev) => [...prev, {
           isSystem: true,
-          text: `${member.info.name} has joined the war council.`,
-          senderId: "", senderName: "", color: "", timestamp: Date.now(),
+          message: `${member.info.name} has joined the war council.`,
+          playerId: "", 
+          username: "", 
+          color: "", 
+          gameId: gameId,
+          timestamp: Date.now(),
         }]);
       });
 
@@ -171,13 +180,17 @@ export default function GameChat({ gameId, currentUser, apiUrl }: GameChatProps)
         setOnlinePlayers((prev) => prev.filter((p) => p.id !== member.id));
         setMessages((prev) => [...prev, {
           isSystem: true,
-          text: `${member.info.name} has left the war council.`,
-          senderId: "", senderName: "", color: "", timestamp: Date.now(),
+          message: `${member.info.name} has left the war council.`,
+          playerId: "",
+          username: "",
+          color: "",
+          gameId: gameId, 
+          timestamp: Date.now(),
         }]);
       });
 
       channel.bind("new-message", (msg: ChatMessage) => {
-        if (msg.senderId === currentUser.id) return;
+        if (msg.playerId === currentUser.id) return;
         setMessages((prev) => [...prev, msg]);
       });
     };
@@ -202,10 +215,11 @@ export default function GameChat({ gameId, currentUser, apiUrl }: GameChatProps)
     if (!text || !connected) return;
 
     const msg: ChatMessage = {
-      senderId:   currentUser.id,
-      senderName: currentUser.name,
-      color:      currentUser.color,
-      text,
+      gameId:     gameId,
+      playerId:   currentUser.id,
+      username:   currentUser.name,
+      color:      currentUser.color.toLowerCase(),
+      message:    text,
       timestamp:  Date.now(),
     };
 
@@ -217,7 +231,7 @@ export default function GameChat({ gameId, currentUser, apiUrl }: GameChatProps)
       await fetch(`${apiUrl}/chat/message`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ gameId, ...msg }),
+        body: JSON.stringify(msg),
       });
     } catch (err) {
       console.error("Failed to send message:", err);
@@ -297,8 +311,8 @@ export default function GameChat({ gameId, currentUser, apiUrl }: GameChatProps)
         )}
         {messages.map((msg, i) =>
           msg.isSystem
-            ? <SystemMessage key={i} text={msg.text} />
-            : <Message key={i} msg={msg} isOwn={msg.senderId === currentUser.id} />
+            ? <SystemMessage key={i} text={msg.message} />
+            : <Message key={i} msg={msg} isOwn={msg.playerId === currentUser.id} />
         )}
         <div ref={bottomRef} />
       </div>
