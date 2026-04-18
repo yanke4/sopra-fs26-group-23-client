@@ -302,6 +302,18 @@ const GamePage = () => {
     }
   };
 
+  const handleSurrender = async () => {
+  if (!gameId || !myPlayerId) return;
+  const confirmed = window.confirm("Are you sure you want to surrender?");
+  if (!confirmed) return;
+  try {
+    const apiService = new ApiService();
+    await apiService.post(`/games/${gameId}/players/${myPlayerId}/surrender`, {});
+  } catch (e) {
+    console.error("Surrender failed:", e);
+  }
+};
+
   const nextPhase = () => {
     advancePhase();
   };
@@ -398,6 +410,19 @@ const GamePage = () => {
         >
           {phaseIndex < PHASES.length - 1 ? "Next Phase" : "End Turn"} &rarr;
         </button>
+
+        <button
+          onClick={handleSurrender}
+          disabled={!myPlayerId}
+          className={`px-4 py-1.5 rounded text-xs font-bold uppercase tracking-wide border transition-all ${
+            myPlayerId
+              ? "bg-red-900/40 hover:bg-red-800/50 text-red-300 border-red-500/30 cursor-pointer"
+              : "bg-white/5 text-white/20 border-white/10 cursor-not-allowed"
+          }`}
+        >
+          Surrender
+        </button>
+
       </div>
 
       <div className="flex flex-1 overflow-hidden">
