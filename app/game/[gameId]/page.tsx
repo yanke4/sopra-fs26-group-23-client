@@ -48,7 +48,7 @@ const GamePage = () => {
   const currentUser = useMemo(() => ({
     id: String(myPlayerId ?? "0"), 
     name: gameState?.players.find(p => p.userId === userId)?.username ?? "Player", 
-    color: gameState?.players.find(p => p.userId === userId)?.color ?? "RED".toLowerCase(),
+    color: (gameState?.players.find(p => p.userId === userId)?.color ?? "RED").toLowerCase(),
   }), [gameState, userId, myPlayerId]);
       
 
@@ -510,11 +510,13 @@ const GamePage = () => {
           <div className="flex-1 flex flex-col overflow-hidden">
             <div className="px-3 py-2 border-b border-amber-900/20">
             <div className="h-64 border-t border-amber-900/30">
-            <GameChat
-              gameId={String(gameId ?? "0")}
-              currentUser={currentUser}
-              apiUrl={process.env.NEXT_PUBLIC_PROD_API_URL ?? "http://localhost:8080"}
-            />
+            {myPlayerId &&(
+              <GameChat
+                key={gameId} // Reset chat when gameId changes, but not on every render
+                gameId={String(gameId ?? "0")}
+                currentUser={currentUser}
+                apiUrl={process.env.NEXT_PUBLIC_PROD_API_URL ?? "http://localhost:8080"}
+            />)}
           </div>
             </div>
           </div>
