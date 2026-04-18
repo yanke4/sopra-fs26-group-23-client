@@ -30,6 +30,8 @@ const GamePage = () => {
     null,
   );
   const [targetTerritory, setTargetTerritory] = useState<string | null>(null);
+  const [deployTroops, setDeployTroops] = useState<number>(1);
+  const [reinforcements, setReinforcements] = useState<number>(0);
 
   const userId =
     typeof window !== "undefined"
@@ -42,7 +44,10 @@ const GamePage = () => {
   const [gameState, setGameState] = useState<GameStateDTO | null>(null);
 
   const myPlayerId =
-    gameState?.players.find((p) => p.userId === userId)?.playerId ?? null;
+    gameState && userId !== null
+      ? (gameState.players.find((p) => String(p.userId) === String(userId))
+          ?.playerId ?? null)
+      : null;
 
   // not currentPlayer so whos turn it is instead currentUser so Person in Chat
   const currentUser = useMemo(() => ({
@@ -93,7 +98,8 @@ const GamePage = () => {
   const isMyTurn = gameState ? gameState.currentPlayerId === myPlayerId : false;
 
   const currentTurn = 3;
-  const reinforcements = 5;
+
+
 
   const phaseIndex = PHASES.indexOf(currentPhase);
 
@@ -160,6 +166,29 @@ const GamePage = () => {
     ? playerStats.findIndex((p) => p.playerId === myPlayerId)
     : 0;
 
+  const selectedFieldOwnerPlayerId =
+    selectedTerritory && gameState
+      ? (gameState.fields.find((f) => f.fieldName === selectedTerritory)
+          ?.ownerPlayerId ?? null)
+      : null;
+
+  const canDeployToSelected =
+    currentPhase === "Deploy" &&
+    isMyTurn &&
+    reinforcements > 0 &&
+    !!selectedTerritory &&
+    selectedFieldOwnerPlayerId === myPlayerId;
+
+  useEffect(() => {
+    // Only the active player gets deploy troops
+    if (currentPhase === "Deploy" && isMyTurn) {
+      setReinforcements(5);
+      setDeployTroops(1);
+    } else {
+      setReinforcements(0);
+    }
+  }, [currentPhase, isMyTurn, gameState?.currentPlayerId]);
+
   const validTargets = useMemo(() => {
     if (!selectedTerritory) return [];
     const selectedOwner = territories[selectedTerritory]?.owner;
@@ -205,7 +234,7 @@ const GamePage = () => {
   };
 
   const advancePhase = async () => {
-    if (!gameId || !myPlayerId || !isMyTurn) return;
+    if (gameId === null || myPlayerId === null || !isMyTurn) return;
     try {
       const apiService = new ApiService();
       await apiService.post(`/games/${gameId}/turns/advance-phase`, {
@@ -219,7 +248,12 @@ const GamePage = () => {
   };
 
   const handleAttack = async () => {
-    if (!selectedTerritory || !targetTerritory || !gameId || !myPlayerId)
+    if (
+      !selectedTerritory ||
+      !targetTerritory ||
+      gameId === null ||
+      myPlayerId === null
+    )
       return;
     try {
       const apiService = new ApiService();
@@ -237,6 +271,34 @@ const GamePage = () => {
       setTargetTerritory(null);
     } catch (e) {
       console.error("Attack failed:", e);
+    }
+  };
+
+  const handleDeploy = async () => {
+    if (
+      !canDeployToSelected ||
+      gameId === null ||
+      myPlayerId === null ||
+      !selectedTerritory ||
+      reinforcements <= 0
+    ) {
+      return;
+    }
+
+    const troops = Math.min(Math.max(1, deployTroops || 1), reinforcements);
+    if (troops <= 0) return;
+
+    try {
+      const apiService = new ApiService();
+      await apiService.post(`/games/${gameId}/turns/deploy`, {
+        playerId: myPlayerId,
+        deployments: [{ fieldName: selectedTerritory, troops }],
+      });
+
+      setReinforcements((prev) => Math.max(0, prev - troops));
+      setDeployTroops(1);
+    } catch (e) {
+      console.error("Deploy failed:", e);
     }
   };
 
@@ -385,8 +447,9 @@ const GamePage = () => {
             ))}
           </div>
 
-          {currentPhase === "Deploy" && (
-            <div className="p-3 border-t border-amber-900/20 bg-green-950/20">
+          {/* deploy panel only during your deploy phase */}
+          {currentPhase === "Deploy" && isMyTurn && (
+            <div className="p-3 border-t border-amber-900/20 bg-green-950/20 space-y-2">
               <div className="text-[10px] text-green-400/70 font-bold uppercase tracking-wider mb-1">
                 Reinforcements
               </div>
@@ -397,6 +460,67 @@ const GamePage = () => {
                 </span>
                 <span className="text-green-400/50 text-[10px]">remaining</span>
               </div>
+
+              {canDeployToSelected && (
+                <div className="pt-2 mt-2 border-t border-green-800/40 space-y-2">
+                  <div className="text-[10px] text-green-400/70 font-bold uppercase tracking-wider">
+                    Deploy to
+                  </div>
+                  <div className="text-sm text-green-200 font-semibold truncate">
+                    {selectedTerritory}
+                  </div>
+
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      onClick={() =>
+                        setDeployTroops((v) => Math.max(1, (v || 1) - 1))
+                      }
+                      className="w-7 h-7 rounded bg-green-900/30 hover:bg-green-800/40 border border-green-500/30 text-green-200 font-bold"
+                    >
+                      -
+                    </button>
+                    <input
+                      type="number"
+                      min={1}
+                      max={Math.max(1, reinforcements)}
+                      value={deployTroops}
+                      onChange={(e) => {
+                        const next = Number(e.target.value);
+                        if (Number.isNaN(next)) {
+                          setDeployTroops(1);
+                          return;
+                        }
+                        setDeployTroops(
+                          Math.max(1, Math.min(next, Math.max(1, reinforcements))),
+                        );
+                      }}
+                      className="w-full h-7 px-2 rounded bg-black/30 border border-green-500/30 text-green-100 text-sm font-mono"
+                    />
+                    <button
+                      onClick={() =>
+                        setDeployTroops((v) =>
+                          Math.min(Math.max(1, reinforcements), (v || 1) + 1),
+                        )
+                      }
+                      className="w-7 h-7 rounded bg-green-900/30 hover:bg-green-800/40 border border-green-500/30 text-green-200 font-bold"
+                    >
+                      +
+                    </button>
+                  </div>
+
+                  <button
+                    onClick={handleDeploy}
+                    disabled={!isMyTurn || reinforcements <= 0}
+                    className={`w-full py-1.5 rounded text-[11px] font-bold border transition-all ${
+                      isMyTurn && reinforcements > 0
+                        ? "bg-green-900/40 hover:bg-green-800/50 text-green-200 border-green-500/30"
+                        : "bg-white/5 text-white/30 border-white/10 cursor-not-allowed"
+                    }`}
+                  >
+                    Deploy troops
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>
