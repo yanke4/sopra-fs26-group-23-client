@@ -218,7 +218,7 @@ export default function GameChat({ gameId, currentUser, apiUrl }: GameChatProps)
       gameId:     gameId,
       playerId:   currentUser.id,
       username:   currentUser.name,
-      color:      currentUser.color.toLowerCase(),
+      color:      currentUser.color.toUpperCase(),
       message:    text,
       timestamp:  Date.now(),
     };

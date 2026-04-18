@@ -502,11 +502,11 @@ const GamePage = () => {
             <div className="px-3 py-2 border-b border-amber-900/20">
             <div className="h-64 border-t border-amber-900/30">
             <GameChat
-              gameId={String(gameId ?? "default")}
+              gameId={String(gameId ?? "0")}
               currentUser={{
-                id: String(myPlayerId ?? "anonymous"),
-                name: PLAYER_NAMES[currentPlayer],
-                color: "red",
+                id: String(myPlayerId ?? "0"),
+                name: gameState?.players.find(p => p.userId === userId)?.username ?? "Player",
+                color: gameState?.players.find(p => p.userId === userId)?.color ?? "RED",
               }}
               apiUrl={process.env.NEXT_PUBLIC_PROD_API_URL ?? "http://localhost:8080"}
             />
