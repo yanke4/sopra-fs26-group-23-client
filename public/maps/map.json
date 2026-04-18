@@ -12,7 +12,7 @@
     },
     {
       "name": "Baltic States",
-      "bonus": 3,
+      "bonus": 4,
       "fields": ["Estonia", "Latvia", "Lithuania", "Belarus"]
     },
     {
@@ -22,12 +22,12 @@
     },
     {
       "name": "Balkans",
-      "bonus": 3,
+      "bonus": 4,
       "fields": ["Balkan", "Greece", "Bulgaria", "Turkey"]
     },
     {
       "name": "Central Europe",
-      "bonus": 3,
+      "bonus": 4,
       "fields": ["Hungary", "Czech Republic", "Slovakia", "Poland"]
     },
     {
@@ -42,7 +42,7 @@
     },
     {
       "name": "Low Countries",
-      "bonus": 3,
+      "bonus": 4,
       "fields": ["Belgium", "Netherlands", "Germany", "Denmark"]
     }
   ],
