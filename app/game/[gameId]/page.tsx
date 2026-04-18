@@ -44,6 +44,15 @@ const GamePage = () => {
   const myPlayerId =
     gameState?.players.find((p) => p.userId === userId)?.playerId ?? null;
 
+  // not currentPlayer so whos turn it is instead currentUser so Person in Chat
+  const currentUser = useMemo(() => ({
+    id: String(myPlayerId ?? "0"), 
+    name: gameState?.players.find(p => p.userId === userId)?.username ?? "Player", 
+    color: gameState?.players.find(p => p.userId === userId)?.color ?? "RED".toLowerCase(),
+  }), [gameState, userId, myPlayerId]);
+      
+
+
   const handleGameUpdate = useCallback((state: GameStateDTO) => {
     setGameState(state);
   }, []);
@@ -503,11 +512,7 @@ const GamePage = () => {
             <div className="h-64 border-t border-amber-900/30">
             <GameChat
               gameId={String(gameId ?? "0")}
-              currentUser={{
-                id: String(myPlayerId ?? "0"),
-                name: gameState?.players.find(p => p.userId === userId)?.username ?? "Player",
-                color: gameState?.players.find(p => p.userId === userId)?.color ?? "RED",
-              }}
+              currentUser={currentUser}
               apiUrl={process.env.NEXT_PUBLIC_PROD_API_URL ?? "http://localhost:8080"}
             />
           </div>
