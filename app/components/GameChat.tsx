@@ -231,7 +231,11 @@ export default function GameChat({ gameId, currentUser, apiUrl }: GameChatProps)
       await fetch(`${apiUrl}/chat/message`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(msg),
+        body: JSON.stringify({
+          ...msg, 
+          gameId: Number(msg.gameId),
+          playerId: Number(msg.playerId),
+        }),
       });
     } catch (err) {
       console.error("Failed to send message:", err);
