@@ -104,8 +104,8 @@ reason).
 |                    | 16/04/2026   | [[Link to Commit 4]](https://github.com/yanke4/sopra-fs26-group-23-client/commit/45cf9517320b3236d6cc8d428cc51860cfa1734b) | Victory screen UI | Implement victory screen UI which is shown to the players at the end of the game |
 | **[@githubUser3]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
 |                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
-| **[@githubUser4]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
-|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **[@MatteoLozano]** | [18/04/2026]   | [[Link to Commit 1]](https://github.com/yanke4/sopra-fs26-group-23-client/commit/291822c77eefe193ac1bada635dc3910abbc4dc6) | [Deployment UI and logic. Display deployment outcome for everybody in client ] | [Ensures deployment is correctly processed on the client and synchronizes deployment outcomes for all players.] |
+|                    | [18/04/2026]   | [[Link to Commit 2]](https://github.com/yanke4/sopra-fs26-group-23-client/commit/d2553a32e148286d1dbebca5d1a6bcc0a21f6c0e) | [Implement attack and movement UI and display outcome for everybody] | [Enables complete attack/movement interactions in the UI and keeps all players synchronized with shared outcomes.] |
 
 ---
 
