@@ -106,6 +106,14 @@ reason).
 |                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
 | **[@MatteoLozano]** | [18/04/2026]   | [[Link to Commit 1]](https://github.com/yanke4/sopra-fs26-group-23-client/commit/291822c77eefe193ac1bada635dc3910abbc4dc6) | [Deployment UI and logic. Display deployment outcome for everybody in client ] | [Ensures deployment is correctly processed on the client and synchronizes deployment outcomes for all players.] |
 |                    | [18/04/2026]   | [[Link to Commit 2]](https://github.com/yanke4/sopra-fs26-group-23-client/commit/d2553a32e148286d1dbebca5d1a6bcc0a21f6c0e) | [Implement attack and movement UI and display outcome for everybody] | [Enables complete attack/movement interactions in the UI and keeps all players synchronized with shared outcomes.] |
+| **Linus5Frick** | 17/04/2026   | [[Link to Commit 1]][text](https://github.com/yanke4/sopra-fs26-group-23-client/commit/84ee5606882ea0ee9935fc4a223c18231eaee799) | Implemented the GameChat UI in the game page #30 | The GameChat is visible in the game site |
+|                    | 18/04/2026   | [[Link to Commit 2]](https://github.com/yanke4/sopra-fs26-group-23-client/commit/dba64b84a58caf47d9f95bf8cfdbc663fdc83eff) | Implemented everything needed for the Chat API in the frontend | Implemented the basis for the use of the API |
+|                    | 18/04/2026   | [[Link to Commit 3]](https://github.com/yanke4/sopra-fs26-group-23-client/commit/ba5c34a51d254ec07aafb6e9913758f02516b6c1) | add GameChat component to game page #64 and #65| Needed the GameChat for the sending of messages  |
+|                    | 18/04/2026   | [[Link to Commit 4]](https://github.com/yanke4/sopra-fs26-group-23-client/commit/9f725ddf9702e7e87363400aea16e5021ddb14e7) | Adjustments and additions for the GameChat to work. Color of Player and multiple message fix. #64 and #65  | Now the users have the same colour as in the game and messages arent sent multiple times |
+|                    | 18/04/2026   | [[Link to Commit 5]](https://github.com/yanke4/sopra-fs26-group-23-server/commit/744ce69e760c2a338cb28f95556b1c120bc0b94e) | Implemented the backend of the Chat| In order for the chat to work with the API the implementation of ChatController and MessageDTO |
+|                    | 18/04/2026   | [[Link to Commit 6]](https://github.com/yanke4/sopra-fs26-group-23-server/commit/33d92ae7c8a93ec4e010296a711213d1a7c0a4d5) | Changed the implementation of the attack method, so that the calculation of the remaining troops is correct.
+| Whenever a player attacks another field now the right amount of troops is taken away|
+
 
 ---
 
