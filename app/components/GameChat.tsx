@@ -24,6 +24,31 @@ interface OnlinePlayer {
   color: string;
 }
 
+interface PusherMemberInfo {
+  name: string;
+  color: string;
+}
+
+interface PusherMember {
+  id: string;
+  info: PusherMemberInfo;
+}
+
+interface PusherMembers {
+  each: (fn: (member: PusherMember) => void) => void;
+}
+
+interface PusherChannel {
+  bind: (event: string, callback: (data: unknown) => void) => void;
+  unbind_all: () => void;
+}
+
+interface PusherInstance {
+  subscribe: (channel: string) => PusherChannel;
+  unsubscribe: (channel: string) => void;
+  disconnect: () => void;
+}
+
 interface GameChatProps {
   gameId: string;
   currentUser: CurrentUser;
@@ -124,8 +149,8 @@ export default function GameChat({ gameId, currentUser, apiUrl }: GameChatProps)
 
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const channelRef = useRef<any>(null);
-  const pusherRef = useRef<any>(null);
+  const channelRef = useRef<PusherChannel | null>(null);
+  const pusherRef = useRef<PusherInstance | boolean | null>(null);
   const currentUserRef = useRef<CurrentUser>(currentUser);
 
   useEffect(() => {
@@ -158,38 +183,39 @@ export default function GameChat({ gameId, currentUser, apiUrl }: GameChatProps)
 
       pusherRef.current = pusherClient;
 
-      const channel = pusherClient.subscribe(`presence-game-${gameId}`) as any;
+      const channel = pusherClient.subscribe(`presence-game-${gameId}`) as unknown as PusherChannel;
       channelRef.current = channel;
 
-      channel.bind("pusher:subscription_succeeded", (members: any) => {
+      channel.bind("pusher:subscription_succeeded", (members: unknown) => {
         setConnected(true);
         const players: OnlinePlayer[] = [];
-        members.each((m: any) => players.push({ id: m.id, ...m.info }));
+        (members as PusherMembers).each((m) => players.push({ id: m.id, ...m.info }));
         setOnlinePlayers(players);
       });
 
-      channel.bind("pusher:member_added", (member: any) => {
+      channel.bind("pusher:member_added", (member: unknown) => {
+        const m = member as PusherMember;
         setOnlinePlayers((prev) => {
-          if(prev.some(p => p.id === member.id)) 
-            return prev;
-          return [...prev, { id: member.id, ...member.info }];
-      });
+          if (prev.some(p => p.id === m.id)) return prev;
+          return [...prev, { id: m.id, ...m.info }];
+        });
         setMessages((prev) => [...prev, {
           isSystem: true,
-          message: `${member.info.name} has joined the war council.`,
-          playerId: "", 
-          username: "", 
-          color: "", 
+          message: `${m.info.name} has joined the war council.`,
+          playerId: "",
+          username: "",
+          color: "",
           gameId: gameId,
           timestamp: Date.now(),
         }]);
       });
 
-      channel.bind("pusher:member_removed", (member: any) => {
-        setOnlinePlayers((prev) => prev.filter((p) => p.id !== member.id));
+      channel.bind("pusher:member_removed", (member: unknown) => {
+        const m = member as PusherMember;
+        setOnlinePlayers((prev) => prev.filter((p) => p.id !== m.id));
         setMessages((prev) => [...prev, {
           isSystem: true,
-          message: `${member.info.name} has left the war council.`,
+          message: `${m.info.name} has left the war council.`,
           playerId: "",
           username: "",
           color: "",
@@ -198,7 +224,8 @@ export default function GameChat({ gameId, currentUser, apiUrl }: GameChatProps)
         }]);
       });
 
-      channel.bind("new-message", (msg: ChatMessage) => {
+      channel.bind("new-message", (data: unknown) => {
+        const msg = data as ChatMessage;
         console.log("received playerId:", msg.playerId, "my id:", currentUserRef.current.id, "types:", typeof msg.playerId, typeof currentUserRef.current.id);
         if (String(msg.playerId) === String(currentUserRef.current.id)) return;
         setMessages((prev) => [...prev, msg]);
@@ -212,9 +239,10 @@ export default function GameChat({ gameId, currentUser, apiUrl }: GameChatProps)
         channelRef.current.unbind_all();
         channelRef.current = null;
       }
-      if (pusherRef.current && pusherRef.current.disconnect) {
-        pusherRef.current.unsubscribe(`presence-game-${gameId}`);
-        pusherRef.current.disconnect();
+      const p = pusherRef.current;
+      if (p && typeof p !== "boolean") {
+        p.unsubscribe(`presence-game-${gameId}`);
+        p.disconnect();
         pusherRef.current = null;
       }
     };
