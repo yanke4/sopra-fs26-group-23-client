@@ -98,8 +98,10 @@ reason).
 |                    | 18/04/2026 | [[Link to Commit 5]](https://github.com/yanke4/sopra-fs26-group-23-server/commit/109d1bc31c871d0515e3cc1d6ffa0600a5db99ed) | implemented win condition check | game can end |
 |                    | 18/04/2026 | [[Link to Commit 6]](https://github.com/yanke4/sopra-fs26-group-23-client/commit/296e5869c8645e1789c8e7e6a54e3ca966afedfc) | added surrender button | player can surrender now |
 |                    | 19/04/2026 | [[Link to Commit 7]](https://github.com/yanke4/sopra-fs26-group-23-client/commit/845fee5c1cb3fb9bde9073e4c57b4ff0e4fb9846) | surrender notification | players see when someone surrenders |
-| **[@githubUser2]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
-|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **devnida** | 14/04/2026  | [[Link to Commit 1]](https://github.com/yanke4/sopra-fs26-group-23-client/commit/a60bd758b0678f876a10dd4b8eb78cbde8f47d8c) | Load map | Load map with initial informations about players and assigned territories  |
+|                    | 15/04/2026   | [[Link to Commit 2]](https://github.com/yanke4/sopra-fs26-group-23-client/commit/31760b62b98b8c2f9294344c672061488a6215b1) | Attack phase UI | Players can see which territories can be attacked from a starting position |
+|                    | 15/04/2026   | [[Link to Commit 3]](https://github.com/yanke4/sopra-fs26-group-23-server/commit/ff27234446ed7bfe22184607dd2df3c649542f31) | Turn rotation logic | Implement turn rotation that handles the rotation of turns between players |
+|                    | 16/04/2026   | [[Link to Commit 4]](https://github.com/yanke4/sopra-fs26-group-23-client/commit/45cf9517320b3236d6cc8d428cc51860cfa1734b) | Victory screen UI | Implement victory screen UI which is shown to the players at the end of the game |
 | **[@githubUser3]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
 |                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
 | **[@githubUser4]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
