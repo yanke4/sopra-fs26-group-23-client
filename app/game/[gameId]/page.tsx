@@ -18,6 +18,7 @@ import {
   NEUTRAL_COLOR,
   ADJACENCY,
   FALLBACK_TERRITORIES,
+  REGIONS,
 } from "./gameData";
 import type { Phase } from "./gameData";
 
@@ -189,6 +190,18 @@ const GamePage = () => {
     ? playerStats.findIndex((p) => p.playerId === myPlayerId)
     : 0;
 
+  const myRegionBonus = useMemo(() => {
+    return REGIONS.filter((region) =>
+      region.fields.every((f) => territories[f]?.owner === myOwnerIndex),
+    ).reduce((sum, r) => sum + r.bonus, 0);
+  }, [territories, myOwnerIndex]);
+
+  const myOwnedRegions = useMemo(() => {
+    return REGIONS.filter((region) =>
+      region.fields.every((f) => territories[f]?.owner === myOwnerIndex),
+    );
+  }, [territories, myOwnerIndex]);
+
   const selectedFieldOwnerPlayerId =
     selectedTerritory && gameState
       ? (gameState.fields.find((f) => f.fieldName === selectedTerritory)
@@ -203,14 +216,13 @@ const GamePage = () => {
     selectedFieldOwnerPlayerId === myPlayerId;
 
   useEffect(() => {
-    // Only the active player gets deploy troops
     if (currentPhase === "Deploy" && isMyTurn) {
-      setReinforcements(5);
+      setReinforcements(5 + myRegionBonus);
       setDeployTroops(1);
     } else {
       setReinforcements(0);
     }
-  }, [currentPhase, isMyTurn, gameState?.currentPlayerId]);
+  }, [currentPhase, isMyTurn, gameState?.currentPlayerId, myRegionBonus]);
 
   const validTargets = useMemo(() => {
     if (!selectedTerritory) return [];
@@ -393,8 +405,12 @@ const GamePage = () => {
         deployments: [{ fieldName: selectedTerritory, troops }],
       });
 
-      setReinforcements((prev) => Math.max(0, prev - troops));
+      const newReinforcements = Math.max(0, reinforcements - troops);
+      setReinforcements(newReinforcements);
       setDeployTroops(1);
+      if (newReinforcements === 0) {
+        advancePhase();
+      }
     } catch (e) {
       console.error("Deploy failed:", e);
     }
@@ -448,6 +464,7 @@ const GamePage = () => {
       setSelectedTerritory(null);
       setTargetTerritory(null);
       setFortifyTroops(1);
+      advancePhase();
     } catch (e) {
       console.error("Move/Fortify failed:", e);
     }
@@ -547,29 +564,31 @@ const GamePage = () => {
           ))}
         </div>
 
-        <button
-          onClick={nextPhase}
-          disabled={!isMyTurn}
-          className={`w-36 px-5 py-1.5 rounded text-xs font-bold uppercase tracking-wide border transition-all ${
-            isMyTurn
-              ? "bg-amber-700/50 hover:bg-amber-600/60 text-amber-100 border-amber-500/30 hover:shadow-lg hover:shadow-amber-900/30 cursor-pointer"
-              : "bg-white/5 text-white/20 border-white/10 cursor-not-allowed"
-          }`}
-        >
-          {phaseIndex < PHASES.length - 1 ? "Next Phase" : "End Turn"} &rarr;
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={nextPhase}
+            disabled={!isMyTurn}
+            className={`w-36 px-5 py-1.5 rounded text-xs font-bold uppercase tracking-wide border transition-all ${
+              isMyTurn
+                ? "bg-amber-700/50 hover:bg-amber-600/60 text-amber-100 border-amber-500/30 hover:shadow-lg hover:shadow-amber-900/30 cursor-pointer"
+                : "bg-white/5 text-white/20 border-white/10 cursor-not-allowed"
+            }`}
+          >
+            {phaseIndex < PHASES.length - 1 ? "Next Phase" : "End Turn"} &rarr;
+          </button>
 
-        <button
-          onClick={handleSurrender}
-          disabled={!myPlayerId}
-          className={`px-4 py-1.5 rounded text-xs font-bold uppercase tracking-wide border transition-all ${
-            myPlayerId
-              ? "bg-red-900/40 hover:bg-red-800/50 text-red-300 border-red-500/30 cursor-pointer"
-              : "bg-white/5 text-white/20 border-white/10 cursor-not-allowed"
-          }`}
-        >
-          Surrender
-        </button>
+          <button
+            onClick={handleSurrender}
+            disabled={!myPlayerId}
+            className={`px-4 py-1.5 rounded text-xs font-bold uppercase tracking-wide border transition-all ${
+              myPlayerId
+                ? "bg-red-900/40 hover:bg-red-800/50 text-red-300 border-red-500/30 cursor-pointer"
+                : "bg-white/5 text-white/20 border-white/10 cursor-not-allowed"
+            }`}
+          >
+            Surrender
+          </button>
+        </div>
 
       </div>
 
@@ -631,6 +650,31 @@ const GamePage = () => {
                 </div>
               </div>
             ))}
+          </div>
+
+          {/* region bonus panel */}
+          <div className="p-3 border-t border-amber-900/20 space-y-1.5">
+            <div className="text-[10px] text-amber-400/70 font-bold uppercase tracking-wider">
+              Your Region Bonus
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-amber-300 text-lg font-bold font-mono">
+                +{myRegionBonus}
+              </span>
+              <span className="text-amber-400/50 text-[10px]">troops / round</span>
+            </div>
+            {myOwnedRegions.length > 0 ? (
+              <div className="space-y-1">
+                {myOwnedRegions.map((r) => (
+                  <div key={r.name} className="flex items-center justify-between text-[10px]">
+                    <span className="text-amber-200/60">{r.name}</span>
+                    <span className="text-amber-300/80 font-mono">+{r.bonus}</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-[10px] text-white/25 italic">No regions controlled</div>
+            )}
           </div>
 
           {/* deploy panel only during your deploy phase */}

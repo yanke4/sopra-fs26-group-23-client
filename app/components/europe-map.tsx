@@ -10,6 +10,83 @@ import {
   createCoordinates,
 } from "@vnedyalk0v/react19-simple-maps";
 
+const REGION_INFO: Record<string, { name: string; bonus: number }> = {
+  Iceland: { name: "British Isles", bonus: 5 },
+  Ireland: { name: "British Isles", bonus: 5 },
+  "Great Britain": { name: "British Isles", bonus: 5 },
+  Norway: { name: "Scandinavia", bonus: 4 },
+  Sweden: { name: "Scandinavia", bonus: 4 },
+  Finland: { name: "Scandinavia", bonus: 4 },
+  Estonia: { name: "Baltic States", bonus: 3 },
+  Latvia: { name: "Baltic States", bonus: 3 },
+  Lithuania: { name: "Baltic States", bonus: 3 },
+  Belarus: { name: "Baltic States", bonus: 3 },
+  Ukraine: { name: "Eastern Europe", bonus: 3 },
+  Moldova: { name: "Eastern Europe", bonus: 3 },
+  Romania: { name: "Eastern Europe", bonus: 3 },
+  Balkan: { name: "Balkans", bonus: 5 },
+  Greece: { name: "Balkans", bonus: 5 },
+  Bulgaria: { name: "Balkans", bonus: 5 },
+  Turkey: { name: "Balkans", bonus: 5 },
+  Hungary: { name: "Central Europe", bonus: 5 },
+  "Czech Republic": { name: "Central Europe", bonus: 5 },
+  Slovakia: { name: "Central Europe", bonus: 5 },
+  Poland: { name: "Central Europe", bonus: 5 },
+  Portugal: { name: "Western Europe", bonus: 4 },
+  Spain: { name: "Western Europe", bonus: 4 },
+  France: { name: "Western Europe", bonus: 4 },
+  Italy: { name: "Alpine", bonus: 3 },
+  Switzerland: { name: "Alpine", bonus: 3 },
+  Austria: { name: "Alpine", bonus: 3 },
+  Belgium: { name: "Low Countries", bonus: 4 },
+  Netherlands: { name: "Low Countries", bonus: 4 },
+  Germany: { name: "Low Countries", bonus: 4 },
+  Denmark: { name: "Low Countries", bonus: 4 },
+};
+
+const REGION_COLORS: Record<string, string> = {
+  // British Isles
+  Iceland: "#a855f7",
+  Ireland: "#a855f7",
+  "Great Britain": "#a855f7",
+  // Scandinavia
+  Norway: "#06b6d4",
+  Sweden: "#06b6d4",
+  Finland: "#06b6d4",
+  // Baltic States
+  Estonia: "#f59e0b",
+  Latvia: "#f59e0b",
+  Lithuania: "#f59e0b",
+  Belarus: "#f59e0b",
+  // Eastern Europe
+  Ukraine: "#f87171",
+  Moldova: "#f87171",
+  Romania: "#f87171",
+  // Balkans
+  Balkan: "#ec4899",
+  Greece: "#ec4899",
+  Bulgaria: "#ec4899",
+  Turkey: "#ec4899",
+  // Central Europe
+  Hungary: "#84cc16",
+  "Czech Republic": "#84cc16",
+  Slovakia: "#84cc16",
+  Poland: "#84cc16",
+  // Western Europe
+  Portugal: "#60a5fa",
+  Spain: "#60a5fa",
+  France: "#60a5fa",
+  // Alpine
+  Italy: "#fb923c",
+  Switzerland: "#fb923c",
+  Austria: "#fb923c",
+  // Low Countries
+  Belgium: "#34d399",
+  Netherlands: "#34d399",
+  Germany: "#34d399",
+  Denmark: "#34d399",
+};
+
 const COUNTRY_CENTERS: Record<string, [number, number]> = {
   Spain: [-3.7, 40.4],
   Ukraine: [31.2, 48.4],
@@ -84,6 +161,8 @@ const EuropeMap: React.FC<EuropeMapProps> = ({
 }) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [geoData, setGeoData] = useState<any>(null);
+  const [hoveredTerritory, setHoveredTerritory] = useState<string | null>(null);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     fetch("/maps/europe-names.json")
@@ -106,9 +185,12 @@ const EuropeMap: React.FC<EuropeMapProps> = ({
     [territories, playerColors, selectedTerritory],
   );
 
-  const getStroke = useCallback(() => "#0d0d0d", []);
+  const getStroke = useCallback(
+    (name: string) => REGION_COLORS[name] ?? "#0d0d0d",
+    [],
+  );
 
-  const getStrokeWidth = useCallback(() => 0.5, []);
+  const getStrokeWidth = useCallback(() => 0.8, []);
 
   if (!geoData)
     return (
@@ -123,6 +205,10 @@ const EuropeMap: React.FC<EuropeMapProps> = ({
       style={{
         background:
           "radial-gradient(ellipse at 50% 45%, #111010 0%, #0a0908 50%, #050404 100%)",
+      }}
+      onMouseMove={(e) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        setMousePos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
       }}
     >
       <style>{`
@@ -274,7 +360,7 @@ const EuropeMap: React.FC<EuropeMapProps> = ({
               if (!name) return null;
 
               const fill = getTerritoryFill(name);
-              const stroke = getStroke();
+              const stroke = getStroke(name);
               const strokeWidth = getStrokeWidth();
 
               return (
@@ -285,6 +371,8 @@ const EuropeMap: React.FC<EuropeMapProps> = ({
                     (e.target as SVGElement).blur();
                     onTerritoryClick(name);
                   }}
+                  onMouseEnter={() => setHoveredTerritory(name)}
+                  onMouseLeave={() => setHoveredTerritory(null)}
                   tabIndex={-1}
                   style={{
                     default: {
@@ -420,6 +508,32 @@ const EuropeMap: React.FC<EuropeMapProps> = ({
           );
         })}
       </ComposableMap>
+
+      {hoveredTerritory && REGION_INFO[hoveredTerritory] && (
+        <div
+          className="absolute z-50 pointer-events-none"
+          style={{ left: mousePos.x + 14, top: mousePos.y + 14 }}
+        >
+          <div
+            className="px-3 py-2 rounded text-xs border shadow-lg shadow-black/60"
+            style={{
+              background: "rgba(10,9,8,0.92)",
+              borderColor: REGION_COLORS[hoveredTerritory] + "66",
+              color: "#e5d5b0",
+            }}
+          >
+            <div
+              className="font-bold text-sm mb-1"
+              style={{ color: REGION_COLORS[hoveredTerritory] }}
+            >
+              {REGION_INFO[hoveredTerritory].name}
+            </div>
+            <div className="flex items-center gap-1 text-amber-300/80">
+              <span>+{REGION_INFO[hoveredTerritory].bonus} troops / round</span>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

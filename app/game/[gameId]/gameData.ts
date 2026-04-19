@@ -15,6 +15,18 @@ export const COLOR_MAP: Record<string, string> = {
 
 export const NEUTRAL_COLOR = "#555555";
 
+export const REGIONS: { name: string; bonus: number; fields: string[] }[] = [
+  { name: "British Isles", bonus: 5, fields: ["Iceland", "Ireland", "Great Britain"] },
+  { name: "Scandinavia", bonus: 4, fields: ["Norway", "Sweden", "Finland"] },
+  { name: "Baltic States", bonus: 3, fields: ["Estonia", "Latvia", "Lithuania", "Belarus"] },
+  { name: "Eastern Europe", bonus: 3, fields: ["Ukraine", "Moldova", "Romania"] },
+  { name: "Balkans", bonus: 5, fields: ["Balkan", "Greece", "Bulgaria", "Turkey"] },
+  { name: "Central Europe", bonus: 5, fields: ["Hungary", "Czech Republic", "Slovakia", "Poland"] },
+  { name: "Western Europe", bonus: 4, fields: ["Portugal", "Spain", "France"] },
+  { name: "Alpine", bonus: 3, fields: ["Italy", "Switzerland", "Austria"] },
+  { name: "Low Countries", bonus: 4, fields: ["Belgium", "Netherlands", "Germany", "Denmark"] },
+];
+
 export const ADJACENCY: Record<string, string[]> = {
   Iceland: ["Norway", "Ireland"],
   Ireland: ["Great Britain", "Iceland"],
