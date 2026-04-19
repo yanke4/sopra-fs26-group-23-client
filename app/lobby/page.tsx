@@ -50,6 +50,7 @@ function LobbyContent() {
   const [copied, setCopied] = useState(false);
   const [lobby, setLobby] = useState<LobbyGetDTO | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [startError, setStartError] = useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
   const searchParams = useSearchParams();
 
@@ -270,16 +271,30 @@ function LobbyContent() {
             </div>
           </div>
 
+          {startError && (
+            <div className="text-red-400 text-[11px] font-audiowide uppercase tracking-tighter text-center">
+              {startError}
+            </div>
+          )}
+
           <div className="flex flex-row-reverse gap-3 mt-2">
             {isHost && (
               <Button
                 onClick={async () => {
+                  setStartError(null);
                   try {
+                    const fresh = await apiService.get<LobbyGetDTO>(`/lobbies/${lobby.lobbyId}`);
+                    if (!fresh.host || fresh.host.id !== currentUserId) {
+                      setStartError("You are no longer the host.");
+                      setLobby(fresh);
+                      return;
+                    }
                     await apiService.put(`/lobbies/${lobby.lobbyId}/start`, {
-                      userId: lobby.host.id,
+                      userId: currentUserId,
                     });
                   } catch (err) {
                     console.error("Failed to start game:", err);
+                    setStartError("Failed to start the game. Please try again.");
                   }
                 }}
                 disabled={!canStart}
