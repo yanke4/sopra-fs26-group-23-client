@@ -87,15 +87,38 @@ reason).
 
 ---
 
-## Contributions Week 3 - [Begin Date] to [End Date]
+## Contributions Week 3 - 13/04/2026 to 20/04/2026
 
-_Continue with the same table format as above._
+| **Student**        | **Date** | **Link to Commit** | **Description**                 | **Relevance**                       |
+| ------------------ | -------- | ------------------ | ------------------------------- | ----------------------------------- |
+| **yanke4** | 15/04/2026 | [[Link to Commit 1]](https://github.com/yanke4/sopra-fs26-group-23-server/commit/27a17ddcbabe84d957cdc74179c5fcfe07e35ed2) | fixed lobby bugs | lobby now works as intended |
+|                    | 16/04/2026 | [[Link to Commit 2]](https://github.com/yanke4/sopra-fs26-group-23-server/commit/a4a292dfe3ce0d4cbb445a8d91ce02f3fb1e9ef4) | implemented troop movement validation | troops can only move if territories are connected |
+|                    | 16/04/2026 | [[Link to Commit 3]](https://github.com/yanke4/sopra-fs26-group-23-server/commit/5e60522065274ae717d7b7d5873af4c4ae76af4f) | enforced 1 movement per turn | player can only move once per turn |
+|                    | 17/04/2026 | [[Link to Commit 4]](https://github.com/yanke4/sopra-fs26-group-23-server/commit/534cbb0162ff246d57f1f32e385dbafe1e031c4a) | implemented surrender logic | players can surrender |
+|                    | 18/04/2026 | [[Link to Commit 5]](https://github.com/yanke4/sopra-fs26-group-23-server/commit/109d1bc31c871d0515e3cc1d6ffa0600a5db99ed) | implemented win condition check | game can end |
+|                    | 18/04/2026 | [[Link to Commit 6]](https://github.com/yanke4/sopra-fs26-group-23-client/commit/296e5869c8645e1789c8e7e6a54e3ca966afedfc) | added surrender button | player can surrender now |
+|                    | 19/04/2026 | [[Link to Commit 7]](https://github.com/yanke4/sopra-fs26-group-23-client/commit/845fee5c1cb3fb9bde9073e4c57b4ff0e4fb9846) | surrender notification | players see when someone surrenders |
+| **[@githubUser2]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
+|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **[@githubUser3]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
+|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **[@githubUser4]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
+|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
 
 ---
 
 ## Contributions Week 4 - [Begin Date] to [End Date]
 
-_Continue with the same table format as above._
+| **Student**        | **Date** | **Link to Commit** | **Description**                 | **Relevance**                       |
+| ------------------ | -------- | ------------------ | ------------------------------- | ----------------------------------- |
+| **[@githubUser1]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
+|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **[@githubUser2]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
+|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **[@githubUser3]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
+|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **[@githubUser4]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
+|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
 
 ---
 
