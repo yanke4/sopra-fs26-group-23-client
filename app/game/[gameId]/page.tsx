@@ -2,11 +2,11 @@
 
 import EuropeMap, { TerritoryState } from "@/components/europe-map";
 import VictoryScreen from "@/components/victory-screen";
-import React, { useState, useMemo, useCallback, useEffect } from "react";
+import React, { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { Swords, Shield, Users, MapPin, Flag, Dice5 } from "lucide-react";
 import { ApiService } from "@/api/apiService";
 import { useGameSocket } from "@/hooks/useGameSocket";
-import type { GameStateDTO, GamePhase } from "@/types/game";
+import type { GameStateDTO, GamePhase, PlayerStateDTO } from "@/types/game";
 import type { AttackPayload } from "@/types/game";
 import GameChat from "@/components/GameChat";
 import { useParams } from "next/navigation";
@@ -34,6 +34,9 @@ const GamePage = () => {
   const [attackTroops, setAttackTroops] = useState<number>(1);
   const [fortifyTroops, setFortifyTroops] = useState<number>(1);
 
+  const [surrenderMessage, setSurrenderMessage] = useState<string | null>(null);
+  const previousPlayersRef = useRef<PlayerStateDTO[]>([]);
+
   const userId =
     typeof window !== "undefined"
       ? (() => {
@@ -50,16 +53,34 @@ const GamePage = () => {
           ?.playerId ?? null)
       : null;
 
-  // not currentPlayer so whos turn it is instead currentUser so Person in Chat
+
   const currentUser = useMemo(() => ({
     id: String(myPlayerId ?? "0"), 
     name: gameState?.players.find(p => p.userId === userId)?.username ?? "Player", 
     color: (gameState?.players.find(p => p.userId === userId)?.color ?? "RED").toLowerCase(),
   }), [gameState, userId, myPlayerId]);
-      
+
+
+  useEffect(() => {
+    if (!surrenderMessage) return;
+    const timer = setTimeout(() => setSurrenderMessage(null), 4000);
+    return () => clearTimeout(timer);
+  }, [surrenderMessage]);
 
 
   const handleGameUpdate = useCallback((state: GameStateDTO) => {
+    const prev = previousPlayersRef.current;
+    if (prev.length > 0) {
+      const surrendered = state.players.filter((p) => {
+        const old = prev.find((op) => op.playerId === p.playerId);
+        return old?.alive === true && p.alive === false;
+      });
+      if (surrendered.length > 0) {
+        setSurrenderMessage(`${surrendered[0].username} has surrendered!`);
+      }
+    }
+    previousPlayersRef.current = state.players;
+
     setGameState(state);
   }, []);
 
@@ -79,6 +100,7 @@ const GamePage = () => {
           "Game state fields:",
           JSON.stringify(state.fields, null, 2),
         );
+        previousPlayersRef.current = state.players;
         setGameState(state);
       })
       .catch((err) =>
@@ -100,8 +122,6 @@ const GamePage = () => {
 
   const currentTurn = 3;
 
-
-
   const phaseIndex = PHASES.indexOf(currentPhase);
 
   // Compute player stats from game state (real players) or fallback to mock
@@ -117,6 +137,7 @@ const GamePage = () => {
           territories: ownedFields.length,
           troops: ownedFields.reduce((sum, f) => sum + f.troops, 0),
           playerId: p.playerId,
+          alive: p.alive,
         };
       });
     }
@@ -130,6 +151,7 @@ const GamePage = () => {
         territories: owned.length,
         troops: owned.reduce((sum, t) => sum + t.troops, 0),
         playerId: i,
+        alive: true,
       };
     });
   }, [gameState, userId]);
@@ -379,16 +401,17 @@ const GamePage = () => {
   };
 
   const handleSurrender = async () => {
-  if (!gameId || !myPlayerId) return;
-  const confirmed = window.confirm("Are you sure you want to surrender?");
-  if (!confirmed) return;
-  try {
-    const apiService = new ApiService();
-    await apiService.post(`/games/${gameId}/players/${myPlayerId}/surrender`, {});
-  } catch (e) {
-    console.error("Surrender failed:", e);
-  }
-};
+    if (!gameId || !myPlayerId) return;
+    const confirmed = window.confirm("Are you sure you want to surrender?");
+    if (!confirmed) return;
+    try {
+      const apiService = new ApiService();
+      await apiService.post(`/games/${gameId}/players/${myPlayerId}/surrender`, {});
+      setSurrenderMessage("You have surrendered.");
+    } catch (e) {
+      console.error("Surrender failed:", e);
+    }
+  };
 
   const handleFortify = async () => {
     if (
@@ -469,6 +492,15 @@ const GamePage = () => {
 
   return (
     <div className="flex flex-col h-[calc(100vh-64px)] overflow-hidden select-none bg-[#0a0908]">
+
+      
+      {surrenderMessage && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 bg-red-900/90 border border-red-500/50 text-red-100 px-5 py-2.5 rounded-lg shadow-xl shadow-black/50 text-sm font-semibold">
+          <Flag size={14} className="text-red-400 shrink-0" />
+          {surrenderMessage}
+        </div>
+      )}
+
       <div className="flex items-center justify-between px-4 py-2 bg-black/60 border-b border-amber-900/40">
         <div className="flex items-center gap-3">
           <span className="text-amber-400/70 text-xs font-mono uppercase tracking-wider">
@@ -553,9 +585,11 @@ const GamePage = () => {
               <div
                 key={player.name}
                 className={`rounded-lg p-2.5 transition-all ${
-                  i === currentPlayer
-                    ? "bg-amber-900/20 border border-amber-500/30"
-                    : "bg-white/3 border border-transparent hover:bg-white/6"
+                  !player.alive
+                    ? "opacity-40 bg-white/3 border border-transparent"
+                    : i === currentPlayer
+                      ? "bg-amber-900/20 border border-amber-500/30"
+                      : "bg-white/3 border border-transparent hover:bg-white/6"
                 }`}
               >
                 <div className="flex items-center gap-2 mb-1">
@@ -564,13 +598,24 @@ const GamePage = () => {
                     style={{ backgroundColor: player.color }}
                   />
                   <span
-                    className={`text-sm font-semibold ${i === currentPlayer ? "text-amber-200" : "text-white/60"}`}
+                    className={`text-sm font-semibold ${
+                      !player.alive
+                        ? "text-white/30 line-through"
+                        : i === currentPlayer
+                          ? "text-amber-200"
+                          : "text-white/60"
+                    }`}
                   >
                     {player.name}
                   </span>
-                  {i === currentPlayer && (
+                  {i === currentPlayer && player.alive && (
                     <span className="ml-auto text-[9px] text-amber-400 bg-amber-400/10 px-1.5 py-0.5 rounded font-bold">
                       TURN
+                    </span>
+                  )}
+                  {!player.alive && (
+                    <span className="ml-auto text-[9px] text-red-400/60 bg-red-400/10 px-1.5 py-0.5 rounded font-bold">
+                      OUT
                     </span>
                   )}
                 </div>
