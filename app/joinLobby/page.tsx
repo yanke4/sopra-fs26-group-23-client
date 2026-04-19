@@ -28,25 +28,39 @@ export default function JoinLobbyPage() {
       return;
     }
 
-    try {
-      const lobby = await apiService.put<{ lobbyId: number }>(
-        `/lobbies/${pin}`,
-        {
-          userId: Number(user.id),
-        },
-      );
+    const MAX_ATTEMPTS = 3;
+    const RETRY_DELAY_MS = 1500;
 
-      router.push(`/lobby?lobbyId=${lobby.lobbyId}`);
-    } catch (err: unknown) {
-      if (err instanceof Error && "status" in err) {
-        const appError = err as ApplicationError;
-        setError(appError.info || "Failed to find Lobby. Check your code.");
-      } else {
-        setError("Something went wrong. Please try again.");
+    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+      try {
+        const lobby = await apiService.put<{ lobbyId: number }>(
+          `/lobbies/${pin}`,
+          { userId: Number(user.id) },
+        );
+        router.push(`/lobby?lobbyId=${lobby.lobbyId}`);
+        return;
+      } catch (err: unknown) {
+        const isNotFound =
+          err instanceof Error &&
+          "status" in err &&
+          (err as ApplicationError).status === 404;
+
+        if (isNotFound && attempt < MAX_ATTEMPTS) {
+          await new Promise((res) => setTimeout(res, RETRY_DELAY_MS));
+          continue;
+        }
+
+        if (err instanceof Error && "status" in err) {
+          const appError = err as ApplicationError;
+          setError(appError.info || "Failed to find Lobby. Check your code.");
+        } else {
+          setError("Something went wrong. Please try again.");
+        }
+        break;
       }
-    } finally {
-      setLoading(false);
     }
+
+    setLoading(false);
   };
 
   return (
