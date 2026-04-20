@@ -567,9 +567,9 @@ const GamePage = () => {
         <div className="flex items-center gap-2">
           <button
             onClick={nextPhase}
-            disabled={!isMyTurn}
+            disabled={!isMyTurn || (currentPhase === "Deploy" && reinforcements > 0)}
             className={`w-36 px-5 py-1.5 rounded text-xs font-bold uppercase tracking-wide border transition-all ${
-              isMyTurn
+              isMyTurn && !(currentPhase === "Deploy" && reinforcements > 0)
                 ? "bg-amber-700/50 hover:bg-amber-600/60 text-amber-100 border-amber-500/30 hover:shadow-lg hover:shadow-amber-900/30 cursor-pointer"
                 : "bg-white/5 text-white/20 border-white/10 cursor-not-allowed"
             }`}
