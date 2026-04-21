@@ -31,7 +31,6 @@ const GamePage = () => {
   );
   const [targetTerritory, setTargetTerritory] = useState<string | null>(null);
   const [deployTroops, setDeployTroops] = useState<number>(1);
-  const [reinforcements, setReinforcements] = useState<number>(0);
   const [attackTroops, setAttackTroops] = useState<number>(1);
   const [fortifyTroops, setFortifyTroops] = useState<number>(1);
 
@@ -208,6 +207,12 @@ const GamePage = () => {
           ?.ownerPlayerId ?? null)
       : null;
 
+  const reinforcements = useMemo(() => {
+    if (currentPhase !== "Deploy" || !isMyTurn || !gameState) return 0;
+    const me = gameState.players.find((p) => p.playerId === myPlayerId);
+    return me?.troopCount ?? 0;
+  }, [currentPhase, isMyTurn, gameState, myPlayerId]);
+
   const canDeployToSelected =
     currentPhase === "Deploy" &&
     isMyTurn &&
@@ -217,12 +222,9 @@ const GamePage = () => {
 
   useEffect(() => {
     if (currentPhase === "Deploy" && isMyTurn) {
-      setReinforcements(5 + myRegionBonus);
       setDeployTroops(1);
-    } else {
-      setReinforcements(0);
     }
-  }, [currentPhase, isMyTurn, gameState?.currentPlayerId, myRegionBonus]);
+  }, [currentPhase, isMyTurn, gameState?.currentPlayerId]);
 
   const validTargets = useMemo(() => {
     if (!selectedTerritory) return [];
@@ -405,10 +407,8 @@ const GamePage = () => {
         deployments: [{ fieldName: selectedTerritory, troops }],
       });
 
-      const newReinforcements = Math.max(0, reinforcements - troops);
-      setReinforcements(newReinforcements);
       setDeployTroops(1);
-      if (newReinforcements === 0) {
+      if (reinforcements - troops === 0) {
         advancePhase();
       }
     } catch (e) {
