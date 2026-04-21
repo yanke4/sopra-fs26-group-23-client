@@ -45,14 +45,13 @@ export const ADJACENCY: Record<string, string[]> = {
   Bulgaria: ["Greece", "Turkey", "Balkan", "Romania"],
   Turkey: ["Bulgaria", "Greece"],
   Hungary: [
-    "Czech Republic",
     "Slovakia",
     "Austria",
     "Balkan",
     "Romania",
     "Ukraine",
   ],
-  "Czech Republic": ["Germany", "Austria", "Poland", "Slovakia", "Hungary"],
+  "Czech Republic": ["Germany", "Austria", "Poland", "Slovakia"],
   Slovakia: ["Czech Republic", "Poland", "Austria", "Hungary", "Ukraine"],
   Poland: [
     "Germany",
