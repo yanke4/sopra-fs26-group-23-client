@@ -154,7 +154,7 @@ const handleGameUpdate = useCallback((state: GameStateDTO) => {
 useGameSocket({ gameId, onGameUpdate: handleGameUpdate });
 
   const currentPlayer = 0; // visual only
-  const currentTurn = 3;
+  const currentTurn = gameState?.turnNumber ?? 1;
   const reinforcements = 5;
 
 
