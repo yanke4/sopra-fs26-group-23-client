@@ -874,13 +874,13 @@ const GamePage = () => {
                       : "bg-white/3 border border-transparent hover:bg-white/6"
                 }`}
               >
-                <div className="flex items-center gap-2 mb-1">
+                <div className="flex items-center gap-2 mb-1 min-w-0">
                   <div
-                    className="w-3 h-3 rounded-full ring-1 ring-white/20"
+                    className="w-3 h-3 rounded-full ring-1 ring-white/20 shrink-0"
                     style={{ backgroundColor: player.color }}
                   />
                   <span
-                    className={`text-sm font-semibold ${
+                    className={`text-sm font-semibold truncate min-w-0 ${
                       !player.alive
                         ? "text-white/30 line-through"
                         : i === currentPlayer
@@ -891,12 +891,12 @@ const GamePage = () => {
                     {player.name}
                   </span>
                   {i === currentPlayer && player.alive && (
-                    <span className="ml-auto text-[9px] text-amber-400 bg-amber-400/10 px-1.5 py-0.5 rounded font-bold">
+                    <span className="ml-auto shrink-0 text-[9px] text-amber-400 bg-amber-400/10 px-1.5 py-0.5 rounded font-bold">
                       TURN
                     </span>
                   )}
                   {!player.alive && (
-                    <span className="ml-auto text-[9px] text-red-400/60 bg-red-400/10 px-1.5 py-0.5 rounded font-bold">
+                    <span className="ml-auto shrink-0 text-[9px] text-red-400/60 bg-red-400/10 px-1.5 py-0.5 rounded font-bold">
                       OUT
                     </span>
                   )}
