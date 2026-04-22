@@ -987,7 +987,7 @@ const GamePage = () => {
                           Math.max(1, Math.min(next, Math.max(1, reinforcements))),
                         );
                       }}
-                      className="w-full h-7 px-2 rounded bg-black/30 border border-green-500/30 text-green-100 text-sm font-mono"
+                      className="flex-1 min-w-0 h-7 px-2 rounded bg-black/30 border border-green-500/30 text-green-100 text-sm font-mono"
                     />
                     <button
                       onClick={() =>
@@ -998,6 +998,19 @@ const GamePage = () => {
                       className="w-7 h-7 rounded bg-green-900/30 hover:bg-green-800/40 border border-green-500/30 text-green-200 font-bold"
                     >
                       +
+                    </button>
+                    <button
+                      onClick={() =>
+                        setDeployTroops(Math.max(1, reinforcements))
+                      }
+                      disabled={reinforcements <= 0}
+                      className={`h-7 px-2 rounded text-[10px] font-bold border tracking-wider uppercase transition-all ${
+                        reinforcements > 0
+                          ? "bg-green-900/30 hover:bg-green-800/40 text-green-200 border-green-500/30"
+                          : "bg-white/5 text-white/30 border-white/10 cursor-not-allowed"
+                      }`}
+                    >
+                      Max
                     </button>
                   </div>
 
@@ -1064,7 +1077,7 @@ const GamePage = () => {
                       Math.max(1, Math.min(next, Math.max(1, maxAttackTroops))),
                     );
                   }}
-                  className="w-full h-7 px-2 rounded bg-black/30 border border-red-500/30 text-red-100 text-sm font-mono"
+                  className="flex-1 min-w-0 h-7 px-2 rounded bg-black/30 border border-red-500/30 text-red-100 text-sm font-mono"
                 />
                 <button
                   onClick={() =>
@@ -1075,6 +1088,19 @@ const GamePage = () => {
                   className="w-7 h-7 rounded bg-red-900/30 hover:bg-red-800/40 border border-red-500/30 text-red-200 font-bold"
                 >
                   +
+                </button>
+                <button
+                  onClick={() =>
+                    setAttackTroops(Math.max(1, maxAttackTroops))
+                  }
+                  disabled={maxAttackTroops <= 0}
+                  className={`h-7 px-2 rounded text-[10px] font-bold border tracking-wider uppercase transition-all ${
+                    maxAttackTroops > 0
+                      ? "bg-red-900/30 hover:bg-red-800/40 text-red-200 border-red-500/30"
+                      : "bg-white/5 text-white/30 border-white/10 cursor-not-allowed"
+                  }`}
+                >
+                  Max
                 </button>
               </div>
 
@@ -1137,7 +1163,7 @@ const GamePage = () => {
                       Math.max(1, Math.min(next, Math.max(1, maxFortifyTroops))),
                     );
                   }}
-                  className="w-full h-7 px-2 rounded bg-black/30 border border-blue-500/30 text-blue-100 text-sm font-mono"
+                  className="flex-1 min-w-0 h-7 px-2 rounded bg-black/30 border border-blue-500/30 text-blue-100 text-sm font-mono"
                 />
                 <button
                   onClick={() =>
@@ -1148,6 +1174,19 @@ const GamePage = () => {
                   className="w-7 h-7 rounded bg-blue-900/30 hover:bg-blue-800/40 border border-blue-500/30 text-blue-200 font-bold"
                 >
                   +
+                </button>
+                <button
+                  onClick={() =>
+                    setFortifyTroops(Math.max(1, maxFortifyTroops))
+                  }
+                  disabled={maxFortifyTroops <= 0}
+                  className={`h-7 px-2 rounded text-[10px] font-bold border tracking-wider uppercase transition-all ${
+                    maxFortifyTroops > 0
+                      ? "bg-blue-900/30 hover:bg-blue-800/40 text-blue-200 border-blue-500/30"
+                      : "bg-white/5 text-white/30 border-white/10 cursor-not-allowed"
+                  }`}
+                >
+                  Max
                 </button>
               </div>
 
