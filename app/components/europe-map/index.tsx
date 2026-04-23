@@ -13,10 +13,16 @@ import MapBackground from "./MapBackground";
 import SeaConnections from "./SeaConnections";
 import TerritoryGeographies from "./TerritoryGeographies";
 import AttackArrows from "./AttackArrows";
+import AttackAnimation from "./AttackAnimation";
+import FortifyAnimation from "./FortifyAnimation";
+import DeployAnimation from "./DeployAnimation";
 import TerritoryMarkers from "./TerritoryMarkers";
 import RegionTooltip from "./RegionTooltip";
 
 export type { TerritoryState } from "./types";
+export type { AttackAnimationData } from "./AttackAnimation";
+export type { FortifyAnimationData } from "./FortifyAnimation";
+export type { DeployAnimationData } from "./DeployAnimation";
 
 const EuropeMap: React.FC<EuropeMapProps> = ({
   territories,
@@ -25,6 +31,9 @@ const EuropeMap: React.FC<EuropeMapProps> = ({
   targetTerritory,
   onTerritoryClick,
   validTargets = [],
+  attackAnimation = null,
+  fortifyAnimation = null,
+  deployAnimation = null,
 }) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [geoData, setGeoData] = useState<any>(null);
@@ -111,6 +120,12 @@ const EuropeMap: React.FC<EuropeMapProps> = ({
           selectedTerritory={selectedTerritory}
           targetTerritory={targetTerritory}
         />
+
+        <AttackAnimation animation={attackAnimation} />
+
+        <FortifyAnimation animation={fortifyAnimation} />
+
+        <DeployAnimation animation={deployAnimation} />
       </ComposableMap>
 
       <RegionTooltip

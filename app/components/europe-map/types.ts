@@ -1,3 +1,7 @@
+import type { AttackAnimationData } from "./AttackAnimation";
+import type { FortifyAnimationData } from "./FortifyAnimation";
+import type { DeployAnimationData } from "./DeployAnimation";
+
 export interface TerritoryState {
   owner: number;
   troops: number;
@@ -10,4 +14,7 @@ export interface EuropeMapProps {
   targetTerritory: string | null;
   onTerritoryClick: (name: string) => void;
   validTargets?: string[];
+  attackAnimation?: AttackAnimationData | null;
+  fortifyAnimation?: FortifyAnimationData | null;
+  deployAnimation?: DeployAnimationData | null;
 }

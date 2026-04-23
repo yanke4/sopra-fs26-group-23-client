@@ -1,12 +1,22 @@
 "use client";
 
-import EuropeMap, { TerritoryState } from "@/components/europe-map";
+import EuropeMap, {
+  TerritoryState,
+  AttackAnimationData,
+  FortifyAnimationData,
+  DeployAnimationData,
+} from "@/components/europe-map";
 import VictoryScreen from "@/components/victory-screen";
 import React, { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { Swords, Shield, Users, MapPin, Flag, Dice5 } from "lucide-react";
 import { ApiService } from "@/api/apiService";
 import { useGameSocket } from "@/hooks/useGameSocket";
-import type { GameStateDTO, GamePhase, PlayerStateDTO } from "@/types/game";
+import type {
+  GameStateDTO,
+  GamePhase,
+  PlayerStateDTO,
+  FieldStateDTO,
+} from "@/types/game";
 import type { AttackPayload } from "@/types/game";
 import GameChat from "@/components/GameChat";
 import { useParams } from "next/navigation";
@@ -21,6 +31,134 @@ import {
   REGIONS,
 } from "./gameData";
 import type { Phase } from "./gameData";
+
+type AttackDiffResult = Omit<AttackAnimationData, "id">;
+type FortifyDiffResult = Omit<FortifyAnimationData, "id">;
+type DeployDiffResult = Omit<DeployAnimationData, "id">;
+
+const detectDeployFromDiff = (
+  prev: GameStateDTO,
+  next: GameStateDTO,
+): DeployDiffResult | null => {
+  const prevByName = new Map(prev.fields.map((f) => [f.fieldName, f]));
+  const changed: { prev: FieldStateDTO; cur: FieldStateDTO }[] = [];
+  for (const cur of next.fields) {
+    const pf = prevByName.get(cur.fieldName);
+    if (!pf) continue;
+    if (pf.ownerPlayerId !== cur.ownerPlayerId || pf.troops !== cur.troops) {
+      changed.push({ prev: pf, cur });
+    }
+  }
+  if (changed.length !== 1) return null;
+  const c = changed[0];
+  if (c.prev.ownerPlayerId !== c.cur.ownerPlayerId) return null;
+  const delta = c.cur.troops - c.prev.troops;
+  if (delta <= 0) return null;
+  return { field: c.prev.fieldName, troops: delta };
+};
+
+const detectFortifyFromDiff = (
+  prev: GameStateDTO,
+  next: GameStateDTO,
+): FortifyDiffResult | null => {
+  const prevByName = new Map(prev.fields.map((f) => [f.fieldName, f]));
+  const changed: { prev: FieldStateDTO; cur: FieldStateDTO }[] = [];
+  for (const cur of next.fields) {
+    const pf = prevByName.get(cur.fieldName);
+    if (!pf) continue;
+    if (pf.ownerPlayerId !== cur.ownerPlayerId || pf.troops !== cur.troops) {
+      changed.push({ prev: pf, cur });
+    }
+  }
+  if (changed.length !== 2) return null;
+  const [a, b] = changed;
+  if (
+    a.prev.ownerPlayerId !== a.cur.ownerPlayerId ||
+    b.prev.ownerPlayerId !== b.cur.ownerPlayerId
+  )
+    return null;
+  if (a.prev.ownerPlayerId !== b.prev.ownerPlayerId) return null;
+
+  const aDelta = a.cur.troops - a.prev.troops;
+  const bDelta = b.cur.troops - b.prev.troops;
+  if (aDelta + bDelta !== 0) return null;
+  if (aDelta === 0) return null;
+
+  const source = aDelta < 0 ? a : b;
+  const dest = aDelta < 0 ? b : a;
+  return {
+    from: source.prev.fieldName,
+    to: dest.prev.fieldName,
+    troops: Math.abs(aDelta),
+  };
+};
+
+const detectAttackFromDiff = (
+  prev: GameStateDTO,
+  next: GameStateDTO,
+): AttackDiffResult | null => {
+  const prevByName = new Map(prev.fields.map((f) => [f.fieldName, f]));
+  const changed: { prev: FieldStateDTO; cur: FieldStateDTO }[] = [];
+  for (const cur of next.fields) {
+    const pf = prevByName.get(cur.fieldName);
+    if (!pf) continue;
+    if (pf.ownerPlayerId !== cur.ownerPlayerId || pf.troops !== cur.troops) {
+      changed.push({ prev: pf, cur });
+    }
+  }
+  if (changed.length === 0) return null;
+
+  const ownerChanges = changed.filter(
+    (c) => c.prev.ownerPlayerId !== c.cur.ownerPlayerId,
+  );
+
+  if (ownerChanges.length === 1) {
+    const defender = ownerChanges[0];
+    const newOwner = defender.cur.ownerPlayerId;
+    if (newOwner === null) return null;
+    const attacker = changed.find(
+      (c) =>
+        c !== defender &&
+        c.prev.ownerPlayerId === newOwner &&
+        c.cur.ownerPlayerId === newOwner &&
+        c.cur.troops < c.prev.troops,
+    );
+    if (!attacker) return null;
+    const troopsMoved = attacker.prev.troops - attacker.cur.troops;
+    const survivingAttackers = defender.cur.troops;
+    return {
+      attacker: attacker.prev.fieldName,
+      defender: defender.prev.fieldName,
+      attackerLosses: Math.max(0, troopsMoved - survivingAttackers),
+      defenderLosses: defender.prev.troops,
+      conquered: true,
+    };
+  }
+
+  if (changed.length === 2 && ownerChanges.length === 0) {
+    const [a, b] = changed;
+    if (a.cur.troops >= a.prev.troops || b.cur.troops >= b.prev.troops)
+      return null;
+    if (a.prev.ownerPlayerId === b.prev.ownerPlayerId) return null;
+    const attackerField =
+      a.prev.ownerPlayerId === prev.currentPlayerId
+        ? a
+        : b.prev.ownerPlayerId === prev.currentPlayerId
+          ? b
+          : null;
+    if (!attackerField) return null;
+    const defenderField = attackerField === a ? b : a;
+    return {
+      attacker: attackerField.prev.fieldName,
+      defender: defenderField.prev.fieldName,
+      attackerLosses: attackerField.prev.troops - attackerField.cur.troops,
+      defenderLosses: defenderField.prev.troops - defenderField.cur.troops,
+      conquered: false,
+    };
+  }
+
+  return null;
+};
 
 const GamePage = () => {
   const params = useParams();
@@ -37,6 +175,23 @@ const GamePage = () => {
   const [surrenderMessage, setSurrenderMessage] = useState<string | null>(null);
   const [showSurrenderModal, setShowSurrenderModal] = useState(false);
   const previousPlayersRef = useRef<PlayerStateDTO[]>([]);
+  const previousStateRef = useRef<GameStateDTO | null>(null);
+  const [attackAnimation, setAttackAnimation] =
+    useState<AttackAnimationData | null>(null);
+  const attackAnimationIdRef = useRef(0);
+  const pendingAttackRef = useRef<{
+    attacker: string;
+    defender: string;
+    troopsSent: number;
+    defenderTroopsBefore: number;
+    defenderOwnerBefore: number | null;
+  } | null>(null);
+  const [fortifyAnimation, setFortifyAnimation] =
+    useState<FortifyAnimationData | null>(null);
+  const fortifyAnimationIdRef = useRef(0);
+  const [deployAnimation, setDeployAnimation] =
+    useState<DeployAnimationData | null>(null);
+  const deployAnimationIdRef = useRef(0);
 
   const userId =
     typeof window !== "undefined"
@@ -82,8 +237,103 @@ const GamePage = () => {
     }
     previousPlayersRef.current = state.players;
 
+    const prevState = previousStateRef.current;
+    if (prevState && prevState.currentPhase === "ATTACK") {
+      let result: AttackDiffResult | null = null;
+
+      const pending = pendingAttackRef.current;
+      if (pending) {
+        const defField = state.fields.find(
+          (f) => f.fieldName === pending.defender,
+        );
+        const attField = state.fields.find(
+          (f) => f.fieldName === pending.attacker,
+        );
+        if (defField && attField) {
+          const conquered =
+            defField.ownerPlayerId !== pending.defenderOwnerBefore;
+          if (conquered) {
+            const survivingAttackers = defField.troops;
+            result = {
+              attacker: pending.attacker,
+              defender: pending.defender,
+              attackerLosses: Math.max(
+                0,
+                pending.troopsSent - survivingAttackers,
+              ),
+              defenderLosses: pending.defenderTroopsBefore,
+              conquered: true,
+            };
+          } else {
+            result = {
+              attacker: pending.attacker,
+              defender: pending.defender,
+              attackerLosses: pending.troopsSent - 1,
+              defenderLosses: Math.max(
+                0,
+                pending.defenderTroopsBefore - defField.troops,
+              ),
+              conquered: false,
+            };
+          }
+          pendingAttackRef.current = null;
+        }
+      }
+
+      if (!result) {
+        result = detectAttackFromDiff(prevState, state);
+      }
+
+      if (result) {
+        attackAnimationIdRef.current += 1;
+        setAttackAnimation({ id: attackAnimationIdRef.current, ...result });
+      }
+    }
+
+    if (prevState && prevState.currentPhase === "FORTIFY") {
+      const fortifyResult = detectFortifyFromDiff(prevState, state);
+      if (fortifyResult) {
+        fortifyAnimationIdRef.current += 1;
+        setFortifyAnimation({
+          id: fortifyAnimationIdRef.current,
+          ...fortifyResult,
+        });
+      }
+    }
+
+    if (prevState && prevState.currentPhase === "DEPLOY") {
+      const deployResult = detectDeployFromDiff(prevState, state);
+      if (deployResult) {
+        deployAnimationIdRef.current += 1;
+        setDeployAnimation({
+          id: deployAnimationIdRef.current,
+          ...deployResult,
+        });
+      }
+    }
+
+    previousStateRef.current = state;
+
     setGameState(state);
   }, []);
+
+  useEffect(() => {
+    if (!attackAnimation) return;
+    const timer = setTimeout(() => setAttackAnimation(null), 2200);
+    return () => clearTimeout(timer);
+  }, [attackAnimation]);
+
+  useEffect(() => {
+    if (!fortifyAnimation) return;
+    const timer = setTimeout(() => setFortifyAnimation(null), 2100);
+    return () => clearTimeout(timer);
+  }, [fortifyAnimation]);
+
+  useEffect(() => {
+    if (!deployAnimation) return;
+    const timer = setTimeout(() => setDeployAnimation(null), 2100);
+    return () => clearTimeout(timer);
+  }, [deployAnimation]);
 
   useGameSocket({ gameId, onGameUpdate: handleGameUpdate });
 
@@ -102,6 +352,7 @@ const GamePage = () => {
           JSON.stringify(state.fields, null, 2),
         );
         previousPlayersRef.current = state.players;
+        previousStateRef.current = state;
         setGameState(state);
       })
       .catch((err) =>
@@ -121,7 +372,7 @@ const GamePage = () => {
 
   const isMyTurn = gameState ? gameState.currentPlayerId === myPlayerId : false;
 
-  const currentTurn = 3;
+  const currentTurn = gameState?.turnNumber ?? 1;
 
   const phaseIndex = PHASES.indexOf(currentPhase);
 
@@ -366,6 +617,17 @@ const GamePage = () => {
 
     const troops = Math.min(Math.max(1, attackTroops || 1), maxAttackTroops);
 
+    const defenderField = gameState?.fields.find(
+      (f) => f.fieldName === targetTerritory,
+    );
+    pendingAttackRef.current = {
+      attacker: selectedTerritory,
+      defender: targetTerritory,
+      troopsSent: troops,
+      defenderTroopsBefore: defenderField?.troops ?? 0,
+      defenderOwnerBefore: defenderField?.ownerPlayerId ?? null,
+    };
+
     try {
       const apiService = new ApiService();
       await apiService.post(`/games/${gameId}/turns/attack`, {
@@ -383,6 +645,7 @@ const GamePage = () => {
       setTargetTerritory(null);
       setAttackTroops(1);
     } catch (e) {
+      pendingAttackRef.current = null;
       console.error("Attack failed:", e);
     }
   };
@@ -656,13 +919,13 @@ const GamePage = () => {
                       : "bg-white/3 border border-transparent hover:bg-white/6"
                 }`}
               >
-                <div className="flex items-center gap-2 mb-1">
+                <div className="flex items-center gap-2 mb-1 min-w-0">
                   <div
-                    className="w-3 h-3 rounded-full ring-1 ring-white/20"
+                    className="w-3 h-3 rounded-full ring-1 ring-white/20 shrink-0"
                     style={{ backgroundColor: player.color }}
                   />
                   <span
-                    className={`text-sm font-semibold ${
+                    className={`text-sm font-semibold truncate min-w-0 ${
                       !player.alive
                         ? "text-white/30 line-through"
                         : i === currentPlayer
@@ -673,12 +936,12 @@ const GamePage = () => {
                     {player.name}
                   </span>
                   {i === currentPlayer && player.alive && (
-                    <span className="ml-auto text-[9px] text-amber-400 bg-amber-400/10 px-1.5 py-0.5 rounded font-bold">
+                    <span className="ml-auto shrink-0 text-[9px] text-amber-400 bg-amber-400/10 px-1.5 py-0.5 rounded font-bold">
                       TURN
                     </span>
                   )}
                   {!player.alive && (
-                    <span className="ml-auto text-[9px] text-red-400/60 bg-red-400/10 px-1.5 py-0.5 rounded font-bold">
+                    <span className="ml-auto shrink-0 text-[9px] text-red-400/60 bg-red-400/10 px-1.5 py-0.5 rounded font-bold">
                       OUT
                     </span>
                   )}
@@ -769,7 +1032,7 @@ const GamePage = () => {
                           Math.max(1, Math.min(next, Math.max(1, reinforcements))),
                         );
                       }}
-                      className="w-full h-7 px-2 rounded bg-black/30 border border-green-500/30 text-green-100 text-sm font-mono"
+                      className="flex-1 min-w-0 h-7 px-2 rounded bg-black/30 border border-green-500/30 text-green-100 text-sm font-mono"
                     />
                     <button
                       onClick={() =>
@@ -780,6 +1043,19 @@ const GamePage = () => {
                       className="w-7 h-7 rounded bg-green-900/30 hover:bg-green-800/40 border border-green-500/30 text-green-200 font-bold"
                     >
                       +
+                    </button>
+                    <button
+                      onClick={() =>
+                        setDeployTroops(Math.max(1, reinforcements))
+                      }
+                      disabled={reinforcements <= 0}
+                      className={`h-7 px-2 rounded text-[10px] font-bold border tracking-wider uppercase transition-all ${
+                        reinforcements > 0
+                          ? "bg-green-900/30 hover:bg-green-800/40 text-green-200 border-green-500/30"
+                          : "bg-white/5 text-white/30 border-white/10 cursor-not-allowed"
+                      }`}
+                    >
+                      Max
                     </button>
                   </div>
 
@@ -846,7 +1122,7 @@ const GamePage = () => {
                       Math.max(1, Math.min(next, Math.max(1, maxAttackTroops))),
                     );
                   }}
-                  className="w-full h-7 px-2 rounded bg-black/30 border border-red-500/30 text-red-100 text-sm font-mono"
+                  className="flex-1 min-w-0 h-7 px-2 rounded bg-black/30 border border-red-500/30 text-red-100 text-sm font-mono"
                 />
                 <button
                   onClick={() =>
@@ -857,6 +1133,19 @@ const GamePage = () => {
                   className="w-7 h-7 rounded bg-red-900/30 hover:bg-red-800/40 border border-red-500/30 text-red-200 font-bold"
                 >
                   +
+                </button>
+                <button
+                  onClick={() =>
+                    setAttackTroops(Math.max(1, maxAttackTroops))
+                  }
+                  disabled={maxAttackTroops <= 0}
+                  className={`h-7 px-2 rounded text-[10px] font-bold border tracking-wider uppercase transition-all ${
+                    maxAttackTroops > 0
+                      ? "bg-red-900/30 hover:bg-red-800/40 text-red-200 border-red-500/30"
+                      : "bg-white/5 text-white/30 border-white/10 cursor-not-allowed"
+                  }`}
+                >
+                  Max
                 </button>
               </div>
 
@@ -919,7 +1208,7 @@ const GamePage = () => {
                       Math.max(1, Math.min(next, Math.max(1, maxFortifyTroops))),
                     );
                   }}
-                  className="w-full h-7 px-2 rounded bg-black/30 border border-blue-500/30 text-blue-100 text-sm font-mono"
+                  className="flex-1 min-w-0 h-7 px-2 rounded bg-black/30 border border-blue-500/30 text-blue-100 text-sm font-mono"
                 />
                 <button
                   onClick={() =>
@@ -930,6 +1219,19 @@ const GamePage = () => {
                   className="w-7 h-7 rounded bg-blue-900/30 hover:bg-blue-800/40 border border-blue-500/30 text-blue-200 font-bold"
                 >
                   +
+                </button>
+                <button
+                  onClick={() =>
+                    setFortifyTroops(Math.max(1, maxFortifyTroops))
+                  }
+                  disabled={maxFortifyTroops <= 0}
+                  className={`h-7 px-2 rounded text-[10px] font-bold border tracking-wider uppercase transition-all ${
+                    maxFortifyTroops > 0
+                      ? "bg-blue-900/30 hover:bg-blue-800/40 text-blue-200 border-blue-500/30"
+                      : "bg-white/5 text-white/30 border-white/10 cursor-not-allowed"
+                  }`}
+                >
+                  Max
                 </button>
               </div>
 
@@ -960,6 +1262,9 @@ const GamePage = () => {
             targetTerritory={targetTerritory}
             onTerritoryClick={handleTerritoryClick}
             validTargets={validTargets}
+            attackAnimation={currentPhase === "Attack" ? attackAnimation : null}
+            fortifyAnimation={fortifyAnimation}
+            deployAnimation={deployAnimation}
           />
         </div>
 

@@ -36,6 +36,7 @@ export interface GameStateDTO {
   currentPlayerIndex: number;
   currentPlayerId: number;
   currentPhase: GamePhase;
+  turnNumber: number;
   players: PlayerStateDTO[];
   fields: FieldStateDTO[];
 }

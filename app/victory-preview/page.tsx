@@ -10,6 +10,7 @@ const mockGameState: GameStateDTO = {
   currentPlayerIndex: 0,
   currentPlayerId: 1,
   currentPhase: "ATTACK",
+  turnNumber: 12,
   players: [
     { playerId: 1, userId: 99, username: "Napoleon", color: "RED", alive: true, troopCount: 42 },
     { playerId: 2, userId: 100, username: "Caesar", color: "BLUE", alive: false, troopCount: 0 },
