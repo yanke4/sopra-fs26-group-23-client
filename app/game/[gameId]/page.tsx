@@ -35,6 +35,7 @@ const GamePage = () => {
   const [fortifyTroops, setFortifyTroops] = useState<number>(1);
 
   const [surrenderMessage, setSurrenderMessage] = useState<string | null>(null);
+  const [showSurrenderModal, setShowSurrenderModal] = useState(false);
   const previousPlayersRef = useRef<PlayerStateDTO[]>([]);
 
   const userId =
@@ -416,10 +417,13 @@ const GamePage = () => {
     }
   };
 
-  const handleSurrender = async () => {
+  const handleSurrender = () => {
     if (!gameId || !myPlayerId) return;
-    const confirmed = window.confirm("Are you sure you want to surrender?");
-    if (!confirmed) return;
+    setShowSurrenderModal(true);
+  };
+
+  const handleConfirmSurrender = async () => {
+    setShowSurrenderModal(false);
     try {
       const apiService = new ApiService();
       await apiService.post(`/games/${gameId}/players/${myPlayerId}/surrender`, {});
@@ -517,7 +521,48 @@ const GamePage = () => {
           {surrenderMessage}
         </div>
       )}
-
+      {showSurrenderModal && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center">
+        {/* Backdrop */}
+        <div
+          className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+          onClick={() => setShowSurrenderModal(false)}
+        />
+        {/* Modal */}
+        <div className="relative z-10 bg-[#0f0d0b] border border-amber-900/50 rounded-xl shadow-2xl shadow-black/80 p-6 w-80 flex flex-col gap-4">
+          {/* Icon + Title */}
+          <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center w-9 h-9 rounded-full bg-red-900/40 border border-red-500/30">
+              <Flag size={16} className="text-red-400" />
+            </div>
+            <h2 className="text-amber-100 font-bold text-base uppercase tracking-wide font-mono">
+              Surrender?
+            </h2>
+          </div>
+          {/* Body */}
+          <p className="text-amber-200/60 text-sm leading-relaxed">
+            Are you sure you want to surrender? You will be eliminated and your territories will be lost.
+          </p>
+          {/* Divider */}
+          <div className="h-px bg-amber-900/30" />
+          {/* Buttons */}
+          <div className="flex gap-2 justify-end">
+            <button
+              onClick={() => setShowSurrenderModal(false)}
+              className="px-4 py-1.5 rounded text-xs font-bold uppercase tracking-wide border border-amber-900/40 bg-white/5 text-amber-200/60 hover:bg-white/10 hover:text-amber-200 transition-all cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleConfirmSurrender}
+              className="px-4 py-1.5 rounded text-xs font-bold uppercase tracking-wide border border-red-500/30 bg-red-900/40 text-red-300 hover:bg-red-800/50 hover:text-red-200 transition-all cursor-pointer"
+            >
+              Surrender
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
       <div className="flex items-center justify-between px-4 py-2 bg-black/60 border-b border-amber-900/40">
         <div className="flex items-center gap-3">
           <span className="text-amber-400/70 text-xs font-mono uppercase tracking-wider">
