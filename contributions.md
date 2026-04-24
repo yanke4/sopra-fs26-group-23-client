@@ -117,12 +117,13 @@ reason).
 
 ---
 
-## Contributions Week 4 - [Begin Date] to [End Date]
+## Contributions Week 4 - 20/04/2026 to 24/04/2026
 
 | **Student**        | **Date** | **Link to Commit** | **Description**                 | **Relevance**                       |
 | ------------------ | -------- | ------------------ | ------------------------------- | ----------------------------------- |
-| **[@githubUser1]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
-|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **yanke4** | 21/04/2026 | [[Link to Commit 1]](https://github.com/yanke4/sopra-fs26-group-23-server/commit/705e1477745a0ab004a90dac710fa0f5bc85f7fa) | deploy on cloud run | cloud run is needed for websockets to work |
+|                    | 23/04/2026 | [[Link to Commit 2]](https://github.com/yanke4/sopra-fs26-group-23-client/commit/f5bfb4fc2cd097205d82478701fcb9780262d1b5) | changed surrender confirmation ui | ui more visual pleasing matching with rest of ui |
+|                    | 24/04/2026 | [[Link to Commit 3]](https://github.com/yanke4/sopra-fs26-group-23-server/commit/66b6f4883971dda201c0d5c3715341db1f27f50c) | added test | test required for m3 |
 | **[@githubUser2]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
 |                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
 | **[@githubUser3]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
