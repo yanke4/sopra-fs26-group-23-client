@@ -102,17 +102,14 @@ reason).
 |                    | 15/04/2026   | [[Link to Commit 2]](https://github.com/yanke4/sopra-fs26-group-23-client/commit/31760b62b98b8c2f9294344c672061488a6215b1) | Attack phase UI | Players can see which territories can be attacked from a starting position |
 |                    | 15/04/2026   | [[Link to Commit 3]](https://github.com/yanke4/sopra-fs26-group-23-server/commit/ff27234446ed7bfe22184607dd2df3c649542f31) | Turn rotation logic | Implement turn rotation that handles the rotation of turns between players |
 |                    | 16/04/2026   | [[Link to Commit 4]](https://github.com/yanke4/sopra-fs26-group-23-client/commit/45cf9517320b3236d6cc8d428cc51860cfa1734b) | Victory screen UI | Implement victory screen UI which is shown to the players at the end of the game |
-| **[@githubUser3]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
-|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
-| **[@MatteoLozano]** | [18/04/2026]   | [[Link to Commit 1]](https://github.com/yanke4/sopra-fs26-group-23-client/commit/291822c77eefe193ac1bada635dc3910abbc4dc6) | [Deployment UI and logic. Display deployment outcome for everybody in client ] | [Ensures deployment is correctly processed on the client and synchronizes deployment outcomes for all players.] |
+| **MatteoLozano** | [18/04/2026]   | [[Link to Commit 1]](https://github.com/yanke4/sopra-fs26-group-23-client/commit/291822c77eefe193ac1bada635dc3910abbc4dc6) | [Deployment UI and logic. Display deployment outcome for everybody in client ] | [Ensures deployment is correctly processed on the client and synchronizes deployment outcomes for all players.] |
 |                    | [18/04/2026]   | [[Link to Commit 2]](https://github.com/yanke4/sopra-fs26-group-23-client/commit/d2553a32e148286d1dbebca5d1a6bcc0a21f6c0e) | [Implement attack and movement UI and display outcome for everybody] | [Enables complete attack/movement interactions in the UI and keeps all players synchronized with shared outcomes.] |
 | **Linus5Frick** | 17/04/2026   | [[Link to Commit 1]][text](https://github.com/yanke4/sopra-fs26-group-23-client/commit/84ee5606882ea0ee9935fc4a223c18231eaee799) | Implemented the GameChat UI in the game page #30 | The GameChat is visible in the game site |
 |                    | 18/04/2026   | [[Link to Commit 2]](https://github.com/yanke4/sopra-fs26-group-23-client/commit/dba64b84a58caf47d9f95bf8cfdbc663fdc83eff) | Implemented everything needed for the Chat API in the frontend | Implemented the basis for the use of the API |
 |                    | 18/04/2026   | [[Link to Commit 3]](https://github.com/yanke4/sopra-fs26-group-23-client/commit/ba5c34a51d254ec07aafb6e9913758f02516b6c1) | add GameChat component to game page #64 and #65| Needed the GameChat for the sending of messages  |
 |                    | 18/04/2026   | [[Link to Commit 4]](https://github.com/yanke4/sopra-fs26-group-23-client/commit/9f725ddf9702e7e87363400aea16e5021ddb14e7) | Adjustments and additions for the GameChat to work. Color of Player and multiple message fix. #64 and #65  | Now the users have the same colour as in the game and messages arent sent multiple times |
 |                    | 18/04/2026   | [[Link to Commit 5]](https://github.com/yanke4/sopra-fs26-group-23-server/commit/744ce69e760c2a338cb28f95556b1c120bc0b94e) | Implemented the backend of the Chat| In order for the chat to work with the API the implementation of ChatController and MessageDTO |
-|                    | 18/04/2026   | [[Link to Commit 6]](https://github.com/yanke4/sopra-fs26-group-23-server/commit/33d92ae7c8a93ec4e010296a711213d1a7c0a4d5) | Changed the implementation of the attack method, so that the calculation of the remaining troops is correct.
-| Whenever a player attacks another field now the right amount of troops is taken away|
+|                    | 18/04/2026   | [[Link to Commit 6]](https://github.com/yanke4/sopra-fs26-group-23-server/commit/33d92ae7c8a93ec4e010296a711213d1a7c0a4d5) | Changed the implementation of the attack method, so that the calculation of the remaining troops is correct.| Whenever a player attacks another field now the right amount of troops is taken away|
 
 
 ---
@@ -126,10 +123,13 @@ reason).
 |                    | 24/04/2026 | [[Link to Commit 3]](https://github.com/yanke4/sopra-fs26-group-23-server/commit/66b6f4883971dda201c0d5c3715341db1f27f50c) | added test | test required for m3 |
 | **[@githubUser2]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
 |                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
-| **[@githubUser3]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
-|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
-| **[@githubUser4]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
-|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **MatteoLozano** | 24/04/2026 | [[Link to Commit 1]](https://github.com/yanke4/sopra-fs26-group-23-server/commit/b8967b8d5ebc8138aec47ed0c7d3558e33f233cc) | TurnServiceTests | test required for m3 |
+|                    | 24/04/2026 | [[Link to Commit 2]](https://github.com/yanke4/sopra-fs26-group-23-server/commit/07b03d945ca562d765acb193720ea7f44604a82f) | Fixed bug in TurnServiceTest | test required for m3 |
+|                    | 24/04/2026 | [[Link to Commit 3]](https://github.com/yanke4/sopra-fs26-group-23-server/commit/9fcd325f28268d00aabb4f4077e538d1fe755381) | TurnControllerTest | test required for m3 |
+| **Linus5Frick** | 21/04/2026 | [[Link to Commit 1]](https://github.com/yanke4/sopra-fs26-group-23-server/commit/5562b6d15d441b63d6c5d78db4972d339a84fdbf) | Start implementing UserControllerTests | test required for m3|
+|                    | 21/04/2026 | [[Link to Commit 2]](https://github.com/yanke4/sopra-fs26-group-23-server/commit/ce46d82dea125273fa4a5ff69eba448eae684eee) | Implemented UserContorllerTest and started on others | test required for m3 |
+|                    | 22/04/2026 | [[Link to Commit 3]](https://github.com/yanke4/sopra-fs26-group-23-server/commit/e3d15ffc7c1d0d3ec0d7e2e19a93c4460b3356e4) | Start with UserServiceTest | test required for m3 |
+|                    | 22/04/2026 | [[Link to Commit 4]](https://github.com/yanke4/sopra-fs26-group-23-server/commit/9fcc5d91c5dc870d495158df887065c77068157d) | Implemented UserServiceTest | test required for m3 |
 
 ---
 
