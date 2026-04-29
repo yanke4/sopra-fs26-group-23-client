@@ -93,7 +93,7 @@ function Message({ msg, isOwn }: { msg: ChatMessage; isOwn: boolean }) {
       display: "flex",
       flexDirection: isOwn ? "row-reverse" : "row",
       alignItems: "flex-end",
-      gap: 8,
+      gap: 2,
       maxWidth: "78%",
       alignSelf: isOwn ? "flex-end" : "flex-start",
     }}>
@@ -294,14 +294,14 @@ export default function GameChat({ gameId, currentUser, apiUrl }: GameChatProps)
   return (
     <div style={{
       display: "flex", flexDirection: "column",
-      height: "100%", background: "#0d0c0b",
+      height: "100%", minHeight: 0, flex:1,  background: "#0d0c0b",
       borderTop: "1px solid rgba(180,120,40,0.2)",
       overflow: "hidden", fontFamily: "var(--font-bruno)",
     }}>
       {/* Header */}
       <div style={{
         padding: "6px 12px",
-        borderBottom: "1px solid rgba(180,120,40,0.2)",
+        borderBottom: "1px solid rgba(16, 16, 15, 0.2)",
         display: "flex", alignItems: "center", justifyContent: "space-between",
       }}>
         <span style={{ fontSize: 10, fontWeight: 700, color: "rgba(251,191,36,0.7)", letterSpacing: "0.1em",}}>
@@ -345,7 +345,7 @@ export default function GameChat({ gameId, currentUser, apiUrl }: GameChatProps)
       <div style={{
         flex: 1, overflowY: "auto",
         padding: "10px 10px 6px",
-        display: "flex", flexDirection: "column", gap: 8,
+        display: "flex", flexDirection: "column", gap: 2,
       }}>
         {messages.length === 0 && (
           <div style={{

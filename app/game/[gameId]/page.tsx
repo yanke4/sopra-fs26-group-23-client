@@ -1268,8 +1268,8 @@ const GamePage = () => {
           />
         </div>
 
-        <div className="w-56 bg-black/40 border-l border-amber-900/30 flex flex-col">
-          <div className="border-b border-amber-900/20">
+        <div className="w-56 bg-black/40 border-l border-amber-900/30 flex flex-col" style={{ height: "100%" }}>
+          <div className="border-b border-amber-900/20"style={{ maxHeight: "40%", overflowY: "auto" }}>
             <div className="px-3 py-2 border-b border-amber-900/20">
               <h3 className="text-amber-400/70 text-[10px] font-bold uppercase tracking-widest">
                 Territory
@@ -1341,18 +1341,15 @@ const GamePage = () => {
             )}
           </div>
 
-          <div className="flex-1 flex flex-col overflow-hidden">
-            <div className="px-3 py-2 border-b border-amber-900/20">
-            <div className="h-64 border-t border-amber-900/30">
+            <div style={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column" }}>
             {myPlayerId &&(
               <GameChat
                 key={gameId} // Reset chat when gameId changes, but not on every render
                 gameId={String(gameId ?? "0")}
                 currentUser={currentUser}
                 apiUrl={process.env.NEXT_PUBLIC_PROD_API_URL ?? "http://localhost:8080"}
-            />)}
-          </div>
-            </div>
+            />
+            )}
           </div>
         </div>
       </div>
