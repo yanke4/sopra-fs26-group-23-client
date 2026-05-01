@@ -6,7 +6,7 @@ import EuropeMap, {
   FortifyAnimationData,
   DeployAnimationData,
 } from "@/components/europe-map";
-import VictoryScreen from "@/components/victory-screen";
+import VictoryScreen, { type TroopSnapshot } from "@/components/victory-screen";
 import React, { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { Swords, Shield, Users, MapPin, Flag, Dice5 } from "lucide-react";
 import { ApiService } from "@/api/apiService";
@@ -202,6 +202,7 @@ const GamePage = () => {
       : null;
 
   const [gameState, setGameState] = useState<GameStateDTO | null>(null);
+  const [troopHistory, setTroopHistory] = useState<TroopSnapshot[]>([]);
 
   const myPlayerId =
     gameState && userId !== null
@@ -310,6 +311,33 @@ const GamePage = () => {
           ...deployResult,
         });
       }
+    }
+
+    const isFirstSnapshot = !previousStateRef.current;
+    const turnChanged =
+      !!previousStateRef.current &&
+      previousStateRef.current.turnNumber !== state.turnNumber;
+    const justFinished =
+      state.status === "FINISHED" &&
+      previousStateRef.current?.status !== "FINISHED";
+
+    if (isFirstSnapshot || turnChanged || justFinished) {
+      const totalTroopsByPlayer: Record<number, number> = {};
+      state.players.forEach((p) => {
+        totalTroopsByPlayer[p.playerId] = state.fields
+          .filter((f) => f.ownerPlayerId === p.playerId)
+          .reduce((sum, f) => sum + f.troops, 0);
+      });
+      setTroopHistory((prev) => {
+        const snapshot: TroopSnapshot = {
+          turn: state.turnNumber,
+          troops: totalTroopsByPlayer,
+        };
+        if (prev.length > 0 && prev[prev.length - 1].turn === state.turnNumber) {
+          return [...prev.slice(0, -1), snapshot];
+        }
+        return [...prev, snapshot];
+      });
     }
 
     previousStateRef.current = state;
@@ -1355,7 +1383,11 @@ const GamePage = () => {
       </div>
 
       {gameState?.status === "FINISHED" && (
-        <VictoryScreen gameState={gameState} currentUserId={userId} />
+        <VictoryScreen
+          gameState={gameState}
+          currentUserId={userId}
+          troopHistory={troopHistory}
+        />
       )}
     </div>
   );
