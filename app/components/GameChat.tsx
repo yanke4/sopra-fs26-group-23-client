@@ -145,13 +145,19 @@ const EMOTES = ["😂", "😎", "😢", "😡", "👍", "👎", "🤝", "💀", 
 
 function EmotePicker({onSelect}: {onSelect: (emote: string) => void}) {
   return (
-    <div style={{ display: "flex", gap: 4, padding: "4px 10px", flexWrap: "wrap",
+    <div style={{ display: "flex", 
+      gap: 4, 
+      padding: "4px 10px", 
+      flexWrap: "wrap",
       borderTop: "1px solid rgba(180,120,40,0.2)" }}>
       {EMOTES.map((emote) => (
         <button key={emote} onClick={() => onSelect(emote)} style={{
-          fontSize: 18, padding: "2px 5px", borderRadius: 6,
+          fontSize: 18, 
+          padding: "2px 5px", 
+          borderRadius: 6,
           border: "1px solid rgba(180,120,40,0.3)",
-          background: "rgba(255,255,255,0.05)", cursor: "pointer",
+          background: "rgba(255,255,255,0.05)", 
+          cursor: "pointer",
         }}>
           {emote}
         </button>
