@@ -219,37 +219,6 @@ export default function GameChat({ gameId, currentUser, apiUrl }: GameChatProps)
         setOnlinePlayers(players);
       });
 
-      channel.bind("pusher:member_added", (member: unknown) => {
-        const m = member as PusherMember;
-        setOnlinePlayers((prev) => {
-          if (prev.some(p => p.id === m.id)) return prev;
-          return [...prev, { id: m.id, ...m.info }];
-        });
-        setMessages((prev) => [...prev, {
-          isSystem: true,
-          message: `${m.info.name} has joined the war council.`,
-          playerId: "",
-          username: "",
-          color: "",
-          gameId: gameId,
-          timestamp: Date.now(),
-        }]);
-      });
-
-      channel.bind("pusher:member_removed", (member: unknown) => {
-        const m = member as PusherMember;
-        setOnlinePlayers((prev) => prev.filter((p) => p.id !== m.id));
-        setMessages((prev) => [...prev, {
-          isSystem: true,
-          message: `${m.info.name} has left the war council.`,
-          playerId: "",
-          username: "",
-          color: "",
-          gameId: gameId, 
-          timestamp: Date.now(),
-        }]);
-      });
-
       channel.bind("new-message", (data: unknown) => {
         const msg = data as ChatMessage;
         console.log("received playerId:", msg.playerId, "my id:", currentUserRef.current.id, "types:", typeof msg.playerId, typeof currentUserRef.current.id);
