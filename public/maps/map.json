@@ -2,17 +2,17 @@
   "regions": [
     {
       "name": "British Isles",
-      "bonus": 3,
+      "bonus": 4,
       "fields": ["Iceland", "Ireland", "Great Britain"]
     },
     {
       "name": "Scandinavia",
-      "bonus": 3,
+      "bonus": 4,
       "fields": ["Norway", "Sweden", "Finland"]
     },
     {
       "name": "Baltic States",
-      "bonus": 4,
+      "bonus": 3,
       "fields": ["Estonia", "Latvia", "Lithuania", "Belarus"]
     },
     {
@@ -27,12 +27,12 @@
     },
     {
       "name": "Central Europe",
-      "bonus": 4,
+      "bonus": 5,
       "fields": ["Hungary", "Czech Republic", "Slovakia", "Poland"]
     },
     {
       "name": "Western Europe",
-      "bonus": 3,
+      "bonus": 4,
       "fields": ["Portugal", "Spain", "France"]
     },
     {
@@ -42,7 +42,7 @@
     },
     {
       "name": "Low Countries",
-      "bonus": 4,
+      "bonus": 5,
       "fields": ["Belgium", "Netherlands", "Germany", "Denmark"]
     }
   ],
