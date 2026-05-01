@@ -30,6 +30,14 @@ export interface FieldStateDTO {
   troops: number;
 }
 
+export interface AttackEventDTO {
+  attacker: string;
+  defender: string;
+  attackerLosses: number;
+  defenderLosses: number;
+  conquered: boolean;
+}
+
 export interface GameStateDTO {
   gameId: number;
   status: GameStatus;
@@ -39,4 +47,5 @@ export interface GameStateDTO {
   turnNumber: number;
   players: PlayerStateDTO[];
   fields: FieldStateDTO[];
+  lastAttack?: AttackEventDTO | null;
 }

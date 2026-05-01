@@ -8,7 +8,7 @@ import EuropeMap, {
 } from "@/components/europe-map";
 import VictoryScreen, { type TroopSnapshot } from "@/components/victory-screen";
 import React, { useState, useMemo, useCallback, useEffect, useRef } from "react";
-import { Swords, Shield, Users, MapPin, Flag, Dice5 } from "lucide-react";
+import { Swords, Shield, Users, MapPin, Flag } from "lucide-react";
 import { ApiService } from "@/api/apiService";
 import { useGameSocket } from "@/hooks/useGameSocket";
 import type {
@@ -17,7 +17,6 @@ import type {
   PlayerStateDTO,
   FieldStateDTO,
 } from "@/types/game";
-import type { AttackPayload } from "@/types/game";
 import GameChat from "@/components/GameChat";
 import { useParams } from "next/navigation";
 import {
@@ -240,10 +239,13 @@ const GamePage = () => {
 
     const prevState = previousStateRef.current;
     if (prevState && prevState.currentPhase === "ATTACK") {
-      let result: AttackDiffResult | null = null;
+      let result: AttackDiffResult | null = state.lastAttack ?? null;
+      if (result) {
+        pendingAttackRef.current = null;
+      }
 
       const pending = pendingAttackRef.current;
-      if (pending) {
+      if (!result && pending) {
         const defField = state.fields.find(
           (f) => f.fieldName === pending.defender,
         );
@@ -269,7 +271,7 @@ const GamePage = () => {
             result = {
               attacker: pending.attacker,
               defender: pending.defender,
-              attackerLosses: pending.troopsSent - 1,
+              attackerLosses: pending.troopsSent,
               defenderLosses: Math.max(
                 0,
                 pending.defenderTroopsBefore - defField.troops,
@@ -782,23 +784,6 @@ const GamePage = () => {
         return <Swords size={14} />;
       case "Fortify":
         return <Shield size={14} />;
-    }
-  };
-
-  const logIcon = (type: string) => {
-    switch (type) {
-      case "deploy":
-        return <Users size={13} className="text-green-400" />;
-      case "attack":
-        return <Swords size={13} className="text-red-400" />;
-      case "fortify":
-        return <Shield size={13} className="text-blue-400" />;
-      case "conquer":
-        return <Flag size={13} className="text-yellow-400" />;
-      case "defend":
-        return <Shield size={13} className="text-green-400" />;
-      default:
-        return <Dice5 size={13} className="text-gray-400" />;
     }
   };
 
