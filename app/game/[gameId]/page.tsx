@@ -7,7 +7,13 @@ import EuropeMap, {
   DeployAnimationData,
 } from "@/components/europe-map";
 import VictoryScreen, { type TroopSnapshot } from "@/components/victory-screen";
-import React, { useState, useMemo, useCallback, useEffect, useRef } from "react";
+import React, {
+  useState,
+  useMemo,
+  useCallback,
+  useEffect,
+  useRef,
+} from "react";
 import { Swords, Shield, Users, MapPin, Flag } from "lucide-react";
 import { ApiService } from "@/api/apiService";
 import { useGameSocket } from "@/hooks/useGameSocket";
@@ -209,20 +215,24 @@ const GamePage = () => {
           ?.playerId ?? null)
       : null;
 
-
-  const currentUser = useMemo(() => ({
-    id: String(myPlayerId ?? "0"), 
-    name: gameState?.players.find(p => p.userId === userId)?.username ?? "Player", 
-    color: (gameState?.players.find(p => p.userId === userId)?.color ?? "RED").toLowerCase(),
-  }), [gameState, userId, myPlayerId]);
-
+  const currentUser = useMemo(
+    () => ({
+      id: String(myPlayerId ?? "0"),
+      name:
+        gameState?.players.find((p) => p.userId === userId)?.username ??
+        "Player",
+      color: (
+        gameState?.players.find((p) => p.userId === userId)?.color ?? "RED"
+      ).toLowerCase(),
+    }),
+    [gameState, userId, myPlayerId],
+  );
 
   useEffect(() => {
     if (!surrenderMessage) return;
     const timer = setTimeout(() => setSurrenderMessage(null), 4000);
     return () => clearTimeout(timer);
   }, [surrenderMessage]);
-
 
   const handleGameUpdate = useCallback((state: GameStateDTO) => {
     const prev = previousPlayersRef.current;
@@ -335,7 +345,10 @@ const GamePage = () => {
           turn: state.turnNumber,
           troops: totalTroopsByPlayer,
         };
-        if (prev.length > 0 && prev[prev.length - 1].turn === state.turnNumber) {
+        if (
+          prev.length > 0 &&
+          prev[prev.length - 1].turn === state.turnNumber
+        ) {
           return [...prev.slice(0, -1), snapshot];
         }
         return [...prev, snapshot];
@@ -557,8 +570,7 @@ const GamePage = () => {
     selectedOwnerIndex === myOwnerIndex &&
     targetOwnerIndex === myOwnerIndex;
 
-  const canFortifySelectedTarget =
-    hasFortifySelection && maxFortifyTroops > 0;
+  const canFortifySelectedTarget = hasFortifySelection && maxFortifyTroops > 0;
 
   useEffect(() => {
     if (currentPhase !== "Attack") {
@@ -719,7 +731,10 @@ const GamePage = () => {
     setShowSurrenderModal(false);
     try {
       const apiService = new ApiService();
-      await apiService.post(`/games/${gameId}/players/${myPlayerId}/surrender`, {});
+      await apiService.post(
+        `/games/${gameId}/players/${myPlayerId}/surrender`,
+        {},
+      );
       setSurrenderMessage("You have surrendered.");
     } catch (e) {
       console.error("Surrender failed:", e);
@@ -779,18 +794,16 @@ const GamePage = () => {
   const phaseIcon = (phase: Phase) => {
     switch (phase) {
       case "Deploy":
-        return <Users size={14} />;
+        return <Users size={18} />;
       case "Attack":
-        return <Swords size={14} />;
+        return <Swords size={18} />;
       case "Fortify":
-        return <Shield size={14} />;
+        return <Shield size={18} />;
     }
   };
 
   return (
     <div className="flex flex-col h-[calc(100vh-64px)] overflow-hidden select-none bg-[#0a0908]">
-
-      
       {surrenderMessage && (
         <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 bg-red-900/90 border border-red-500/50 text-red-100 px-5 py-2.5 rounded-lg shadow-xl shadow-black/50 text-sm font-semibold">
           <Flag size={14} className="text-red-400 shrink-0" />
@@ -798,47 +811,48 @@ const GamePage = () => {
         </div>
       )}
       {showSurrenderModal && (
-      <div className="fixed inset-0 z-50 flex items-center justify-center">
-        {/* Backdrop */}
-        <div
-          className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-          onClick={() => setShowSurrenderModal(false)}
-        />
-        {/* Modal */}
-        <div className="relative z-10 bg-[#0f0d0b] border border-amber-900/50 rounded-xl shadow-2xl shadow-black/80 p-6 w-80 flex flex-col gap-4">
-          {/* Icon + Title */}
-          <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-9 h-9 rounded-full bg-red-900/40 border border-red-500/30">
-              <Flag size={16} className="text-red-400" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            onClick={() => setShowSurrenderModal(false)}
+          />
+          {/* Modal */}
+          <div className="relative z-10 bg-[#0f0d0b] border border-amber-900/50 rounded-xl shadow-2xl shadow-black/80 p-6 w-80 flex flex-col gap-4">
+            {/* Icon + Title */}
+            <div className="flex items-center gap-3">
+              <div className="flex items-center justify-center w-9 h-9 rounded-full bg-red-900/40 border border-red-500/30">
+                <Flag size={16} className="text-red-400" />
+              </div>
+              <h2 className="text-amber-100 font-bold text-base uppercase tracking-wide font-mono">
+                Surrender?
+              </h2>
             </div>
-            <h2 className="text-amber-100 font-bold text-base uppercase tracking-wide font-mono">
-              Surrender?
-            </h2>
-          </div>
-          {/* Body */}
-          <p className="text-amber-200/60 text-sm leading-relaxed">
-            Are you sure you want to surrender? You will be eliminated and your territories will be lost.
-          </p>
-          {/* Divider */}
-          <div className="h-px bg-amber-900/30" />
-          {/* Buttons */}
-          <div className="flex gap-2 justify-end">
-            <button
-              onClick={() => setShowSurrenderModal(false)}
-              className="px-4 py-1.5 rounded text-xs font-bold uppercase tracking-wide border border-amber-900/40 bg-white/5 text-amber-200/60 hover:bg-white/10 hover:text-amber-200 transition-all cursor-pointer"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleConfirmSurrender}
-              className="px-4 py-1.5 rounded text-xs font-bold uppercase tracking-wide border border-red-500/30 bg-red-900/40 text-red-300 hover:bg-red-800/50 hover:text-red-200 transition-all cursor-pointer"
-            >
-              Surrender
-            </button>
+            {/* Body */}
+            <p className="text-amber-200/60 text-sm leading-relaxed">
+              Are you sure you want to surrender? You will be eliminated and
+              your territories will be lost.
+            </p>
+            {/* Divider */}
+            <div className="h-px bg-amber-900/30" />
+            {/* Buttons */}
+            <div className="flex gap-2 justify-end">
+              <button
+                onClick={() => setShowSurrenderModal(false)}
+                className="px-4 py-1.5 rounded text-xs font-bold uppercase tracking-wide border border-amber-900/40 bg-white/5 text-amber-200/60 hover:bg-white/10 hover:text-amber-200 transition-all cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmSurrender}
+                className="px-4 py-1.5 rounded text-xs font-bold uppercase tracking-wide border border-red-500/30 bg-red-900/40 text-red-300 hover:bg-red-800/50 hover:text-red-200 transition-all cursor-pointer"
+              >
+                Surrender
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-    )}
+      )}
       <div className="flex items-center justify-between px-4 py-2 bg-black/60 border-b border-amber-900/40">
         <div className="flex items-center gap-3">
           <span className="text-amber-400/70 text-xs font-mono uppercase tracking-wider">
@@ -866,11 +880,11 @@ const GamePage = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-2">
           {PHASES.map((phase, i) => (
             <div
               key={phase}
-              className={`flex items-center gap-1.5 px-4 py-1.5 rounded text-xs font-bold uppercase tracking-wide transition-all
+              className={`flex min-h-11 items-center gap-2 px-6 py-2.5 rounded-md text-sm font-bold uppercase tracking-wide transition-all
                 ${
                   currentPhase === phase
                     ? "bg-amber-600/30 text-amber-200 border border-amber-500/50 shadow-lg shadow-amber-900/30"
@@ -888,7 +902,9 @@ const GamePage = () => {
         <div className="flex items-center gap-2">
           <button
             onClick={nextPhase}
-            disabled={!isMyTurn || (currentPhase === "Deploy" && reinforcements > 0)}
+            disabled={
+              !isMyTurn || (currentPhase === "Deploy" && reinforcements > 0)
+            }
             className={`w-36 px-5 py-1.5 rounded text-xs font-bold uppercase tracking-wide border transition-all ${
               isMyTurn && !(currentPhase === "Deploy" && reinforcements > 0)
                 ? "bg-amber-700/50 hover:bg-amber-600/60 text-amber-100 border-amber-500/30 hover:shadow-lg hover:shadow-amber-900/30 cursor-pointer"
@@ -910,7 +926,6 @@ const GamePage = () => {
             Surrender
           </button>
         </div>
-
       </div>
 
       <div className="flex flex-1 overflow-hidden">
@@ -982,19 +997,28 @@ const GamePage = () => {
               <span className="text-amber-300 text-lg font-bold font-mono">
                 +{myRegionBonus}
               </span>
-              <span className="text-amber-400/50 text-[10px]">troops / round</span>
+              <span className="text-amber-400/50 text-[10px]">
+                troops / round
+              </span>
             </div>
             {myOwnedRegions.length > 0 ? (
               <div className="space-y-1">
                 {myOwnedRegions.map((r) => (
-                  <div key={r.name} className="flex items-center justify-between text-[10px]">
+                  <div
+                    key={r.name}
+                    className="flex items-center justify-between text-[10px]"
+                  >
                     <span className="text-amber-200/60">{r.name}</span>
-                    <span className="text-amber-300/80 font-mono">+{r.bonus}</span>
+                    <span className="text-amber-300/80 font-mono">
+                      +{r.bonus}
+                    </span>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="text-[10px] text-white/25 italic">No regions controlled</div>
+              <div className="text-[10px] text-white/25 italic">
+                No regions controlled
+              </div>
             )}
           </div>
 
@@ -1042,7 +1066,10 @@ const GamePage = () => {
                           return;
                         }
                         setDeployTroops(
-                          Math.max(1, Math.min(next, Math.max(1, reinforcements))),
+                          Math.max(
+                            1,
+                            Math.min(next, Math.max(1, reinforcements)),
+                          ),
                         );
                       }}
                       className="flex-1 min-w-0 h-7 px-2 rounded bg-black/30 border border-green-500/30 text-green-100 text-sm font-mono"
@@ -1075,7 +1102,7 @@ const GamePage = () => {
                   <button
                     onClick={handleDeploy}
                     disabled={!isMyTurn || reinforcements <= 0}
-                    className={`w-full py-1.5 rounded text-[11px] font-bold border transition-all ${
+                    className={`w-full min-h-11 px-4 py-2.5 rounded-md text-sm font-bold border tracking-wide transition-all ${
                       isMyTurn && reinforcements > 0
                         ? "bg-green-900/40 hover:bg-green-800/50 text-green-200 border-green-500/30"
                         : "bg-white/5 text-white/30 border-white/10 cursor-not-allowed"
@@ -1148,9 +1175,7 @@ const GamePage = () => {
                   +
                 </button>
                 <button
-                  onClick={() =>
-                    setAttackTroops(Math.max(1, maxAttackTroops))
-                  }
+                  onClick={() => setAttackTroops(Math.max(1, maxAttackTroops))}
                   disabled={maxAttackTroops <= 0}
                   className={`h-7 px-2 rounded text-[10px] font-bold border tracking-wider uppercase transition-all ${
                     maxAttackTroops > 0
@@ -1169,7 +1194,7 @@ const GamePage = () => {
               <button
                 onClick={handleAttack}
                 disabled={!canAttackSelectedTarget}
-                className={`w-full py-1.5 rounded text-[11px] font-bold border transition-all ${
+                className={`w-full min-h-11 px-4 py-2.5 rounded-md text-sm font-bold border tracking-wide transition-all ${
                   canAttackSelectedTarget
                     ? "bg-red-900/40 hover:bg-red-800/50 text-red-200 border-red-500/30"
                     : "bg-white/5 text-white/30 border-white/10 cursor-not-allowed"
@@ -1201,7 +1226,9 @@ const GamePage = () => {
 
               <div className="flex items-center gap-1.5">
                 <button
-                  onClick={() => setFortifyTroops((v) => Math.max(1, (v || 1) - 1))}
+                  onClick={() =>
+                    setFortifyTroops((v) => Math.max(1, (v || 1) - 1))
+                  }
                   className="w-7 h-7 rounded bg-blue-900/30 hover:bg-blue-800/40 border border-blue-500/30 text-blue-200 font-bold"
                 >
                   -
@@ -1218,7 +1245,10 @@ const GamePage = () => {
                       return;
                     }
                     setFortifyTroops(
-                      Math.max(1, Math.min(next, Math.max(1, maxFortifyTroops))),
+                      Math.max(
+                        1,
+                        Math.min(next, Math.max(1, maxFortifyTroops)),
+                      ),
                     );
                   }}
                   className="flex-1 min-w-0 h-7 px-2 rounded bg-black/30 border border-blue-500/30 text-blue-100 text-sm font-mono"
@@ -1255,7 +1285,7 @@ const GamePage = () => {
               <button
                 onClick={handleFortify}
                 disabled={!canFortifySelectedTarget}
-                className={`w-full py-1.5 rounded text-[11px] font-bold border transition-all ${
+                className={`w-full min-h-11 px-4 py-2.5 rounded-md text-sm font-bold border tracking-wide transition-all ${
                   canFortifySelectedTarget
                     ? "bg-blue-900/40 hover:bg-blue-800/50 text-blue-200 border-blue-500/30"
                     : "bg-white/5 text-white/30 border-white/10 cursor-not-allowed"
@@ -1281,8 +1311,14 @@ const GamePage = () => {
           />
         </div>
 
-        <div className="w-56 bg-black/40 border-l border-amber-900/30 flex flex-col" style={{ height: "100%" }}>
-          <div className="border-b border-amber-900/20"style={{ maxHeight: "40%", overflowY: "auto" }}>
+        <div
+          className="w-56 bg-black/40 border-l border-amber-900/30 flex flex-col"
+          style={{ height: "100%" }}
+        >
+          <div
+            className="border-b border-amber-900/20"
+            style={{ maxHeight: "40%", overflowY: "auto" }}
+          >
             <div className="px-3 py-2 border-b border-amber-900/20">
               <h3 className="text-amber-400/70 text-[10px] font-bold uppercase tracking-widest">
                 Territory
@@ -1354,14 +1390,24 @@ const GamePage = () => {
             )}
           </div>
 
-            <div style={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column" }}>
-            {myPlayerId &&(
+          <div
+            style={{
+              flex: 1,
+              overflow: "hidden",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            {myPlayerId && (
               <GameChat
                 key={gameId} // Reset chat when gameId changes, but not on every render
                 gameId={String(gameId ?? "0")}
                 currentUser={currentUser}
-                apiUrl={process.env.NEXT_PUBLIC_PROD_API_URL ?? "http://localhost:8080"}
-            />
+                apiUrl={
+                  process.env.NEXT_PUBLIC_PROD_API_URL ??
+                  "http://localhost:8080"
+                }
+              />
             )}
           </div>
         </div>
