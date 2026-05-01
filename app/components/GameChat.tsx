@@ -141,6 +141,26 @@ function SystemMessage({ text }: { text: string }) {
   );
 }
 
+const EMOTES = ["😂", "😎", "😢", "😡", "👍", "👎", "🤝", "💀", "🔥", "🖕"];
+
+function EmotePicker({onSelect}: {onSelect: (emote: string) => void}) {
+  return (
+    <div style={{ display: "flex", gap: 4, padding: "4px 10px", flexWrap: "wrap",
+      borderTop: "1px solid rgba(180,120,40,0.2)" }}>
+      {EMOTES.map((emote) => (
+        <button key={emote} onClick={() => onSelect(emote)} style={{
+          fontSize: 18, padding: "2px 5px", borderRadius: 6,
+          border: "1px solid rgba(180,120,40,0.3)",
+          background: "rgba(255,255,255,0.05)", cursor: "pointer",
+        }}>
+          {emote}
+        </button>
+      ))}
+    </div>
+  );
+  }
+
+
 export default function GameChat({ gameId, currentUser, apiUrl }: GameChatProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState("");
@@ -284,6 +304,11 @@ export default function GameChat({ gameId, currentUser, apiUrl }: GameChatProps)
     }
   };
 
+  const sendEmote = (emote: string) => {
+    setInputText((prev) => prev + emote);
+    inputRef.current?.focus();
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -408,7 +433,8 @@ export default function GameChat({ gameId, currentUser, apiUrl }: GameChatProps)
             <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
           </svg>
         </button>
-      </div>
+      </div>   
+      <EmotePicker onSelect={sendEmote} />     
     </div>
   );
 }
