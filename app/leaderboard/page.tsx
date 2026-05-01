@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Crown, Trophy, Medal, LoaderCircle } from "lucide-react";
+import { ApiService } from "@/api/apiService";
 
 interface UserStats {
   userId: number;
@@ -11,6 +12,8 @@ interface UserStats {
   gamesPlayed: number;
   winPercentage: number;
 }
+
+const apiService = new ApiService();
 
 const getRankIcon = (rank: number) => {
   if (rank === 0)
@@ -39,35 +42,15 @@ export default function Leaderboard() {
     setLoading(true);
     setError(null);
     try {
-      const apiUrl =
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
-      const response = await fetch(`${apiUrl}/leaderboard`, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const data = await apiService.get<UserStats[]>("/leaderboard");
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Failed to fetch leaderboard:", errorText);
-        throw new Error(
-          `Failed to fetch leaderboard. Status: ${response.status}`,
-        );
-      }
-
-      const data: UserStats[] = await response.json();
-
-      // Add a defensive sort on the client to ensure correct order
       data.sort((a, b) => {
-        // 1. Sort by wins descending
         if (b.wins !== a.wins) {
           return b.wins - a.wins;
         }
-        // 2. Then by gamesPlayed descending
         if (b.gamesPlayed !== a.gamesPlayed) {
           return b.gamesPlayed - a.gamesPlayed;
         }
-        // 3. Then by username ascending (case-insensitive)
         return a.username.localeCompare(b.username, undefined, {
           sensitivity: "base",
         });
@@ -130,7 +113,7 @@ export default function Leaderboard() {
             Player
           </span>
           <span className="font-audiowide text-[10px] tracking-widest uppercase text-[#FFD900]/60 text-right">
-            Points
+            Wins
           </span>
           <span className="font-audiowide text-[10px] tracking-widest uppercase text-[#FFD900]/60 text-right">
             Played
