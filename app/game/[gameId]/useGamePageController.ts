@@ -396,8 +396,22 @@ export const useGamePageController = () => {
       return neighbors.filter((n) => territories[n]?.owner !== selectedOwner);
     }
     if (currentPhase === "Fortify") {
-      return neighbors.filter((n) => territories[n]?.owner === selectedOwner);
+    const reachable = new Set<string>();
+    const visited = new Set<string>([selectedTerritory]);
+    const queue: string[] = [selectedTerritory];
+
+    while (queue.length > 0) {
+      const current = queue.shift()!;
+      for (const neighbor of ADJACENCY[current] || []) {
+        if (!visited.has(neighbor) && territories[neighbor]?.owner === selectedOwner) {
+          visited.add(neighbor);
+          reachable.add(neighbor);
+          queue.push(neighbor);
+        }
+      }
     }
+    return Array.from(reachable);
+  }
     return [];
   }, [selectedTerritory, currentPhase, territories, myOwnerIndex]);
 
