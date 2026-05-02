@@ -44,6 +44,7 @@ export const useGamePageController = () => {
 
   const [surrenderMessage, setSurrenderMessage] = useState<string | null>(null);
   const [showSurrenderModal, setShowSurrenderModal] = useState(false);
+  const [showYourTurnToast, setShowYourTurnToast] = useState(false);
   const previousPlayersRef = useRef<PlayerStateDTO[]>([]);
   const previousStateRef = useRef<GameStateDTO | null>(null);
   const [attackAnimation, setAttackAnimation] =
@@ -98,6 +99,13 @@ export const useGamePageController = () => {
     const timer = setTimeout(() => setSurrenderMessage(null), 4000);
     return () => clearTimeout(timer);
   }, [surrenderMessage]);
+
+  useEffect(() => {
+    if (!isMyTurn) return;
+    setShowYourTurnToast(true);
+    const timer = setTimeout(() => setShowYourTurnToast(false), 2500);
+    return () => clearTimeout(timer);
+  }, [gameState?.currentPlayerId]);
 
   const handleGameUpdate = useCallback((state: GameStateDTO) => {
     const prev = previousPlayersRef.current;
@@ -715,6 +723,7 @@ export const useGamePageController = () => {
     handleSurrender,
     handleConfirmSurrender,
     nextPhase,
+    showYourTurnToast,
   };
 };
 

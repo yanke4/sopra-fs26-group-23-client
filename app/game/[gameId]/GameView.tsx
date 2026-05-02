@@ -7,6 +7,7 @@ import PlayerSidebar from "./PlayerSidebar";
 import { SurrenderModal, SurrenderToast } from "./SurrenderOverlays";
 import TerritoryAndChatPanel from "./TerritoryAndChatPanel";
 import type { GamePageController } from "./useGamePageController";
+import { YourTurnToast } from "./YourTurnOverlay";
 
 const GameView = ({
   gameId,
@@ -20,6 +21,7 @@ const GameView = ({
   setFortifyTroops,
   surrenderMessage,
   showSurrenderModal,
+  showYourTurnToast,
   setShowSurrenderModal,
   attackAnimation,
   fortifyAnimation,
@@ -60,6 +62,7 @@ const GameView = ({
 }: GamePageController) => (
   <div className="flex flex-col h-[calc(100vh-64px)] overflow-hidden select-none bg-[#0a0908]">
     <SurrenderToast message={surrenderMessage} />
+    <YourTurnToast show={showYourTurnToast} />
     {showSurrenderModal && (
       <SurrenderModal
         onCancel={() => setShowSurrenderModal(false)}
