@@ -549,7 +549,7 @@ export default function HowToPlay() {
                   Outlast them <span className="text-[#FFD900]">all</span>.
                 </h2>
                 <p className="text-white/60 leading-relaxed text-[15px] max-w-xl">
-                  Victory isn't measured in territory but in survival. When
+                  Victory isn&apos;t measured in territory but in survival. When
                   every other commander has been wiped from the map,{" "}
                   <span className="text-[#FFD900]/90">
                     the last banner flying inherits the continent
