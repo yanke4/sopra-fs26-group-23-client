@@ -43,7 +43,7 @@ export default function Navbar() {
   const navLinks = [
     { label: "Home", path: "/" },
     { label: "Leaderboard", path: "/leaderboard" },
-    { label: "Settings", path: "/settings" },
+    { label: "How to play", path: "/how-to-play" },
   ];
 
   return (
