@@ -6,7 +6,6 @@ import {
   KeyRound,
   LogOut,
   Swords,
-  Shield,
   Trophy,
   Percent,
 } from "lucide-react";
@@ -15,13 +14,10 @@ import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import useLocalStorage from "@/hooks/useLocalStorage";
 
-const mockStats = {
-  stats: {
-    gamesPlayed: 47,
-    wins: 31,
-    winRate: "66%",
-    territoriesConquered: 312,
-  },
+type Stats = {
+  gamesPlayed: number;
+  wins: number;
+  winRate: number;
 };
 
 export default function ProfilePage() {
@@ -39,6 +35,11 @@ export default function ProfilePage() {
   const { value:token, clear: clearToken } = useLocalStorage<string>("token", "");
 
   const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState<Stats>({
+    gamesPlayed: 0,
+    wins: 0,
+    winRate: 0,
+  });
 
   const [storageReady, setStorageReady] = useState(false);
 
@@ -68,7 +69,11 @@ export default function ProfilePage() {
         }
 
         const data = await res.json();
-        console.log("User loaded:", data); 
+        setStats({
+          gamesPlayed: Number(data?.gamesPlayed ?? 0),
+          wins: Number(data?.wins ?? 0),
+          winRate: Number(data?.winRate ?? 0),
+        });
       } catch (err) {
         clearToken();
         clearUser();
@@ -187,30 +192,24 @@ export default function ProfilePage() {
               Battle Statistics
             </span>
           </div>
-          <CardContent className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-5">
+          <CardContent className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-5">
             {[
               {
                 label: "Games Played",
-                value: mockStats.stats.gamesPlayed,
+                value: stats.gamesPlayed,
                 icon: <Swords size={14} />,
                 highlight: false,
               },
               {
                 label: "Victories",
-                value: mockStats.stats.wins,
+                value: stats.wins,
                 icon: <Trophy size={14} />,
                 highlight: false,
               },
               {
                 label: "Win Rate",
-                value: mockStats.stats.winRate,
+                value: `${Math.round(stats.winRate * 100)}%`,
                 icon: <Percent size={14} />,
-                highlight: false,
-              },
-              {
-                label: "Territories",
-                value: mockStats.stats.territoriesConquered,
-                icon: <Shield size={14} />,
                 highlight: false,
               },
             ].map(({ label, value, icon, highlight }) => (
