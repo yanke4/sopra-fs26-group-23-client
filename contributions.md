@@ -142,8 +142,10 @@ reason).
 | **yanke4** | 02/05/2026 | [[Link to Commit 1]](https://github.com/yanke4/sopra-fs26-group-23-client/commit/e1fe9fb78addea7db7f30fb3e598975ea6eb704a) | troop movement of more than 1 field | important for fortify phase |
 |                    | 02/05/2026 | [[Link to Commit 2]](https://github.com/yanke4/sopra-fs26-group-23-client/commit/c86c3b15a3f582857082382ece439b3b323b5ae3) | added pop up window on turn start | user now gets notification if its their turn |
 |                    | 24/04/2026 | [[Link to Commit 3]](https://github.com/yanke4/sopra-fs26-group-23-server/commit/a321020a639a6fc40db8ba7b57e5fb9aa9b67106) | fixed surrender bug | player after player that surrenders now can properly deploy their units |
-| **[@githubUser2]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
-|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **devnida** | 01/05/2026   | [[Link to Commit 1]](https://github.com/yanke4/sopra-fs26-group-23-client/commit/f2d3b64bd093350e88e5d2ace016df4a409094a2) | Add end game graph | Make players be able to see troop number evolution over time |
+|                    | 02/05/2026  | [[Link to Commit 2] ](https://github.com/yanke4/sopra-fs26-group-23-client/commit/f9ed99f5aded5cf4b34843b1e8422b07ae1b7725)| Add how to play page | Give instructions on how to play the game |
+|                    | 02/05/2026  | [[Link to Commit 3] ](https://github.com/yanke4/sopra-fs26-group-23-client/commit/3bd19b55fca121c9029ec5853d77281de6877f71)| Refactor game page into controller and view components | Make game page smaller |
+|                    | 03/05/2026  | [[Link to Commit 4] ](https://github.com/yanke4/sopra-fs26-group-23-client/commit/be5c593efbfaf57948755a1acc644aa88b263737)| Add profile stats | Make players able to see their stats |
 | **[@githubUser3]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
 |                    | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
 | **[@githubUser4]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
