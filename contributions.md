@@ -135,12 +135,31 @@ reason).
 
 ---
 
-## Contributions Week 5 - [Begin Date] to [End Date]
+## Contributions Week 5 - 27/04/2026 to 04/05/2026
 
-_Continue with the same table format as above._
+| **Student**        | **Date** | **Link to Commit** | **Description**                 | **Relevance**                       |
+| ------------------ | -------- | ------------------ | ------------------------------- | ----------------------------------- |
+| **yanke4** | 02/05/2026 | [[Link to Commit 1]](https://github.com/yanke4/sopra-fs26-group-23-client/commit/e1fe9fb78addea7db7f30fb3e598975ea6eb704a) | troop movement of more than 1 field | important for fortify phase |
+|                    | 02/05/2026 | [[Link to Commit 2]](https://github.com/yanke4/sopra-fs26-group-23-client/commit/c86c3b15a3f582857082382ece439b3b323b5ae3) | added pop up window on turn start | user now gets notification if its their turn |
+|                    | 24/04/2026 | [[Link to Commit 3]](https://github.com/yanke4/sopra-fs26-group-23-server/commit/a321020a639a6fc40db8ba7b57e5fb9aa9b67106) | fixed surrender bug | player after player that surrenders now can properly deploy their units |
+| **[@githubUser2]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
+|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **[@githubUser3]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
+|                    | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
+| **[@githubUser4]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
+|                    | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
 
 ---
 
 ## Contributions Week 6 - [Begin Date] to [End Date]
 
-_Continue with the same table format as above._
+| **Student**        | **Date** | **Link to Commit** | **Description**                 | **Relevance**                       |
+| ------------------ | -------- | ------------------ | ------------------------------- | ----------------------------------- |
+| **[@githubUser1]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
+|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **[@githubUser2]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
+|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **[@githubUser3]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
+|                    | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
+| **[@githubUser4]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
+|                    | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
