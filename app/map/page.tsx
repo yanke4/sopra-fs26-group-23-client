@@ -412,6 +412,7 @@ const handleAttack = async () => {
             territories={MOCK_TERRITORIES}
             playerColors={PLAYER_COLORS}
             selectedTerritory={selectedTerritory}
+            inspectedTerritory={selectedTerritory}
             targetTerritory={targetTerritory}
             onTerritoryClick={handleTerritoryClick}
             validTargets={validTargets}

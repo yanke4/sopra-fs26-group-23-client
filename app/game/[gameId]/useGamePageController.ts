@@ -37,6 +37,9 @@ export const useGamePageController = () => {
   const [selectedTerritory, setSelectedTerritory] = useState<string | null>(
     null,
   );
+  const [inspectedTerritory, setInspectedTerritory] = useState<string | null>(
+    null,
+  );
   const [targetTerritory, setTargetTerritory] = useState<string | null>(null);
   const [deployTroops, setDeployTroops] = useState<number>(1);
   const [attackTroops, setAttackTroops] = useState<number>(1);
@@ -485,6 +488,14 @@ export const useGamePageController = () => {
     const territory = territories[name];
     if (!territory) return;
 
+    setInspectedTerritory(name);
+
+    if (!isMyTurn) {
+      setSelectedTerritory(null);
+      setTargetTerritory(null);
+      return;
+    }
+
     if (currentPhase === "Attack" || currentPhase === "Fortify") {
       const isMine = territory.owner === myOwnerIndex;
 
@@ -669,14 +680,15 @@ export const useGamePageController = () => {
     advancePhase();
   };
 
-  const selectedInfo = selectedTerritory
-    ? territories[selectedTerritory]
+  const inspectedInfo = inspectedTerritory
+    ? territories[inspectedTerritory]
     : null;
   const targetInfo = targetTerritory ? territories[targetTerritory] : null;
 
   return {
     gameId,
     selectedTerritory,
+    inspectedTerritory,
     targetTerritory,
     deployTroops,
     setDeployTroops,
@@ -714,7 +726,7 @@ export const useGamePageController = () => {
     canAttackSelectedTarget,
     hasFortifySelection,
     canFortifySelectedTarget,
-    selectedInfo,
+    inspectedInfo,
     targetInfo,
     handleTerritoryClick,
     handleDeploy,

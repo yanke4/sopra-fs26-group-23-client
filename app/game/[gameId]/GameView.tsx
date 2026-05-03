@@ -12,6 +12,7 @@ import { YourTurnToast } from "./YourTurnOverlay";
 const GameView = ({
   gameId,
   selectedTerritory,
+  inspectedTerritory,
   targetTerritory,
   deployTroops,
   setDeployTroops,
@@ -50,7 +51,7 @@ const GameView = ({
   canAttackSelectedTarget,
   hasFortifySelection,
   canFortifySelectedTarget,
-  selectedInfo,
+  inspectedInfo,
   targetInfo,
   handleTerritoryClick,
   handleDeploy,
@@ -117,6 +118,7 @@ const GameView = ({
           territories={territories}
           playerColors={mapColors}
           selectedTerritory={selectedTerritory}
+          inspectedTerritory={inspectedTerritory}
           targetTerritory={targetTerritory}
           onTerritoryClick={handleTerritoryClick}
           validTargets={validTargets}
@@ -130,8 +132,8 @@ const GameView = ({
         gameId={gameId}
         myPlayerId={myPlayerId}
         currentUser={currentUser}
-        selectedInfo={selectedInfo}
-        selectedTerritory={selectedTerritory}
+        inspectedInfo={inspectedInfo}
+        inspectedTerritory={inspectedTerritory}
         targetInfo={targetInfo}
         targetTerritory={targetTerritory}
         mapColors={mapColors}

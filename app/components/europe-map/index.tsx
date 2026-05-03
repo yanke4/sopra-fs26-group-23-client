@@ -28,6 +28,7 @@ const EuropeMap: React.FC<EuropeMapProps> = ({
   territories,
   playerColors,
   selectedTerritory,
+  inspectedTerritory,
   targetTerritory,
   onTerritoryClick,
   validTargets = [],
@@ -56,9 +57,10 @@ const EuropeMap: React.FC<EuropeMapProps> = ({
       if (!territory) return "#2a2a2a";
       const baseColor = playerColors[territory.owner] || "#2a2a2a";
       if (name === selectedTerritory) return darkenColor(baseColor, 12);
+      if (name === inspectedTerritory) return darkenColor(baseColor, 8);
       return baseColor;
     },
-    [territories, playerColors, selectedTerritory],
+    [territories, playerColors, selectedTerritory, inspectedTerritory],
   );
 
   const getStroke = useCallback(
@@ -118,6 +120,7 @@ const EuropeMap: React.FC<EuropeMapProps> = ({
           territories={territories}
           playerColors={playerColors}
           selectedTerritory={selectedTerritory}
+          inspectedTerritory={inspectedTerritory}
           targetTerritory={targetTerritory}
         />
 

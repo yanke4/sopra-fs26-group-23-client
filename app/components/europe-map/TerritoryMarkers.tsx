@@ -7,6 +7,7 @@ interface Props {
   territories: Record<string, TerritoryState>;
   playerColors: string[];
   selectedTerritory: string | null;
+  inspectedTerritory: string | null;
   targetTerritory: string | null;
 }
 
@@ -14,6 +15,7 @@ const TerritoryMarkers: React.FC<Props> = ({
   territories,
   playerColors,
   selectedTerritory,
+  inspectedTerritory,
   targetTerritory,
 }) => (
   <>
@@ -23,7 +25,8 @@ const TerritoryMarkers: React.FC<Props> = ({
 
       const isSelected = name === selectedTerritory;
       const isTarget = name === targetTerritory;
-      const r = isSelected || isTarget ? 11 : 9;
+      const isInspected = name === inspectedTerritory;
+      const r = isSelected || isTarget || isInspected ? 11 : 9;
 
       return (
         <Marker
@@ -39,9 +42,11 @@ const TerritoryMarkers: React.FC<Props> = ({
                   ? "#fbbf24"
                   : isTarget
                     ? "#ef4444"
+                    : isInspected
+                      ? "#e5e7eb"
                     : playerColors[territory.owner]
               }
-              strokeWidth={isSelected || isTarget ? 2.5 : 1.5}
+              strokeWidth={isSelected || isTarget || isInspected ? 2.5 : 1.5}
               opacity={0.8}
             />
             <circle r={r} fill="rgba(0,0,0,0.75)" />
@@ -53,8 +58,12 @@ const TerritoryMarkers: React.FC<Props> = ({
                   ? "#fbbf24"
                   : isTarget
                     ? "#ef4444"
+                    : isInspected
+                      ? "#e5e7eb"
                     : "#fff",
-                fontSize: isSelected || isTarget ? "12px" : "10px",
+                fontSize: isSelected || isTarget || isInspected
+                  ? "12px"
+                  : "10px",
                 fontWeight: "bold",
                 fontFamily: "monospace",
                 userSelect: "none",

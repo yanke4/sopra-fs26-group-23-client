@@ -11,6 +11,7 @@ export interface EuropeMapProps {
   territories: Record<string, TerritoryState>;
   playerColors: string[];
   selectedTerritory: string | null;
+  inspectedTerritory: string | null;
   targetTerritory: string | null;
   onTerritoryClick: (name: string) => void;
   validTargets?: string[];

@@ -11,8 +11,8 @@ const TerritoryAndChatPanel = ({
   gameId,
   myPlayerId,
   currentUser,
-  selectedInfo,
-  selectedTerritory,
+  inspectedInfo,
+  inspectedTerritory,
   targetInfo,
   targetTerritory,
   mapColors,
@@ -21,8 +21,8 @@ const TerritoryAndChatPanel = ({
   gameId: number | null;
   myPlayerId: number | null;
   currentUser: GamePageController["currentUser"];
-  selectedInfo: GamePageController["selectedInfo"];
-  selectedTerritory: string | null;
+  inspectedInfo: GamePageController["inspectedInfo"];
+  inspectedTerritory: string | null;
   targetInfo: GamePageController["targetInfo"];
   targetTerritory: string | null;
   mapColors: string[];
@@ -41,40 +41,45 @@ const TerritoryAndChatPanel = ({
           Territory
         </h3>
       </div>
-      {selectedInfo ? (
+      {inspectedInfo ? (
         <div className="p-3 space-y-2">
           <div className="flex items-center gap-2">
             <div
               className="w-3 h-3 rounded-full"
               style={{
-                backgroundColor: mapColors[selectedInfo.owner],
+                backgroundColor: mapColors[inspectedInfo.owner],
               }}
             />
             <span className="text-sm text-white/90 font-semibold">
-              {selectedTerritory}
+              {inspectedTerritory}
             </span>
           </div>
           <div className="flex gap-3 text-[11px] text-white/50">
             <span>
               Owner:{" "}
-              <span style={{ color: mapColors[selectedInfo.owner] }}>
-                {playerStats[selectedInfo.owner]?.name ?? "Neutral"}
+              <span style={{ color: mapColors[inspectedInfo.owner] }}>
+                {playerStats[inspectedInfo.owner]?.name ?? "Neutral"}
               </span>
             </span>
           </div>
           <div className="flex items-center gap-1.5 text-[11px] text-white/50">
             <Users size={11} />
             <span className="text-white/80 font-bold">
-              {selectedInfo.troops}
+              {inspectedInfo.troops}
             </span>{" "}
             troops
           </div>
           <div className="text-[10px] text-white/30 mt-1">
             <span className="uppercase tracking-wider">Borders: </span>
-            {(ADJACENCY[selectedTerritory!] || []).join(", ")}
+            {(inspectedTerritory
+              ? ADJACENCY[inspectedTerritory] || []
+              : []
+            ).join(", ")}
           </div>
 
-          {targetTerritory && targetInfo && (
+          {targetTerritory &&
+            targetInfo &&
+            targetTerritory !== inspectedTerritory && (
             <div className="mt-2 pt-2 border-t border-amber-900/20 space-y-1">
               <div className="flex items-center gap-1.5 text-[10px] text-red-400/70 uppercase tracking-wider font-bold">
                 <Swords size={10} /> Target
