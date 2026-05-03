@@ -146,8 +146,11 @@ reason).
 |                    | 02/05/2026  | [[Link to Commit 2] ](https://github.com/yanke4/sopra-fs26-group-23-client/commit/f9ed99f5aded5cf4b34843b1e8422b07ae1b7725)| Add how to play page | Give instructions on how to play the game |
 |                    | 02/05/2026  | [[Link to Commit 3] ](https://github.com/yanke4/sopra-fs26-group-23-client/commit/3bd19b55fca121c9029ec5853d77281de6877f71)| Refactor game page into controller and view components | Make game page smaller |
 |                    | 03/05/2026  | [[Link to Commit 4] ](https://github.com/yanke4/sopra-fs26-group-23-client/commit/be5c593efbfaf57948755a1acc644aa88b263737)| Add profile stats | Make players able to see their stats |
-| **[@githubUser3]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
-|                    | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
+| **Linu5Frick** | 29/04/2026   | [Link to Commit 1](https://github.com/yanke4/sopra-fs26-group-23-client/commit/fbf923fbe5c0d93260ea035f2eb99a69918241db) | Making the chatfield bigger | In order to see big messages and conversations better |
+|                    | 01/05/2026 | [Link to Commit 2](https://github.com/yanke4/sopra-fs26-group-23-client/commit/83c7846266debc0d93aff6194b715726cdc7a959) | Added an emote panel to the chat | The players now can send emojis and therefore react to the turns
+|                    | 01/05/2026   | [Link to Commit 3](https://github.com/yanke4/sopra-fs26-group-23-client/commit/922992e2510174afdb0e87acea09c5534014c0b9) | Updated the region bonus | The region bonus is now adjusted to the difficulty of defending the region against attacks |
+|                    | 01/05/2026   | [Link to Commit 4](https://github.com/yanke4/sopra-fs26-group-23-server/commit/d746b2c80fd0ca10c99391dfb075516d2aa1efa8) | Updated the region bonus for the client | The region bonus is now adjusted to the difficulty of defending the region against attacks|
+|                    | 03/05/2026   | [Link to Commit 5](https://github.com/yanke4/sopra-fs26-group-23-client/commit/055302491f39143b026cce28f7473db9af4d36ef)| Changed the hover and border of the three fields on the homepage | Users might interpret the fields as clickable|
 | **[@githubUser4]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
 |                    | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
 
