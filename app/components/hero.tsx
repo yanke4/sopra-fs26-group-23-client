@@ -78,7 +78,7 @@ export default function Hero() {
         {features.map(({ icon: Icon, title, description }) => (
           <Card
             key={title}
-            className="group w-90 lg:w-72 rounded-md border border-[#FFD900]/12 bg-[rgba(14,12,6,0.55)] backdrop-blur-sm gap-3 transition-all duration-300 hover:border-[#FFD900]/35 hover:bg-[rgba(28,24,8,0.7)] hover:shadow-[0_0_24px_rgba(255,217,0,0.07)]"
+            className="group w-90 lg:w-72 rounded-md border border-[#FFD900]/12 bg-[rgba(14,12,6,0.55)] backdrop-blur-sm gap-3 transition-all duration-300"
           >
             <CardHeader className="pb-0">
               <CardTitle className="flex items-center gap-3">
