@@ -151,8 +151,9 @@ reason).
 |                    | 01/05/2026   | [Link to Commit 3](https://github.com/yanke4/sopra-fs26-group-23-client/commit/922992e2510174afdb0e87acea09c5534014c0b9) | Updated the region bonus | The region bonus is now adjusted to the difficulty of defending the region against attacks |
 |                    | 01/05/2026   | [Link to Commit 4](https://github.com/yanke4/sopra-fs26-group-23-server/commit/d746b2c80fd0ca10c99391dfb075516d2aa1efa8) | Updated the region bonus for the client | The region bonus is now adjusted to the difficulty of defending the region against attacks|
 |                    | 03/05/2026   | [Link to Commit 5](https://github.com/yanke4/sopra-fs26-group-23-client/commit/055302491f39143b026cce28f7473db9af4d36ef)| Changed the hover and border of the three fields on the homepage | Users might interpret the fields as clickable|
-| **[@githubUser4]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
-|                    | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
+| **MatteoLozano** | 29/04/2026 | [Link to Commit 1](https://github.com/yanke4/sopra-fs26-group-23-server/commit/83fbf73f92aa091cba6941a786cdf8170938fda6) | Implemented leaderbord backend logic | Provides the backend logic needed to calculate and manage player rankings. |
+|                    | 01/05/2026 | [Link to Commit 2](https://github.com/yanke4/sopra-fs26-group-23-server/commit/93a9bb64f9d669a33b2fc14e5ef864318777c762) | Bug Fix in the leaderbord persistance | Ensures the server processes user stats correctly |
+|                    | 01/05/2026 | [Link to Commit 3](https://github.com/yanke4/sopra-fs26-group-23-client/commit/06572ff853eb4280e35b676ce6dc0b8be103b3ca) | Implemented Leaderbord page | Displays player rankings in the client so users can view leaderboard results. |
 
 ---
 
