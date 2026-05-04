@@ -48,8 +48,8 @@ export default function Leaderboard() {
         if (b.wins !== a.wins) {
           return b.wins - a.wins;
         }
-        if (b.gamesPlayed !== a.gamesPlayed) {
-          return b.gamesPlayed - a.gamesPlayed;
+        if (a.gamesPlayed !== b.gamesPlayed) {
+          return a.gamesPlayed - b.gamesPlayed;
         }
         return a.username.localeCompare(b.username, undefined, {
           sensitivity: "base",
