@@ -24,7 +24,7 @@ function TroopChart({
   history: TroopSnapshot[];
   players: GameStateDTO["players"];
 }) {
-  if (history.length < 2) return null;
+  if (history.length < 1) return null;
 
   const pad = { top: 20, right: 16, bottom: 28, left: 34 };
   const w = 440;
@@ -209,7 +209,7 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({
 
           <div className="mx-6 h-px bg-gradient-to-r from-transparent via-[#FFD900]/20 to-transparent" />
 
-          {troopHistory.length >= 2 && (
+          {troopHistory.length >= 1 && (
             <div className="px-6 py-5">
               <div className="flex items-center gap-2 mb-3">
                 <Swords size={12} className="text-[#FFD900]/40" />

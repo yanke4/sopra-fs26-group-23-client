@@ -217,13 +217,19 @@ export const useGamePageController = () => {
           .reduce((sum, f) => sum + f.troops, 0);
       });
       setTroopHistory((prev) => {
+        const lastTurn = prev.length > 0 ? prev[prev.length - 1].turn : -1;
+        const snapshotTurn =
+          justFinished && state.turnNumber <= lastTurn
+            ? lastTurn + 1
+            : state.turnNumber;
         const snapshot: TroopSnapshot = {
-          turn: state.turnNumber,
+          turn: snapshotTurn,
           troops: totalTroopsByPlayer,
         };
         if (
+          !justFinished &&
           prev.length > 0 &&
-          prev[prev.length - 1].turn === state.turnNumber
+          prev[prev.length - 1].turn === snapshotTurn
         ) {
           return [...prev.slice(0, -1), snapshot];
         }
