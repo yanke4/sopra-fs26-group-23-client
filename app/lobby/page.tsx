@@ -64,7 +64,7 @@ function LobbyContent() {
       return;
     }
     setCurrentUserId(Number(user.id));
-    setCurrentUser({id: String(user.id), name: user.username, color: "teal"});
+    setCurrentUser({id: String(user.id), name: user.username, color: "blue"});
     const lobbyIdParam = searchParams.get("lobbyId");
 
     if (lobbyIdParam) {
