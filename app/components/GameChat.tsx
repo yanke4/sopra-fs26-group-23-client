@@ -62,6 +62,7 @@ const COLOR_MAP: Record<string, { bg: string; light: string }> = {
   yellow: { bg: "#a16207", light: "#fef9c3" },
   black:  { bg: "#1c1917", light: "#e7e5e4" },
   purple: { bg: "#7e22ce", light: "#f3e8ff" },
+  teal:   { bg: "#0f766e", light: "#ccfbf1" },  
 };
 
 function getColor(color: string) {
@@ -184,64 +185,64 @@ export default function GameChat({ gameId, currentUser, apiUrl }: GameChatProps)
   }, [currentUser]);
 
   useEffect(() => {
-    console.log("useEffect running, pusherRef:", pusherRef.current);
-    if (pusherRef.current) return;
-    pusherRef.current = true; // temporary to prevent double init in strict mode, will be replaced with actual pusher client
-    
-    const pusherKey = process.env.NEXT_PUBLIC_PUSHER_KEY ?? "d10223ce93fd20bcd040";
-    const pusherCluster = process.env.NEXT_PUBLIC_PUSHER_CLUSTER ?? "eu";
+  let cancelled = false;
 
-    const initPusher = async () => {
-      const PusherClient = (await import("pusher-js")).default;
+  const pusherKey = process.env.NEXT_PUBLIC_PUSHER_KEY ?? "d10223ce93fd20bcd040";
+  const pusherCluster = process.env.NEXT_PUBLIC_PUSHER_CLUSTER ?? "eu";
 
-      const pusherClient = new PusherClient(pusherKey, {
-        cluster: pusherCluster,
-        channelAuthorization: {
-          endpoint: `${apiUrl}/chat/auth`,
-          transport: "ajax",
-          headers: {
-            "x-user-id":    currentUser.id,
-            "x-user-name":  currentUser.name,
-            "x-user-color": currentUser.color,
-          },
+  const initPusher = async () => {
+    const PusherClient = (await import("pusher-js")).default;
+
+    if (cancelled) return;
+
+    const pusherClient = new PusherClient(pusherKey, {
+      cluster: pusherCluster,
+      channelAuthorization: {
+        endpoint: `${apiUrl}/chat/auth`,
+        transport: "ajax",
+        headers: {
+          "x-user-id":    currentUser.id,
+          "x-user-name":  currentUser.name,
+          "x-user-color": currentUser.color,
         },
-      });
+      },
+    });
 
-      pusherRef.current = pusherClient;
+    pusherRef.current = pusherClient;
 
-      const channel = pusherClient.subscribe(`presence-game-${gameId}`) as unknown as PusherChannel;
-      channelRef.current = channel;
+    const channel = pusherClient.subscribe(`presence-game-${gameId}`) as unknown as PusherChannel;
+    channelRef.current = channel;
 
-      channel.bind("pusher:subscription_succeeded", (members: unknown) => {
-        setConnected(true);
-        const players: OnlinePlayer[] = [];
-        (members as PusherMembers).each((m) => players.push({ id: m.id, ...m.info }));
-        setOnlinePlayers(players);
-      });
+    channel.bind("pusher:subscription_succeeded", (members: unknown) => {
+      setConnected(true);
+      const players: OnlinePlayer[] = [];
+      (members as PusherMembers).each((m) => players.push({ id: m.id, ...m.info }));
+      setOnlinePlayers(players);
+    });
 
-      channel.bind("new-message", (data: unknown) => {
-        const msg = data as ChatMessage;
-        console.log("received playerId:", msg.playerId, "my id:", currentUserRef.current.id, "types:", typeof msg.playerId, typeof currentUserRef.current.id);
-        if (String(msg.playerId) === String(currentUserRef.current.id)) return;
-        setMessages((prev) => [...prev, msg]);
-      });
-    };
+    channel.bind("new-message", (data: unknown) => {
+      const msg = data as ChatMessage;
+      if (String(msg.playerId) === String(currentUserRef.current.id)) return;
+      setMessages((prev) => [...prev, msg]);
+    });
+  };
 
-    initPusher();
+  initPusher();
 
-    return () => {
-      if (channelRef.current) {
-        channelRef.current.unbind_all();
-        channelRef.current = null;
-      }
-      const p = pusherRef.current;
-      if (p && typeof p !== "boolean") {
-        p.unsubscribe(`presence-game-${gameId}`);
-        p.disconnect();
-        pusherRef.current = null;
-      }
-    };
-  }, [gameId]);
+  return () => {
+    cancelled = true;
+    if (channelRef.current) {
+      channelRef.current.unbind_all();
+      channelRef.current = null;
+    }
+    const p = pusherRef.current;
+    if (p && typeof p !== "boolean") {
+      p.unsubscribe(`presence-game-${gameId}`);
+      p.disconnect();
+      pusherRef.current = null;
+    }
+  };
+}, [gameId]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
