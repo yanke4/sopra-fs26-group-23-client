@@ -162,9 +162,9 @@ function LobbyContent() {
   const accessCode = String(lobby.joinCode).replace(/(\d{3})(\d{3})/, "$1 $2");
 
   return (
-    <div className="h-screen flex flex-row items-center justify-start pt-12 px-6 bg-[rgba(14,12,6,0.5)] overflow-hidden">
-      <div className = "w-180 hidden lg:block" />
-      <Card className="w-full max-w-2xl rounded-lg border border-[#FFD900]/15 bg-[rgba(14,12,6,0.9)] backdrop-blur-xl shadow-[0_12px_60px_rgba(0,0,0,0.8)]">
+    <div className="min-h-screen flex items-center justify-center px-4 py-10 bg-[rgba(14,12,6,0.5)]">
+      <div className="w-full max-w-6xl flex flex-col lg:flex-row gap-5 items-stretch">
+      <Card className="flex-1 lg:max-w-2xl rounded-lg border border-[#FFD900]/15 bg-[rgba(14,12,6,0.9)] backdrop-blur-xl shadow-[0_12px_60px_rgba(0,0,0,0.8)]">
         <div className="flex items-center justify-between px-5 py-2.5 border-b border-[#FFD900]/10">
           <div className="flex items-center gap-2">
             <Swords size={14} className="text-[#FFD900]/70" />
@@ -334,15 +334,16 @@ function LobbyContent() {
           </div>
         </CardContent>
       </Card>
-      {currentUser && lobby &&(
-        <div className="w-180 max-w-2xl mt-4 h-120">
-        <GameChat
-        gameId={String(lobby.lobbyId)}
-        currentUser={currentUser}
-        apiUrl={process.env.NEXT_PUBLIC_PROD_API_URL ?? "http://localhost:8080"}
-        />
+      {currentUser && lobby && (
+        <div className="w-full lg:w-96 lg:flex-shrink-0 flex flex-col rounded-lg border border-[#FFD900]/15 bg-[rgba(14,12,6,0.9)] backdrop-blur-xl shadow-[0_12px_60px_rgba(0,0,0,0.8)] overflow-hidden h-[480px] lg:h-auto lg:min-h-[560px]">
+          <GameChat
+            gameId={String(lobby.lobbyId)}
+            currentUser={currentUser}
+            apiUrl={process.env.NEXT_PUBLIC_PROD_API_URL ?? "http://localhost:8080"}
+          />
         </div>
       )}
+      </div>
     </div>
   );
 }
