@@ -1,9 +1,82 @@
 "use client";
 
-import { MapPin, Users } from "lucide-react";
+import { MapPin, MousePointerClick, Shield, Swords, Users } from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";
 import type { Phase } from "./gameData";
 import type { GamePageController } from "./useGamePageController";
+
+const PHASE_HINTS: Record<
+  Phase,
+  { tone: "green" | "red" | "blue"; icon: typeof Users; label: string; message: string }
+> = {
+  Deploy: {
+    tone: "green",
+    icon: Users,
+    label: "Deploy phase",
+    message: "Click one of your territories to place reinforcements.",
+  },
+  Attack: {
+    tone: "red",
+    icon: Swords,
+    label: "Attack phase",
+    message: "Click an owned territory with 2+ troops to launch an attack.",
+  },
+  Fortify: {
+    tone: "blue",
+    icon: Shield,
+    label: "Fortify phase",
+    message: "Click a territory to move troops to a connected friendly land.",
+  },
+};
+
+const TONE_CLASSES: Record<
+  "green" | "red" | "blue",
+  { bg: string; border: string; text: string; muted: string; pulse: string }
+> = {
+  green: {
+    bg: "bg-green-950/25",
+    border: "border-green-500/30",
+    text: "text-green-200",
+    muted: "text-green-300/60",
+    pulse: "phase-hint-green",
+  },
+  red: {
+    bg: "bg-red-950/25",
+    border: "border-red-500/30",
+    text: "text-red-200",
+    muted: "text-red-300/60",
+    pulse: "phase-hint-red",
+  },
+  blue: {
+    bg: "bg-blue-950/25",
+    border: "border-blue-500/30",
+    text: "text-blue-200",
+    muted: "text-blue-300/60",
+    pulse: "phase-hint-blue",
+  },
+};
+
+const SelectionHint = ({ phase }: { phase: Phase }) => {
+  const hint = PHASE_HINTS[phase];
+  const tone = TONE_CLASSES[hint.tone];
+  const Icon = hint.icon;
+  return (
+    <div
+      className={`mx-3 my-3 rounded-md border ${tone.border} ${tone.bg} ${tone.pulse} p-3 space-y-1.5`}
+    >
+      <div className={`flex items-center gap-1.5 ${tone.muted}`}>
+        <Icon size={12} />
+        <span className="text-[10px] font-bold uppercase tracking-wider">
+          {hint.label}
+        </span>
+      </div>
+      <div className={`flex items-start gap-1.5 text-[11px] ${tone.text}`}>
+        <MousePointerClick size={12} className="mt-0.5 shrink-0" />
+        <span>{hint.message}</span>
+      </div>
+    </div>
+  );
+};
 
 type PlayerStat = GamePageController["playerStats"][number];
 type RegionStat = GamePageController["myOwnedRegions"][number];
@@ -204,7 +277,7 @@ const DeployPanel = ({
           disabled={!isMyTurn || reinforcements <= 0}
           className={`w-full min-h-11 px-4 py-2.5 rounded-md text-sm font-bold border tracking-wide transition-all ${
             isMyTurn && reinforcements > 0
-              ? "bg-green-900/40 hover:bg-green-800/50 text-green-200 border-green-500/30"
+              ? "bg-green-900/40 hover:bg-green-800/50 text-green-200 border-green-500/30 phase-hint-green cursor-pointer"
               : "bg-white/5 text-white/30 border-white/10 cursor-not-allowed"
           }`}
         >
@@ -310,7 +383,7 @@ const AttackPanel = ({
       disabled={!canAttackSelectedTarget}
       className={`w-full min-h-11 px-4 py-2.5 rounded-md text-sm font-bold border tracking-wide transition-all ${
         canAttackSelectedTarget
-          ? "bg-red-900/40 hover:bg-red-800/50 text-red-200 border-red-500/30"
+          ? "bg-red-900/40 hover:bg-red-800/50 text-red-200 border-red-500/30 phase-hint-red cursor-pointer"
           : "bg-white/5 text-white/30 border-white/10 cursor-not-allowed"
       }`}
     >
@@ -410,7 +483,7 @@ const FortifyPanel = ({
       disabled={!canFortifySelectedTarget}
       className={`w-full min-h-11 px-4 py-2.5 rounded-md text-sm font-bold border tracking-wide transition-all ${
         canFortifySelectedTarget
-          ? "bg-blue-900/40 hover:bg-blue-800/50 text-blue-200 border-blue-500/30"
+          ? "bg-blue-900/40 hover:bg-blue-800/50 text-blue-200 border-blue-500/30 phase-hint-blue cursor-pointer"
           : "bg-white/5 text-white/30 border-white/10 cursor-not-allowed"
       }`}
     >
@@ -480,39 +553,52 @@ const PlayerSidebar = ({
     />
 
     {currentPhase === "Deploy" && isMyTurn && (
-      <DeployPanel
-        canDeployToSelected={canDeployToSelected}
-        selectedTerritory={selectedTerritory}
-        reinforcements={reinforcements}
-        deployTroops={deployTroops}
-        setDeployTroops={setDeployTroops}
-        isMyTurn={isMyTurn}
-        onDeploy={onDeploy}
-      />
+      <>
+        {!canDeployToSelected && reinforcements > 0 && (
+          <SelectionHint phase="Deploy" />
+        )}
+        <DeployPanel
+          canDeployToSelected={canDeployToSelected}
+          selectedTerritory={selectedTerritory}
+          reinforcements={reinforcements}
+          deployTroops={deployTroops}
+          setDeployTroops={setDeployTroops}
+          isMyTurn={isMyTurn}
+          onDeploy={onDeploy}
+        />
+      </>
     )}
 
-    {currentPhase === "Attack" && isMyTurn && hasAttackSelection && (
-      <AttackPanel
-        selectedTerritory={selectedTerritory}
-        targetTerritory={targetTerritory}
-        attackTroops={attackTroops}
-        setAttackTroops={setAttackTroops}
-        maxAttackTroops={maxAttackTroops}
-        canAttackSelectedTarget={canAttackSelectedTarget}
-        onAttack={onAttack}
-      />
+    {currentPhase === "Attack" && isMyTurn && (
+      hasAttackSelection ? (
+        <AttackPanel
+          selectedTerritory={selectedTerritory}
+          targetTerritory={targetTerritory}
+          attackTroops={attackTroops}
+          setAttackTroops={setAttackTroops}
+          maxAttackTroops={maxAttackTroops}
+          canAttackSelectedTarget={canAttackSelectedTarget}
+          onAttack={onAttack}
+        />
+      ) : (
+        <SelectionHint phase="Attack" />
+      )
     )}
 
-    {currentPhase === "Fortify" && isMyTurn && hasFortifySelection && (
-      <FortifyPanel
-        selectedTerritory={selectedTerritory}
-        targetTerritory={targetTerritory}
-        fortifyTroops={fortifyTroops}
-        setFortifyTroops={setFortifyTroops}
-        maxFortifyTroops={maxFortifyTroops}
-        canFortifySelectedTarget={canFortifySelectedTarget}
-        onFortify={onFortify}
-      />
+    {currentPhase === "Fortify" && isMyTurn && (
+      hasFortifySelection ? (
+        <FortifyPanel
+          selectedTerritory={selectedTerritory}
+          targetTerritory={targetTerritory}
+          fortifyTroops={fortifyTroops}
+          setFortifyTroops={setFortifyTroops}
+          maxFortifyTroops={maxFortifyTroops}
+          canFortifySelectedTarget={canFortifySelectedTarget}
+          onFortify={onFortify}
+        />
+      ) : (
+        <SelectionHint phase="Fortify" />
+      )
     )}
   </div>
 );

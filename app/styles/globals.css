@@ -482,3 +482,71 @@
     transform: translate(0, -4px) scale(0.92);
   }
 }
+
+/* Phase-guidance hint pulses — draw attention to the active phase pill and
+   primary action button when it is the local player's turn. */
+@keyframes phase-hint-green {
+  0%,
+  100% {
+    box-shadow:
+      0 0 12px rgba(34, 197, 94, 0.25),
+      0 0 0 0 rgba(34, 197, 94, 0.45);
+  }
+  50% {
+    box-shadow:
+      0 0 22px rgba(34, 197, 94, 0.55),
+      0 0 0 5px rgba(34, 197, 94, 0);
+  }
+}
+@keyframes phase-hint-red {
+  0%,
+  100% {
+    box-shadow:
+      0 0 12px rgba(239, 68, 68, 0.25),
+      0 0 0 0 rgba(239, 68, 68, 0.45);
+  }
+  50% {
+    box-shadow:
+      0 0 22px rgba(239, 68, 68, 0.55),
+      0 0 0 5px rgba(239, 68, 68, 0);
+  }
+}
+@keyframes phase-hint-blue {
+  0%,
+  100% {
+    box-shadow:
+      0 0 12px rgba(59, 130, 246, 0.25),
+      0 0 0 0 rgba(59, 130, 246, 0.45);
+  }
+  50% {
+    box-shadow:
+      0 0 22px rgba(59, 130, 246, 0.55),
+      0 0 0 5px rgba(59, 130, 246, 0);
+  }
+}
+@keyframes phase-hint-amber {
+  0%,
+  100% {
+    box-shadow:
+      0 0 12px rgba(245, 158, 11, 0.25),
+      0 0 0 0 rgba(245, 158, 11, 0.45);
+  }
+  50% {
+    box-shadow:
+      0 0 22px rgba(245, 158, 11, 0.55),
+      0 0 0 5px rgba(245, 158, 11, 0);
+  }
+}
+
+.phase-hint-green {
+  animation: phase-hint-green 1.6s ease-in-out infinite;
+}
+.phase-hint-red {
+  animation: phase-hint-red 1.6s ease-in-out infinite;
+}
+.phase-hint-blue {
+  animation: phase-hint-blue 1.6s ease-in-out infinite;
+}
+.phase-hint-amber {
+  animation: phase-hint-amber 1.6s ease-in-out infinite;
+}
