@@ -19,7 +19,8 @@ import {
   LobbyWebSocketDTO,
   GameStartDTO,
 } from "@/hooks/useLobbySocket";
-import GameChat from "@/components/GameChat"; 
+import GameChat from "@/components/GameChat";
+import BattleLoading from "@/components/battle-loading";
 // Matches LobbyGetDTO from the server
 interface LobbyGetDTO {
   lobbyId: number;
@@ -53,6 +54,7 @@ function LobbyContent() {
   const [startError, setStartError] = useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
   const [currentUser, setCurrentUser] = useState<{id: string; name: string, color: string} | null>(null);
+  const [gameStarting, setGameStarting] = useState(false);
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -101,6 +103,7 @@ function LobbyContent() {
   const handleGameStart = useCallback(
     (data: GameStartDTO) => {
       localStorage.setItem("gameId", String(data.gameId));
+      setGameStarting(true);
       router.push(`/game/${data.gameId}`);
     },
     [router],
@@ -138,6 +141,10 @@ function LobbyContent() {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
+  if (gameStarting) {
+    return <BattleLoading message="Marshalling the legions" />;
+  }
 
   if (error) {
     return (
