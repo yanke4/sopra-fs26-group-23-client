@@ -48,6 +48,7 @@ export const useGamePageController = () => {
   const [surrenderMessage, setSurrenderMessage] = useState<string | null>(null);
   const [showSurrenderModal, setShowSurrenderModal] = useState(false);
   const [showYourTurnToast, setShowYourTurnToast] = useState(false);
+  const [turnTimeoutPopup, setTurnTimeoutPopup] = useState(false);
   const previousPlayersRef = useRef<PlayerStateDTO[]>([]);
   const previousStateRef = useRef<GameStateDTO | null>(null);
   const [attackAnimation, setAttackAnimation] =
@@ -111,6 +112,23 @@ export const useGamePageController = () => {
   }, [gameState?.currentPlayerId]);
 
   const handleGameUpdate = useCallback((state: GameStateDTO) => {
+    if (state.timedOutPlayerId != null) {
+      const stored =
+        typeof window !== "undefined" ? localStorage.getItem("user") : null;
+      const localUserId = stored ? Number(JSON.parse(stored).id) : null;
+      const localPlayerId =
+        localUserId != null
+          ? (state.players.find((p) => Number(p.userId) === localUserId)
+              ?.playerId ?? null)
+          : null;
+      if (
+        localPlayerId != null &&
+        Number(state.timedOutPlayerId) === Number(localPlayerId)
+      ) {
+        setTurnTimeoutPopup(true);
+      }
+    }
+
     const prev = previousPlayersRef.current;
     if (prev.length > 0) {
       const surrendered = state.players.filter((p) => {
@@ -705,6 +723,8 @@ export const useGamePageController = () => {
     surrenderMessage,
     showSurrenderModal,
     setShowSurrenderModal,
+    turnTimeoutPopup,
+    setTurnTimeoutPopup,
     attackAnimation,
     fortifyAnimation,
     deployAnimation,

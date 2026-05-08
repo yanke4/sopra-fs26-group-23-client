@@ -39,7 +39,7 @@ export default function BattleLoading({
         className="absolute w-[700px] h-[700px] rounded-full blur-3xl"
         style={{
           background:
-            "radial-gradient(circle, rgba(245,158,11,0.45) 0%, transparent 70%)",
+            "radial-gradient(circle, rgba(255,217,0,0.42) 0%, transparent 70%)",
           animation: "battle-glow-drift 14s ease-in-out infinite",
         }}
       />
@@ -47,7 +47,7 @@ export default function BattleLoading({
         className="absolute w-[520px] h-[520px] rounded-full blur-3xl"
         style={{
           background:
-            "radial-gradient(circle, rgba(220,38,38,0.35) 0%, transparent 70%)",
+            "radial-gradient(circle, rgba(255,217,0,0.22) 0%, transparent 70%)",
           animation: "battle-glow-drift-rev 18s ease-in-out infinite",
           animationDelay: "-4s",
         }}
@@ -57,7 +57,7 @@ export default function BattleLoading({
         className="absolute inset-0"
         style={{
           backgroundImage:
-            "repeating-linear-gradient(45deg, rgba(245,158,11,0.4) 0 1px, transparent 1px 14px), repeating-linear-gradient(-45deg, rgba(245,158,11,0.4) 0 1px, transparent 1px 14px)",
+            "repeating-linear-gradient(45deg, rgba(255,217,0,0.4) 0 1px, transparent 1px 14px), repeating-linear-gradient(-45deg, rgba(255,217,0,0.4) 0 1px, transparent 1px 14px)",
           animation: "battle-grid-pulse 6s ease-in-out infinite",
         }}
       />
@@ -70,14 +70,15 @@ export default function BattleLoading({
         return (
           <span
             key={i}
-            className="absolute rounded-full bg-amber-400 pointer-events-none"
+            className="absolute rounded-full pointer-events-none"
             style={{
               left: `${left}%`,
               bottom: 0,
               width: size,
               height: size,
+              background: "#FFD900",
               boxShadow:
-                "0 0 6px rgba(245,158,11,0.7), 0 0 12px rgba(245,158,11,0.35)",
+                "0 0 6px rgba(255,217,0,0.7), 0 0 12px rgba(255,217,0,0.35)",
               animation: `battle-ember-rise ${duration}s linear infinite`,
               animationDelay: `${delay}s`,
             }}
@@ -87,22 +88,22 @@ export default function BattleLoading({
 
       <div className="relative flex flex-col items-center gap-7 px-6 max-w-xl">
         <div className="relative">
-          <div className="absolute inset-0 blur-2xl opacity-50 bg-amber-400 rounded-full" />
-          <div className="relative phase-hint-amber rounded-full p-6 border border-amber-500/30">
+          <div className="absolute inset-0 blur-2xl opacity-50 rounded-full bg-[#FFD900]" />
+          <div className="relative rounded-full p-6 border border-[#FFD900]/40 phase-hint-brand">
             <Swords
               size={56}
-              className="relative text-amber-300"
+              className="relative text-[#FFD900]"
               strokeWidth={1.4}
             />
           </div>
         </div>
 
         <div className="text-center space-y-3">
-          <h1 className="font-audiowide text-3xl md:text-4xl tracking-[0.3em] text-amber-200 uppercase drop-shadow-[0_0_18px_rgba(245,158,11,0.35)]">
+          <h1 className="font-audiowide text-3xl md:text-4xl tracking-[0.3em] text-[#FFD900] uppercase drop-shadow-[0_0_18px_rgba(255,217,0,0.4)]">
             Prepare for Battle
           </h1>
-          <div className="h-px w-40 mx-auto bg-gradient-to-r from-transparent via-amber-400/60 to-transparent" />
-          <p className="font-audiowide text-[10px] tracking-[0.4em] text-amber-400/50 uppercase">
+          <div className="h-px w-40 mx-auto bg-gradient-to-r from-transparent via-[#FFD900]/70 to-transparent" />
+          <p className="font-audiowide text-[10px] tracking-[0.4em] text-[#FFD900]/55 uppercase">
             {message}
           </p>
         </div>
@@ -110,13 +111,13 @@ export default function BattleLoading({
         <div className="text-center min-h-[4em] flex flex-col items-center justify-center px-4">
           <p
             key={quoteIndex}
-            className="text-amber-100/80 italic text-sm md:text-base leading-relaxed animate-in fade-in slide-in-from-bottom-1 duration-700"
+            className="italic text-sm md:text-base leading-relaxed text-[#FFD900]/85 animate-in fade-in slide-in-from-bottom-1 duration-700"
           >
             &ldquo;{quote.text}&rdquo;
           </p>
           <p
             key={`a-${quoteIndex}`}
-            className="font-audiowide text-[9px] tracking-[0.3em] text-amber-400/40 uppercase mt-2 animate-in fade-in duration-1000"
+            className="font-audiowide text-[9px] tracking-[0.3em] uppercase mt-2 text-[#FFD900]/45 animate-in fade-in duration-1000"
           >
             — {quote.author}
           </p>
@@ -126,8 +127,9 @@ export default function BattleLoading({
           {[0, 1, 2].map((i) => (
             <span
               key={i}
-              className="w-1.5 h-1.5 rounded-full bg-amber-400"
+              className="w-1.5 h-1.5 rounded-full"
               style={{
+                background: "#FFD900",
                 animation: "battle-dot 1.4s ease-in-out infinite",
                 animationDelay: `${i * 0.18}s`,
               }}

@@ -48,4 +48,7 @@ export interface GameStateDTO {
   players: PlayerStateDTO[];
   fields: FieldStateDTO[];
   lastAttack?: AttackEventDTO | null;
+  turnTimerSeconds?: number | null;
+  turnStartedAtMillis?: number | null;
+  timedOutPlayerId?: number | null;
 }

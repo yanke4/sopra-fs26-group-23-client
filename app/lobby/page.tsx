@@ -5,9 +5,10 @@ import {
   Clipboard,
   CheckCircle2,
   Plus,
-  Settings,
   Swords,
   LogOut,
+  Timer,
+  Infinity as InfinityIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -28,7 +29,14 @@ interface LobbyGetDTO {
   joinCode: number;
   host: { id: number; username: string };
   jointUsers: { id: number; username: string }[];
+  turnTimerSeconds: number | null;
 }
+
+const TIMER_OPTIONS: { label: string; value: number | null }[] = [
+  { label: "30s", value: 30 },
+  { label: "60s", value: 60 },
+  { label: "No limit", value: null },
+];
 
 const apiService = new ApiService();
 
@@ -55,6 +63,7 @@ function LobbyContent() {
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
   const [currentUser, setCurrentUser] = useState<{id: string; name: string, color: string} | null>(null);
   const [gameStarting, setGameStarting] = useState(false);
+  const [savingSettings, setSavingSettings] = useState(false);
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -180,9 +189,6 @@ function LobbyContent() {
               Conquest of Europe
             </span>
           </div>
-          <button className="p-1 rounded-full border border-[rgba(255,217,0,0.2)] text-white/50 hover:text-[#FFD900] transition-colors cursor-pointer">
-            <Settings size={14} />
-          </button>
         </div>
 
         <CardContent className="flex flex-col gap-4 p-5">
@@ -192,6 +198,64 @@ function LobbyContent() {
             </h1>
             <p className="text-[11px] text-white/40 tracking-widest uppercase mt-1">
               Waiting for commanders to assemble
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-2 p-4 rounded border border-[#FFD900]/25 bg-[rgba(255,217,0,0.04)]">
+            <div className="flex items-center gap-2">
+              <Timer size={13} className="text-[#FFD900]/70" />
+              <span className="font-audiowide text-[10px] tracking-[0.25em] text-[#FFD900]/70 uppercase">
+                Turn Timer
+              </span>
+              {!isHost && (
+                <span className="ml-auto text-[9px] text-white/30 italic">
+                  host only
+                </span>
+              )}
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              {TIMER_OPTIONS.map((opt) => {
+                const active = lobby.turnTimerSeconds === opt.value;
+                return (
+                  <button
+                    key={String(opt.value)}
+                    disabled={!isHost || savingSettings || active}
+                    onClick={async () => {
+                      try {
+                        setSavingSettings(true);
+                        await apiService.put<LobbyGetDTO>(
+                          `/lobbies/${lobby.lobbyId}/settings`,
+                          {
+                            userId: currentUserId,
+                            turnTimerSeconds: opt.value,
+                          },
+                        );
+                      } catch (err) {
+                        console.error("Failed to update timer:", err);
+                      } finally {
+                        setSavingSettings(false);
+                      }
+                    }}
+                    className={`flex items-center justify-center gap-1.5 h-12 rounded-md font-audiowide text-xs tracking-[0.2em] uppercase border transition-all ${
+                      active
+                        ? "bg-[#FFD900] text-[#0e0c06] border-[#FFD900] shadow-[0_0_18px_rgba(255,217,0,0.45)]"
+                        : isHost
+                          ? "bg-white/5 text-white/70 border-[#FFD900]/15 hover:border-[#FFD900]/50 hover:text-[#FFD900] hover:bg-[#FFD900]/5 cursor-pointer"
+                          : "bg-white/5 text-white/30 border-white/10 cursor-not-allowed"
+                    } ${savingSettings && !active ? "opacity-60" : ""}`}
+                  >
+                    {opt.value == null ? (
+                      <InfinityIcon size={14} />
+                    ) : (
+                      <Timer size={13} />
+                    )}
+                    {opt.label}
+                  </button>
+                );
+              })}
+            </div>
+            <p className="text-[10px] text-white/35 italic">
+              When time runs out, the turn auto-passes to the next player.
             </p>
           </div>
 
