@@ -9,14 +9,23 @@ const MIN_LOADING_MS = 5000;
 
 const GamePage = () => {
   const controller = useGamePageController();
-  const [minDelayElapsed, setMinDelayElapsed] = useState(false);
+
+  const [showBattleLoading] = useState(() => {
+    if (typeof window === "undefined") return false;
+    const flag = sessionStorage.getItem("battleLoading");
+    if (!flag) return false;
+    sessionStorage.removeItem("battleLoading");
+    return true;
+  });
+  const [minDelayElapsed, setMinDelayElapsed] = useState(!showBattleLoading);
 
   useEffect(() => {
+    if (!showBattleLoading) return;
     const id = setTimeout(() => setMinDelayElapsed(true), MIN_LOADING_MS);
     return () => clearTimeout(id);
-  }, []);
+  }, [showBattleLoading]);
 
-  if (!controller.gameState || !minDelayElapsed) {
+  if (showBattleLoading && (!controller.gameState || !minDelayElapsed)) {
     return <BattleLoading />;
   }
 

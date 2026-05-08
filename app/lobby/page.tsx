@@ -103,6 +103,7 @@ function LobbyContent() {
   const handleGameStart = useCallback(
     (data: GameStartDTO) => {
       localStorage.setItem("gameId", String(data.gameId));
+      sessionStorage.setItem("battleLoading", String(data.gameId));
       setGameStarting(true);
       router.push(`/game/${data.gameId}`);
     },
