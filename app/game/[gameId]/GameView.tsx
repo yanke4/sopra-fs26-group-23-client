@@ -12,7 +12,7 @@ import {
 import TerritoryAndChatPanel from "./TerritoryAndChatPanel";
 import TurnTimerBar from "./TurnTimerBar";
 import type { GamePageController } from "./useGamePageController";
-import { YourTurnToast } from "./YourTurnOverlay";
+import { YourTurnToast, PhaseTransitionToast } from "./YourTurnOverlay";
 import { COLOR_MAP } from "./gameData";
 
 const GameView = ({
@@ -29,6 +29,8 @@ const GameView = ({
   surrenderMessage,
   showSurrenderModal,
   showYourTurnToast,
+  showAttackPhaseToast,
+  showFortifyPhaseToast,
   setShowSurrenderModal,
   turnTimeoutPopup,
   setTurnTimeoutPopup,
@@ -72,6 +74,8 @@ const GameView = ({
   <div className="flex flex-col h-[calc(100vh-64px)] overflow-hidden select-none bg-[#0a0908]">
     <SurrenderToast message={surrenderMessage} />
     <YourTurnToast show={showYourTurnToast} />
+    <PhaseTransitionToast show={showAttackPhaseToast} phase="attack" />
+    <PhaseTransitionToast show={showFortifyPhaseToast} phase="fortify" />
     <TurnTimeoutPopup
       show={turnTimeoutPopup}
       onClose={() => setTurnTimeoutPopup(false)}

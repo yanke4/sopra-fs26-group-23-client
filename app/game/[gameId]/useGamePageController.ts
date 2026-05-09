@@ -48,9 +48,12 @@ export const useGamePageController = () => {
   const [surrenderMessage, setSurrenderMessage] = useState<string | null>(null);
   const [showSurrenderModal, setShowSurrenderModal] = useState(false);
   const [showYourTurnToast, setShowYourTurnToast] = useState(false);
+  const [showAttackPhaseToast, setShowAttackPhaseToast] = useState(false);
+  const [showFortifyPhaseToast, setShowFortifyPhaseToast] = useState(false);
   const [turnTimeoutPopup, setTurnTimeoutPopup] = useState(false);
   const previousPlayersRef = useRef<PlayerStateDTO[]>([]);
   const previousStateRef = useRef<GameStateDTO | null>(null);
+  const previousPhaseRef = useRef<string | null>(null);
   const [attackAnimation, setAttackAnimation] =
     useState<AttackAnimationData | null>(null);
   const attackAnimationIdRef = useRef(0);
@@ -110,6 +113,21 @@ export const useGamePageController = () => {
     const timer = setTimeout(() => setShowYourTurnToast(false), 2500);
     return () => clearTimeout(timer);
   }, [gameState?.currentPlayerId]);
+
+  useEffect(() => {
+    const currPhase = gameState?.currentPhase ?? null;
+    const prevPhase = previousPhaseRef.current;
+
+    if (prevPhase && currPhase && prevPhase !== currPhase && isMyTurn) {
+      if (prevPhase === "DEPLOY" && currPhase === "ATTACK") {
+        setShowAttackPhaseToast(true);
+      } else if (prevPhase === "ATTACK" && currPhase === "FORTIFY") {
+        setShowFortifyPhaseToast(true);
+      }
+    }
+
+    previousPhaseRef.current = currPhase;
+  }, [gameState?.currentPhase, gameState?.currentPlayerId]);
 
   const handleGameUpdate = useCallback((state: GameStateDTO) => {
     if (state.timedOutPlayerId != null) {
@@ -762,6 +780,8 @@ export const useGamePageController = () => {
     handleConfirmSurrender,
     nextPhase,
     showYourTurnToast,
+    showAttackPhaseToast,
+    showFortifyPhaseToast,
   };
 };
 
