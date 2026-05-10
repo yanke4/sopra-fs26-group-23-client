@@ -157,12 +157,13 @@ reason).
 
 ---
 
-## Contributions Week 6 - [Begin Date] to [End Date]
+## Contributions Week 6 - 04/05/2026 to 11/05/2026
 
 | **Student**        | **Date** | **Link to Commit** | **Description**                 | **Relevance**                       |
 | ------------------ | -------- | ------------------ | ------------------------------- | ----------------------------------- |
-| **[@githubUser1]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
-|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **Linu5Frick** | 05/05/2026   | [Link to Commmit 1](https://github.com/yanke4/sopra-fs26-group-23-client/commit/3be54007891528d8c58f5367632a94f2ecaf2352) | Implemented the Lobbychat | Players can now also chat with eachother in the lobby |
+|                    | 06/05/2026   | [Link to Commit 2](https://github.com/yanke4/sopra-fs26-group-23-server/commit/9c0c6e4ab2cdc30bd6bf324d575111d72e7f8e6b) | Response to invalid username or password changed | Users now know receive a better error message in case of failed login |
+|                    | 10/05/2026   | [Link to Commit 3](https://github.com/yanke4/sopra-fs26-group-23-client/commit/9f2b241ebdb12a052472cdcf5adf9197e72a89f2) | Chatcolor in lobby now changes accordingly to the chosen color | The user now automatically know which user is typing without needing to check the name since the corresponding color is the chat color |
 | **[@githubUser2]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
 |                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
 | **[@githubUser3]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
