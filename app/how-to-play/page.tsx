@@ -321,8 +321,8 @@ export default function HowToPlay() {
                 </div>
                 <TroopPips count={5} />
                 <p className="mt-3 text-xs text-white/40 italic">
-                  Distribute them however you wish — concentrate the spear, or
-                  spread the shield.
+                  Fate sets the split — read the field and plan from where it
+                  has placed you.
                 </p>
               </div>
             </div>
@@ -334,13 +334,14 @@ export default function HowToPlay() {
               <p className="text-white/55 leading-relaxed text-[15px]">
                 The moment the lobby starts, the dice of fate carve out{" "}
                 <span className="text-[#FFD900]/85">two territories</span> for
-                you and hand you a battalion of{" "}
-                <span className="text-[#FFD900]/85">five troops</span> to split
-                between them.
+                you and station a battalion of{" "}
+                <span className="text-[#FFD900]/85">five troops</span> across
+                them — both the lands and their split are dealt by fate, not
+                chosen by your hand.
               </p>
               <p className="mt-3 text-white/40 text-sm leading-relaxed">
-                Where you stack your forces is your first decision — and often
-                the one rivals remember longest.
+                Where fate plants you is your opening hand — how you play it
+                from here is what rivals will remember longest.
               </p>
             </div>
           </div>
