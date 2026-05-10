@@ -113,13 +113,13 @@ export default function Leaderboard() {
             Player
           </span>
           <span className="font-audiowide text-[10px] tracking-widest uppercase text-[#FFD900]/60 text-right">
-            Wins
+            Victories
           </span>
           <span className="font-audiowide text-[10px] tracking-widest uppercase text-[#FFD900]/60 text-right">
-            Played
+            Battles
           </span>
           <span className="font-audiowide text-[10px] tracking-widest uppercase text-[#FFD900]/60 text-right">
-            Win %
+            Win Rate
           </span>
         </div>
 
