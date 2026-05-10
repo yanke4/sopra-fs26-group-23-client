@@ -169,5 +169,7 @@ reason).
 |                    | 08/05/2026    | [[Link to Commit 3]](https://github.com/yanke4/sopra-fs26-group-23-client/commit/f99d736a522e1410f1a67397f15c20ffbe3e1b4b) | Add timer during turns | The host is now able to select between 30s,60s or no timer per turn |
 | **[@githubUser3]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
 |                    | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
-| **[@githubUser4]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
-|                    | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
+| **MatteoLozano** | 03/05/2026 | [Link to Commit 1](https://github.com/yanke4/sopra-fs26-group-23-client/commit/a0f2c19fc8675af2098cfd3c938b3985d25a570f) |Change Sorting of leaderbord client side logic | A more natural way of sorting the leaderbords |
+|                    | 03/05/2026 | [Link to Commit 2](https://github.com/yanke4/sopra-fs26-group-23-server/commit/fa7b9b4cb9b25727fe4eff595fc6191f6f683fc0) | Change Sorting of leaderbord client side logic | A more natural way of sorting the leaderbords |
+|                    | 10/05/2026 | [Link to Commit 3](https://github.com/yanke4/sopra-fs26-group-23-client/commit/78b30c7a88201b93f7330ec2dfeeb6b99f662d8a) | Lobby Action bugfix | Immidiate redirect to login page |
+
