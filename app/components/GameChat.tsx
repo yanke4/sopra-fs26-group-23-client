@@ -63,7 +63,7 @@ const COLOR_MAP: Record<string, { bg: string; light: string }> = {
   yellow: { bg: "#a16207", light: "#fef9c3" },
   black:  { bg: "#1c1917", light: "#e7e5e4" },
   purple: { bg: "#7e22ce", light: "#f3e8ff" },
-  teal:   { bg: "#0f766e", light: "#ccfbf1" },
+  gray:   { bg: "#374151", light: "#f3f4f6" },
 };
 
 function getColor(color: string) {

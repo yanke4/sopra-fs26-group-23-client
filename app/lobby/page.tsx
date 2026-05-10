@@ -83,7 +83,7 @@ function LobbyContent() {
       return;
     }
     setCurrentUserId(Number(user.id));
-    setCurrentUser({id: String(user.id), name: user.username, color: "teal"});
+    setCurrentUser({id: String(user.id), name: user.username, color:user.color});
     const lobbyIdParam = searchParams.get("lobbyId");
 
     if (lobbyIdParam) {
@@ -483,7 +483,7 @@ function LobbyContent() {
           <div className="w-full lg:w-96 lg:flex-shrink-0 flex flex-col rounded-lg border border-[#FFD900]/15 bg-[rgba(14,12,6,0.9)] backdrop-blur-xl shadow-[0_12px_60px_rgba(0,0,0,0.8)] overflow-hidden h-[480px] lg:h-auto lg:min-h-[560px]">
             <GameChat
               gameId={String(lobby.lobbyId)}
-              currentUser={currentUser}
+              currentUser={{...currentUser, color: (lobby.colorPreferences?.[currentUserId ?? -1] ?? "GRAY").toLowerCase()}} 
               apiUrl={process.env.NEXT_PUBLIC_PROD_API_URL ?? "http://localhost:8080"}
             />
           </div>
