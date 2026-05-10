@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { Swords, Send, Smile } from "lucide-react";
 
 interface CurrentUser {
   id: string;
@@ -69,15 +70,18 @@ function getColor(color: string) {
   return COLOR_MAP[color.toLowerCase()] ?? COLOR_MAP.blue;
 }
 
-function Avatar({ name, color, size = 28 }: { name: string; color: string; size?: number }) {
+function Avatar({ name, color, size = 26 }: { name: string; color: string; size?: number }) {
   const { bg } = getColor(color);
   return (
-    <div style={{
-      width: size, height: size, borderRadius: "50%",
-      background: bg, color: "#fff",
-      display: "flex", alignItems: "center", justifyContent: "center",
-      fontSize: size * 0.43, fontWeight: 600, flexShrink: 0,
-    }}>
+    <div
+      className="rounded-full flex items-center justify-center font-bold text-white shrink-0 ring-1 ring-white/10"
+      style={{
+        width: size,
+        height: size,
+        background: bg,
+        fontSize: size * 0.42,
+      }}
+    >
       {name?.[0]?.toUpperCase() ?? "?"}
     </div>
   );
@@ -90,39 +94,36 @@ function Message({ msg, isOwn }: { msg: ChatMessage; isOwn: boolean }) {
   });
 
   return (
-    <div style={{
-      display: "flex",
-      flexDirection: isOwn ? "row-reverse" : "row",
-      alignItems: "flex-end",
-      gap: 2,
-      maxWidth: "78%",
-      alignSelf: isOwn ? "flex-end" : "flex-start",
-    }}>
+    <div
+      className={`flex items-end gap-1.5 max-w-[85%] ${
+        isOwn ? "flex-row-reverse self-end" : "flex-row self-start"
+      }`}
+    >
       {!isOwn && <Avatar name={msg.username} color={msg.color} />}
-      <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+      <div className={`flex flex-col gap-0.5 ${isOwn ? "items-end" : "items-start"}`}>
         {!isOwn && (
-          <span style={{
-            fontSize: 11, fontWeight: 600, color: bg,
-            paddingLeft: 4, letterSpacing: "0.04em",
-          }}>
+          <span
+            className="text-[9px] font-audiowide tracking-[0.15em] uppercase px-1"
+            style={{ color: bg }}
+          >
             {msg.username}
           </span>
         )}
-        <div style={{
-          padding: "8px 12px",
-          borderRadius: isOwn ? "14px 14px 2px 14px" : "14px 14px 14px 2px",
-          background: isOwn ? bg : light,
-          color: isOwn ? "#fff" : "#1c1917",
-          fontSize: 14, lineHeight: 1.5, wordBreak: "break-word",
-        }}>
+        <div
+          className="px-3 py-1.5 text-[12px] leading-snug break-words shadow-sm"
+          style={{
+            background: isOwn ? bg : light,
+            color: isOwn ? "#fff" : "#1c1917",
+            borderRadius: isOwn ? "12px 12px 2px 12px" : "12px 12px 12px 2px",
+          }}
+        >
           {msg.message}
         </div>
-        <span style={{
-          fontSize: 10, color: "#a8a29e",
-          textAlign: isOwn ? "right" : "left",
-          paddingLeft: isOwn ? 0 : 4,
-          paddingRight: isOwn ? 4 : 0,
-        }}>
+        <span
+          className={`text-[9px] font-mono text-white/25 px-1 ${
+            isOwn ? "text-right" : "text-left"
+          }`}
+        >
           {time}
         </span>
       </div>
@@ -132,47 +133,36 @@ function Message({ msg, isOwn }: { msg: ChatMessage; isOwn: boolean }) {
 
 function SystemMessage({ text }: { text: string }) {
   return (
-    <div style={{
-      textAlign: "center", fontSize: 11,
-      color: "#a8a29e", padding: "2px 0",
-      letterSpacing: "0.04em", fontStyle: "italic",
-    }}>
+    <div className="text-center text-[10px] italic text-white/30 py-1 tracking-wider font-audiowide uppercase">
       {text}
     </div>
   );
 }
 
-const EMOTES = ["😂", "😎", "😢", "😡", "👍", "👎", "🤝", "💀", "🔥", "🖕"];
+const EMOTES = ["😂", "😎", "😢", "😡", "👍", "👎", "🤝", "💀", "🔥"];
 
-function EmotePicker({onSelect}: {onSelect: (emote: string) => void}) {
+function EmotePicker({ onSelect }: { onSelect: (emote: string) => void }) {
   return (
-    <div style={{ display: "flex", 
-      gap: 4, 
-      padding: "4px 10px", 
-      flexWrap: "wrap",
-      borderTop: "1px solid rgba(180,120,40,0.2)" }}>
+    <div className="flex flex-wrap gap-1 p-2 border border-[#FFD900]/15 rounded-md bg-[rgba(14,12,6,0.97)] shadow-[0_8px_24px_rgba(0,0,0,0.7)] max-w-[200px]">
       {EMOTES.map((emote) => (
-        <button key={emote} onClick={() => onSelect(emote)} style={{
-          fontSize: 18, 
-          padding: "2px 5px", 
-          borderRadius: 6,
-          border: "1px solid rgba(180,120,40,0.3)",
-          background: "rgba(255,255,255,0.05)", 
-          cursor: "pointer",
-        }}>
+        <button
+          key={emote}
+          onClick={() => onSelect(emote)}
+          className="text-base leading-none w-7 h-7 flex items-center justify-center rounded border border-transparent hover:border-[#FFD900]/40 hover:bg-[#FFD900]/10 transition-colors cursor-pointer"
+        >
           {emote}
         </button>
       ))}
     </div>
   );
-  }
-
+}
 
 export default function GameChat({ gameId, currentUser, apiUrl }: GameChatProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState("");
   const [onlinePlayers, setOnlinePlayers] = useState<OnlinePlayer[]>([]);
   const [connected, setConnected] = useState(false);
+  const [showEmotes, setShowEmotes] = useState(false);
 
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -263,6 +253,7 @@ export default function GameChat({ gameId, currentUser, apiUrl }: GameChatProps)
 
     setMessages((prev) => [...prev, msg]);
     setInputText("");
+    setShowEmotes(false);
     inputRef.current?.focus();
 
     try {
@@ -270,7 +261,7 @@ export default function GameChat({ gameId, currentUser, apiUrl }: GameChatProps)
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...msg, 
+          ...msg,
           gameId: Number(msg.gameId),
           playerId: Number(msg.playerId),
         }),
@@ -292,50 +283,60 @@ export default function GameChat({ gameId, currentUser, apiUrl }: GameChatProps)
     }
   };
 
+  const canSend = inputText.trim().length > 0 && connected;
+
   return (
-    <div style={{
-      display: "flex", flexDirection: "column",
-      height: "100%", minHeight: 0, flex:1,  background: "#0d0c0b",
-      borderTop: "1px solid rgba(180,120,40,0.2)",
-      overflow: "hidden", fontFamily: "var(--font-bruno)",
-    }}>
+    <div className="flex flex-col h-full min-h-0 bg-[rgba(14,12,6,0.85)] overflow-hidden">
       {/* Header */}
-      <div style={{
-        padding: "6px 12px",
-        borderBottom: "1px solid rgba(16, 16, 15, 0.2)",
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-      }}>
-        <span style={{ fontSize: 10, fontWeight: 700, color: "rgba(251,191,36,0.7)", letterSpacing: "0.1em",}}>
-          War council
-        </span>
-        <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-          <div style={{
-            width: 6, height: 6, borderRadius: "50%",
-            background: connected ? "#15803d" : "#a16207",
-          }} />
-          <span style={{ fontSize: 10, color: connected ? "#4ade80" : "#fbbf24", fontFamily: "var(--font-audiowide)" }}>
-            {connected ? "Live" : "Connecting…"}
+      <div className="flex items-center justify-between px-4 py-2.5 border-b border-[#FFD900]/10">
+        <div className="flex items-center gap-2">
+          <Swords size={12} className="text-[#FFD900]/70" />
+          <span className="font-audiowide text-[10px] tracking-[0.2em] text-white/60 uppercase">
+            War Council
+          </span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span
+            className={`w-1.5 h-1.5 rounded-full ${
+              connected
+                ? "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.7)]"
+                : "bg-amber-400 animate-pulse"
+            }`}
+          />
+          <span
+            className={`font-audiowide text-[9px] tracking-[0.15em] uppercase ${
+              connected ? "text-emerald-300/80" : "text-amber-300/80"
+            }`}
+          >
+            {connected ? "Live" : "Connecting"}
           </span>
         </div>
       </div>
 
       {/* Online players */}
       {onlinePlayers.length > 0 && (
-        <div style={{
-          padding: "4px 10px",
-          borderBottom: "1px solid rgba(180,120,40,0.1)",
-          display: "flex", gap: 4, flexWrap: "wrap",
-        }}>
+        <div className="flex flex-wrap gap-1 px-3 py-1.5 border-b border-[#FFD900]/8 bg-[rgba(255,217,0,0.025)]">
           {onlinePlayers.map((p) => {
             const { bg } = getColor(p.color);
+            const isYou = p.id === currentUser.id;
             return (
-              <span key={p.id} style={{
-                fontSize: 10, padding: "1px 6px", borderRadius: 99,
-                background: "rgba(255,255,255,0.05)",
-                color: bg, fontWeight: 600,
-                border: `1px solid ${bg}40`,
-              }}>
-                {p.name}{p.id === currentUser.id ? " (you)" : ""}
+              <span
+                key={p.id}
+                className="inline-flex items-center gap-1 text-[9px] uppercase tracking-wider px-2 py-0.5 rounded-full font-audiowide"
+                style={{
+                  borderColor: `${bg}55`,
+                  borderWidth: 1,
+                  borderStyle: "solid",
+                  color: bg,
+                  background: `${bg}11`,
+                }}
+              >
+                <span
+                  className="w-1.5 h-1.5 rounded-full"
+                  style={{ background: bg }}
+                />
+                {p.name}
+                {isYou && <span className="text-white/40 normal-case">· you</span>}
               </span>
             );
           })}
@@ -343,17 +344,13 @@ export default function GameChat({ gameId, currentUser, apiUrl }: GameChatProps)
       )}
 
       {/* Messages */}
-      <div style={{
-        flex: 1, overflowY: "auto",
-        padding: "10px 10px 6px",
-        display: "flex", flexDirection: "column", gap: 2,
-      }}>
+      <div className="flex-1 min-h-0 overflow-y-auto px-3 py-3 flex flex-col gap-2">
         {messages.length === 0 && (
-          <div style={{
-            textAlign: "center", color: "rgba(255,255,255,0.2)",
-            fontSize: 11, margin: "auto", fontFamily: "var(--font-audiowide)",
-          }}>
-            The war council awaits…
+          <div className="m-auto flex flex-col items-center gap-2 text-center">
+            <Swords size={20} className="text-[#FFD900]/20" />
+            <span className="font-audiowide text-[10px] tracking-[0.2em] text-white/25 uppercase">
+              The war council awaits
+            </span>
           </div>
         )}
         {messages.map((msg, i) =>
@@ -365,52 +362,60 @@ export default function GameChat({ gameId, currentUser, apiUrl }: GameChatProps)
       </div>
 
       {/* Input */}
-      <div style={{
-        padding: "8px 10px",
-        borderTop: "1px solid rgba(180,120,40,0.2)",
-        display: "flex", gap: 6, alignItems: "flex-end",
-      }}>
-        <textarea
-          ref={inputRef}
-          value={inputText}
-          onChange={(e) => setInputText(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder={connected ? "Message… (Enter)" : "Enter your demands!"}
-          disabled={!connected}
-          rows={1}
-          style={{
-            flex: 1, resize: "none",
-            border: "1px solid rgba(180,120,40,0.3)", borderRadius: 6,
-            padding: "6px 6px", fontSize: 10,
-            fontFamily: "var(--font-audiowide)",
-            color: "rgba(255,255,255,0.8)",
-            background: "rgba(255,255,255,0.05)",
-            outline: "none", minHeight: 25, maxHeight: 80, lineHeight: 1.5,
-          }}
-          onInput={(e) => {
-            const t = e.target as HTMLTextAreaElement;
-            t.style.height = "auto";
-            t.style.height = Math.min(t.scrollHeight, 80) + "px";
-          }}
-        />
-        <button
-          onClick={sendMessage}
-          disabled={!inputText.trim() || !connected}
-          style={{
-            width: 30, height: 30, borderRadius: "50%", border: "none",
-            background: inputText.trim() && connected ? "#b91c1c" : "rgba(255,255,255,0.1)",
-            color: "#fff",
-            cursor: inputText.trim() && connected ? "pointer" : "default",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            flexShrink: 0, transition: "background 0.15s",
-          }}
-        >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-          </svg>
-        </button>
-      </div>   
-      <EmotePicker onSelect={sendEmote} />     
+      <div className="relative border-t border-[#FFD900]/10 bg-[rgba(14,12,6,0.95)]">
+        {showEmotes && (
+          <div className="absolute bottom-full left-3 mb-2 z-10">
+            <EmotePicker
+              onSelect={(e) => {
+                sendEmote(e);
+                setShowEmotes(false);
+              }}
+            />
+          </div>
+        )}
+        <div className="flex items-end gap-1.5 px-2 py-2 min-w-0">
+          <button
+            type="button"
+            onClick={() => setShowEmotes((v) => !v)}
+            className={`w-8 h-8 rounded-md flex items-center justify-center border transition-colors shrink-0 cursor-pointer ${
+              showEmotes
+                ? "bg-[#FFD900]/15 border-[#FFD900]/40 text-[#FFD900]"
+                : "bg-white/5 border-[#FFD900]/15 text-white/50 hover:text-[#FFD900] hover:border-[#FFD900]/30"
+            }`}
+            aria-label="Toggle emotes"
+          >
+            <Smile size={14} />
+          </button>
+          <textarea
+            ref={inputRef}
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder={connected ? "Message…" : "Connecting…"}
+            disabled={!connected}
+            rows={1}
+            className="flex-1 min-w-0 resize-none rounded-md border border-[#FFD900]/15 bg-white/5 px-2.5 py-1.5 text-[12px] text-white/85 placeholder:text-white/25 outline-none focus:border-[#FFD900]/40 focus:bg-white/8 transition-colors disabled:opacity-50 leading-snug"
+            style={{ minHeight: 32, maxHeight: 90 }}
+            onInput={(e) => {
+              const t = e.target as HTMLTextAreaElement;
+              t.style.height = "auto";
+              t.style.height = Math.min(t.scrollHeight, 90) + "px";
+            }}
+          />
+          <button
+            onClick={sendMessage}
+            disabled={!canSend}
+            className={`w-8 h-8 rounded-md flex items-center justify-center transition-all shrink-0 ${
+              canSend
+                ? "bg-[#FFD900] text-[#0e0c06] hover:bg-[#ffe44d] shadow-[0_0_12px_rgba(255,217,0,0.3)] cursor-pointer active:scale-95"
+                : "bg-white/5 text-white/20 border border-white/10 cursor-not-allowed"
+            }`}
+            aria-label="Send message"
+          >
+            <Send size={13} />
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

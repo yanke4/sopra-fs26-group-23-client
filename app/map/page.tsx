@@ -136,27 +136,26 @@ const GamePage = () => {
   );
   const [targetTerritory, setTargetTerritory] = useState<string | null>(null);
 
-const gameId =
-  typeof window !== "undefined"
-    ? Number(localStorage.getItem("gameId")) || null
-    : null;
-const myPlayerId =
-  typeof window !== "undefined"
-    ? Number(localStorage.getItem("playerId")) || null
-    : null;
+  const gameId =
+    typeof window !== "undefined"
+      ? Number(localStorage.getItem("gameId")) || null
+      : null;
+  const myPlayerId =
+    typeof window !== "undefined"
+      ? Number(localStorage.getItem("playerId")) || null
+      : null;
 
-const [gameState, setGameState] = useState<GameStateDTO | null>(null);
+  const [gameState, setGameState] = useState<GameStateDTO | null>(null);
 
-const handleGameUpdate = useCallback((state: GameStateDTO) => {
-  setGameState(state);
-}, []);
+  const handleGameUpdate = useCallback((state: GameStateDTO) => {
+    setGameState(state);
+  }, []);
 
-useGameSocket({ gameId, onGameUpdate: handleGameUpdate });
+  useGameSocket({ gameId, onGameUpdate: handleGameUpdate });
 
   const currentPlayer = 0; // visual only
   const currentTurn = gameState?.turnNumber ?? 1;
   const reinforcements = 5;
-
 
   const phaseIndex = PHASES.indexOf(currentPhase);
 
@@ -227,26 +226,27 @@ useGameSocket({ gameId, onGameUpdate: handleGameUpdate });
     setTargetTerritory(null);
   };
 
-const handleAttack = async () => {
-  if (!selectedTerritory || !targetTerritory || !gameId || !myPlayerId) return;
-  try {
-    const apiService = new ApiService();
-    await apiService.post(`/games/${gameId}/turns/attack`, {
-      playerId: myPlayerId,
-      attacks: [
-        {
-          attackingField: selectedTerritory,
-          troops: MOCK_TERRITORIES[selectedTerritory]?.troops ?? 1,
-          defendingField: targetTerritory,
-        },
-      ],
-    });
-    setSelectedTerritory(null);
-    setTargetTerritory(null);
-  } catch (e) {
-    console.error("Attack failed:", e);
-  }
-};
+  const handleAttack = async () => {
+    if (!selectedTerritory || !targetTerritory || !gameId || !myPlayerId)
+      return;
+    try {
+      const apiService = new ApiService();
+      await apiService.post(`/games/${gameId}/turns/attack`, {
+        playerId: myPlayerId,
+        attacks: [
+          {
+            attackingField: selectedTerritory,
+            troops: MOCK_TERRITORIES[selectedTerritory]?.troops ?? 1,
+            defendingField: targetTerritory,
+          },
+        ],
+      });
+      setSelectedTerritory(null);
+      setTargetTerritory(null);
+    } catch (e) {
+      console.error("Attack failed:", e);
+    }
+  };
 
   const nextPhase = () => {
     const next =
@@ -340,7 +340,7 @@ const handleAttack = async () => {
           onClick={nextPhase}
           className="w-36 px-5 py-1.5 bg-amber-700/50 hover:bg-amber-600/60 text-amber-100 rounded text-xs font-bold uppercase tracking-wide border border-amber-500/30 transition-all hover:shadow-lg hover:shadow-amber-900/30"
         >
-          {phaseIndex < PHASES.length - 1 ? "Next Phase" : "End Turn"} &rarr;
+          {phaseIndex < PHASES.length - 1 ? "Skip Phase" : "End Turn"} &rarr;
         </button>
       </div>
 
@@ -426,9 +426,10 @@ const handleAttack = async () => {
                 <div className="space-y-2">
                   {selectedTerritory && targetTerritory && (
                     <div className="flex gap-1.5">
-                      <button 
-                      onClick={handleAttack}
-                      className="flex-1 py-2 bg-red-900/30 hover:bg-red-800/40 text-red-300 rounded text-[11px] font-bold border border-red-500/30 transition-all flex items-center justify-center gap-1">
+                      <button
+                        onClick={handleAttack}
+                        className="flex-1 py-2 bg-red-900/30 hover:bg-red-800/40 text-red-300 rounded text-[11px] font-bold border border-red-500/30 transition-all flex items-center justify-center gap-1"
+                      >
                         <Dice5 size={12} /> Roll
                       </button>
                       <button className="flex-1 py-2 bg-white/5 hover:bg-white/10 text-white/40 rounded text-[11px] font-bold border border-white/10 transition-all">
@@ -516,16 +517,19 @@ const handleAttack = async () => {
           <div className="flex-1 flex flex-col overflow-hidden">
             <div className="px-3 py-2 border-b border-amber-900/20">
               <div className="h-64 border-t border-amber-900/30">
-            <GameChat
-              gameId={String(gameId ?? "default")}
-              currentUser={{
-                id: String(myPlayerId ?? "anonymous"),
-                name: PLAYER_NAMES[currentPlayer],
-                color: "red",
-              }}
-              apiUrl={process.env.NEXT_PUBLIC_PROD_API_URL ?? "http://localhost:8080"}
-            />
-          </div>
+                <GameChat
+                  gameId={String(gameId ?? "default")}
+                  currentUser={{
+                    id: String(myPlayerId ?? "anonymous"),
+                    name: PLAYER_NAMES[currentPlayer],
+                    color: "red",
+                  }}
+                  apiUrl={
+                    process.env.NEXT_PUBLIC_PROD_API_URL ??
+                    "http://localhost:8080"
+                  }
+                />
+              </div>
             </div>
           </div>
         </div>

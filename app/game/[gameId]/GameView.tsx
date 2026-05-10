@@ -4,10 +4,16 @@ import EuropeMap from "@/components/europe-map";
 import VictoryScreen from "@/components/victory-screen";
 import GameTopBar from "./GameTopBar";
 import PlayerSidebar from "./PlayerSidebar";
-import { SurrenderModal, SurrenderToast } from "./SurrenderOverlays";
+import {
+  SurrenderModal,
+  SurrenderToast,
+  TurnTimeoutPopup,
+} from "./SurrenderOverlays";
 import TerritoryAndChatPanel from "./TerritoryAndChatPanel";
+import TurnTimerBar from "./TurnTimerBar";
 import type { GamePageController } from "./useGamePageController";
-import { YourTurnToast } from "./YourTurnOverlay";
+import { YourTurnToast, PhaseTransitionToast } from "./YourTurnOverlay";
+import { COLOR_MAP } from "./gameData";
 
 const GameView = ({
   gameId,
@@ -23,7 +29,11 @@ const GameView = ({
   surrenderMessage,
   showSurrenderModal,
   showYourTurnToast,
+  showAttackPhaseToast,
+  showFortifyPhaseToast,
   setShowSurrenderModal,
+  turnTimeoutPopup,
+  setTurnTimeoutPopup,
   attackAnimation,
   fortifyAnimation,
   deployAnimation,
@@ -64,6 +74,12 @@ const GameView = ({
   <div className="flex flex-col h-[calc(100vh-64px)] overflow-hidden select-none bg-[#0a0908]">
     <SurrenderToast message={surrenderMessage} />
     <YourTurnToast show={showYourTurnToast} />
+    <PhaseTransitionToast show={showAttackPhaseToast} phase="attack" />
+    <PhaseTransitionToast show={showFortifyPhaseToast} phase="fortify" />
+    <TurnTimeoutPopup
+      show={turnTimeoutPopup}
+      onClose={() => setTurnTimeoutPopup(false)}
+    />
     {showSurrenderModal && (
       <SurrenderModal
         onCancel={() => setShowSurrenderModal(false)}
@@ -82,6 +98,18 @@ const GameView = ({
       myPlayerId={myPlayerId}
       onNextPhase={nextPhase}
       onSurrender={handleSurrender}
+    />
+
+    <TurnTimerBar
+      turnStartedAtMillis={gameState?.turnStartedAtMillis}
+      turnTimerSeconds={gameState?.turnTimerSeconds}
+      accentColor={
+        COLOR_MAP[
+          gameState?.players.find(
+            (p) => p.playerId === gameState?.currentPlayerId,
+          )?.color ?? "RED"
+        ] ?? "#FFD900"
+      }
     />
 
     <div className="flex flex-1 overflow-hidden">

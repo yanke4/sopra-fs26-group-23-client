@@ -48,8 +48,12 @@ export const useGamePageController = () => {
   const [surrenderMessage, setSurrenderMessage] = useState<string | null>(null);
   const [showSurrenderModal, setShowSurrenderModal] = useState(false);
   const [showYourTurnToast, setShowYourTurnToast] = useState(false);
+  const [showAttackPhaseToast, setShowAttackPhaseToast] = useState(false);
+  const [showFortifyPhaseToast, setShowFortifyPhaseToast] = useState(false);
+  const [turnTimeoutPopup, setTurnTimeoutPopup] = useState(false);
   const previousPlayersRef = useRef<PlayerStateDTO[]>([]);
   const previousStateRef = useRef<GameStateDTO | null>(null);
+  const previousPhaseRef = useRef<string | null>(null);
   const [attackAnimation, setAttackAnimation] =
     useState<AttackAnimationData | null>(null);
   const attackAnimationIdRef = useRef(0);
@@ -110,7 +114,39 @@ export const useGamePageController = () => {
     return () => clearTimeout(timer);
   }, [gameState?.currentPlayerId]);
 
+  useEffect(() => {
+    const currPhase = gameState?.currentPhase ?? null;
+    const prevPhase = previousPhaseRef.current;
+
+    if (prevPhase && currPhase && prevPhase !== currPhase && isMyTurn) {
+      if (prevPhase === "DEPLOY" && currPhase === "ATTACK") {
+        setShowAttackPhaseToast(true);
+      } else if (prevPhase === "ATTACK" && currPhase === "FORTIFY") {
+        setShowFortifyPhaseToast(true);
+      }
+    }
+
+    previousPhaseRef.current = currPhase;
+  }, [gameState?.currentPhase, gameState?.currentPlayerId]);
+
   const handleGameUpdate = useCallback((state: GameStateDTO) => {
+    if (state.timedOutPlayerId != null) {
+      const stored =
+        typeof window !== "undefined" ? localStorage.getItem("user") : null;
+      const localUserId = stored ? Number(JSON.parse(stored).id) : null;
+      const localPlayerId =
+        localUserId != null
+          ? (state.players.find((p) => Number(p.userId) === localUserId)
+              ?.playerId ?? null)
+          : null;
+      if (
+        localPlayerId != null &&
+        Number(state.timedOutPlayerId) === Number(localPlayerId)
+      ) {
+        setTurnTimeoutPopup(true);
+      }
+    }
+
     const prev = previousPlayersRef.current;
     if (prev.length > 0) {
       const surrendered = state.players.filter((p) => {
@@ -217,13 +253,19 @@ export const useGamePageController = () => {
           .reduce((sum, f) => sum + f.troops, 0);
       });
       setTroopHistory((prev) => {
+        const lastTurn = prev.length > 0 ? prev[prev.length - 1].turn : -1;
+        const snapshotTurn =
+          justFinished && state.turnNumber <= lastTurn
+            ? lastTurn + 1
+            : state.turnNumber;
         const snapshot: TroopSnapshot = {
-          turn: state.turnNumber,
+          turn: snapshotTurn,
           troops: totalTroopsByPlayer,
         };
         if (
+          !justFinished &&
           prev.length > 0 &&
-          prev[prev.length - 1].turn === state.turnNumber
+          prev[prev.length - 1].turn === snapshotTurn
         ) {
           return [...prev.slice(0, -1), snapshot];
         }
@@ -699,6 +741,8 @@ export const useGamePageController = () => {
     surrenderMessage,
     showSurrenderModal,
     setShowSurrenderModal,
+    turnTimeoutPopup,
+    setTurnTimeoutPopup,
     attackAnimation,
     fortifyAnimation,
     deployAnimation,
@@ -736,6 +780,8 @@ export const useGamePageController = () => {
     handleConfirmSurrender,
     nextPhase,
     showYourTurnToast,
+    showAttackPhaseToast,
+    showFortifyPhaseToast,
   };
 };
 
