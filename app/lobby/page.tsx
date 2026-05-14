@@ -204,9 +204,9 @@ function LobbyContent() {
   const accessCode = String(lobby.joinCode).replace(/(\d{3})(\d{3})/, "$1 $2");
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-10 bg-[rgba(14,12,6,0.5)]">
-      <div className="w-full max-w-6xl flex flex-col lg:flex-row gap-5 items-stretch">
-        <Card className="flex-1 lg:max-w-2xl rounded-lg border border-[#FFD900]/15 bg-[rgba(14,12,6,0.9)] backdrop-blur-xl shadow-[0_12px_60px_rgba(0,0,0,0.8)]">
+    <div className="h-screen overflow-hidden flex items-center justify-center px-4 py-10 bg-[rgba(14,12,6,0.5)]">
+      <div className="w-full max-w-6xl h-full max-h-[900px] flex flex-col lg:flex-row gap-5">
+        <Card className="flex-1 lg:max-w-2xl flex flex-col min-h-0rounded-lg border border-[#FFD900]/15 bg-[rgba(14,12,6,0.9)] backdrop-blur-xl shadow-[0_12px_60px_rgba(0,0,0,0.8)]">
           <div className="flex items-center justify-between px-5 py-2.5 border-b border-[#FFD900]/10">
             <div className="flex items-center gap-2">
               <Swords size={14} className="text-[#FFD900]/70" />
@@ -216,7 +216,7 @@ function LobbyContent() {
             </div>
           </div>
 
-          <CardContent className="flex flex-col gap-4 p-5">
+          <CardContent className="flex-1 min-h-0 overflow-y-auto flex flex-col gap-4 p-5">
             <div className="text-center">
               <h1 className="font-audiowide text-2xl font-bold tracking-wider text-white">
                 GAME LOBBY
@@ -312,7 +312,8 @@ function LobbyContent() {
                 </h2>
               </div>
 
-              <div className="grid gap-2">
+              <div className="overflow-y-auto flex-1 flex flex-col gap-2 pr-1
+                [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-[#FFD900]/30 ...">
                 {allUsers.map((user) => {
                   const isRowHost = user.id === lobby.host.id;
                   const isMe = user.id === currentUserId;
@@ -323,7 +324,7 @@ function LobbyContent() {
                   return (
                     <div
                       key={user.id}
-                      className="flex flex-col gap-2 px-4 py-3 rounded border border-[#FFD900]/10 bg-[rgba(255,217,0,0.02)]"
+                      className="flex flex-col gap-2 px-4 py-3 rounded border border-[#FFD900]/10 bg-[rgba(255,217,0,0.02)] "
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
@@ -422,7 +423,8 @@ function LobbyContent() {
               </div>
             )}
 
-            <div className="flex flex-row-reverse gap-3 mt-2">
+            <div className="flex-shrink-0 flex flex-row gap-2 px-5 pb-5 pt-3
+              border-t border-[#FFD900]/10">
               {isHost && (
                 <Button
                   onClick={async () => {
@@ -480,7 +482,7 @@ function LobbyContent() {
         </Card>
 
         {currentUser && lobby && (
-          <div className="w-full lg:w-96 lg:flex-shrink-0 flex flex-col rounded-lg border border-[#FFD900]/15 bg-[rgba(14,12,6,0.9)] backdrop-blur-xl shadow-[0_12px_60px_rgba(0,0,0,0.8)] overflow-hidden h-[480px] lg:h-auto lg:min-h-[560px]">
+          <div className="w-full lg:w-96 lg:flex-shrink-0 flex flex-col min-h-0 rounded-lg border border-[#FFD900]/15 bg-[rgba(14,12,6,0.9)] backdrop-blur-xl shadow-[0_12px_60px_rgba(0,0,0,0.8)] overflow-hidden">
             <GameChat
               gameId={String(lobby.lobbyId)}
               currentUser={{...currentUser, color: (lobby.colorPreferences?.[currentUserId ?? -1] ?? "GRAY").toLowerCase()}} 
