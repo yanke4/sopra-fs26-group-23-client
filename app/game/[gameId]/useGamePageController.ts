@@ -362,6 +362,9 @@ const handleGameUpdate = useCallback((state: GameStateDTO) => {
           troops: ownedFields.reduce((sum, f) => sum + f.troops, 0),
           playerId: p.playerId,
           alive: p.alive,
+          isSelf: p.userId === userId,
+          missionStatus: p.missionStatus ?? null,
+          missionBonusTroops: p.missionBonusTroops ?? 0,
         };
       });
     }
@@ -376,6 +379,9 @@ const handleGameUpdate = useCallback((state: GameStateDTO) => {
         troops: owned.reduce((sum, t) => sum + t.troops, 0),
         playerId: i,
         alive: true,
+        isSelf: false,
+        missionStatus: null,
+        missionBonusTroops: 0,
       };
     });
   }, [gameState, userId]);
@@ -445,6 +451,20 @@ const { territories, mapColors } = useMemo(() => {
       region.fields.every((f) => territories[f]?.owner === myOwnerIndex),
     );
   }, [territories, myOwnerIndex]);
+
+  const myMission = useMemo(() => {
+    if (!gameState || myPlayerId === null) return null;
+    const me = gameState.players.find((p) => p.playerId === myPlayerId);
+    if (!me || !me.missionType) return null;
+    return {
+      type: me.missionType,
+      description: me.missionDescription ?? "",
+      status: me.missionStatus ?? "LOCKED",
+      startRound: me.missionStartRound ?? 3,
+      expiresAtRound: me.missionExpiresAtRound ?? 6,
+      bonusTroops: me.missionBonusTroops ?? 0,
+    };
+  }, [gameState, myPlayerId]);
 
   const selectedFieldOwnerPlayerId =
     selectedTerritory && gameState
@@ -795,6 +815,7 @@ const { territories, mapColors } = useMemo(() => {
     mapColors,
     myRegionBonus,
     myOwnedRegions,
+    myMission,
     reinforcements,
     canDeployToSelected,
     validTargets,

@@ -52,6 +52,7 @@ const GameView = ({
   mapColors,
   myRegionBonus,
   myOwnedRegions,
+  myMission,
   reinforcements,
   canDeployToSelected,
   validTargets,
@@ -118,6 +119,8 @@ const GameView = ({
         currentPlayer={currentPlayer}
         myRegionBonus={myRegionBonus}
         myOwnedRegions={myOwnedRegions}
+        myMission={myMission}
+        currentTurn={currentTurn}
         currentPhase={currentPhase}
         isMyTurn={isMyTurn}
         reinforcements={reinforcements}

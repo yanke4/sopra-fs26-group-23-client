@@ -16,6 +16,20 @@ export interface TerritoryState {
   visible?: boolean;
 }
 
+export type MissionType =
+  | "CONTROL_TWO_REGIONS"
+  | "ELIMINATE_PLAYER"
+  | "KILL_EIGHT_TROOPS_IN_TURN"
+  | "FIFTEEN_TROOPS_ON_TERRITORY"
+  | "HOLD_REGION_WITH_THREE_TROOPS"
+  | "CONQUER_ICELAND"
+  | "CONQUER_TURKEY"
+  | "CONQUER_PORTUGAL"
+  | "NO_ATTACK_THIS_TURN"
+  | "CONQUER_FIVE_TERRITORIES_IN_TURN";
+
+export type MissionStatus = "LOCKED" | "ACTIVE" | "COMPLETED";
+
 export interface PlayerStateDTO {
   playerId: number;
   userId: number;
@@ -23,6 +37,12 @@ export interface PlayerStateDTO {
   color: PlayerColor;
   alive: boolean;
   troopCount: number;
+  missionType?: MissionType | null;
+  missionDescription?: string | null;
+  missionStatus?: MissionStatus | null;
+  missionStartRound?: number;
+  missionExpiresAtRound?: number;
+  missionBonusTroops?: number;
 }
 
 export interface FieldStateDTO {
