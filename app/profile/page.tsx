@@ -13,6 +13,7 @@ import { User as UserType } from "@/types/user";
 import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import useLocalStorage from "@/hooks/useLocalStorage";
+import { getApiDomain } from "@/utils/domain";
 
 type Stats = {
   gamesPlayed: number;
@@ -57,7 +58,7 @@ export default function ProfilePage() {
 
     const fetchUser = async ()=> {
       try {
-        const res = await fetch(`http://localhost:8080/users/${user?.id}`, { 
+        const res = await fetch(`${getApiDomain()}/users/${user?.id}`, { 
           headers: {
             token: token,
           },
@@ -84,7 +85,7 @@ export default function ProfilePage() {
     };
 
     fetchUser();
-  }, [storageReady, token, user, router, clearToken, clearUser]);
+  }, [storageReady, token, user?.id]);
   
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -105,7 +106,7 @@ export default function ProfilePage() {
     }
 
     try {
-      const res = await fetch(`http://localhost:8080/users/${user?.id}`, {
+      const res = await fetch(`${getApiDomain()}/users/${user?.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
