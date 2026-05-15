@@ -13,6 +13,7 @@ export interface AttackPayload {
 export interface TerritoryState {
   owner: number;
   troops: number;
+  visible?: boolean;
 }
 
 export interface PlayerStateDTO {

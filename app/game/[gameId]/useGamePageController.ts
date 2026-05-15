@@ -129,16 +129,17 @@ export const useGamePageController = () => {
     previousPhaseRef.current = currPhase;
   }, [gameState?.currentPhase, gameState?.currentPlayerId]);
 
-  const handleGameUpdate = useCallback((state: GameStateDTO) => {
+const handleGameUpdate = useCallback((state: GameStateDTO) => {
+    const stored =
+      typeof window !== "undefined" ? localStorage.getItem("user") : null;
+    const localUserId = stored ? Number(JSON.parse(stored).id) : null;
+    const localPlayerId =
+      localUserId != null
+        ? (state.players.find((p) => Number(p.userId) === localUserId)
+            ?.playerId ?? null)
+        : null;
+
     if (state.timedOutPlayerId != null) {
-      const stored =
-        typeof window !== "undefined" ? localStorage.getItem("user") : null;
-      const localUserId = stored ? Number(JSON.parse(stored).id) : null;
-      const localPlayerId =
-        localUserId != null
-          ? (state.players.find((p) => Number(p.userId) === localUserId)
-              ?.playerId ?? null)
-          : null;
       if (
         localPlayerId != null &&
         Number(state.timedOutPlayerId) === Number(localPlayerId)
@@ -146,6 +147,17 @@ export const useGamePageController = () => {
         setTurnTimeoutPopup(true);
       }
     }
+
+    // Determine if an animation should be visible to this client
+    const isVisibleForAnim = (fieldName: string) => {
+      if (!state.fogOfWarEnabled || localPlayerId === null) return true;
+      const myFields = state.fields.filter(f => f.ownerPlayerId === localPlayerId);
+      if (myFields.some(f => f.fieldName === fieldName)) return true;
+      for (const f of myFields) {
+        if (ADJACENCY[f.fieldName]?.includes(fieldName)) return true;
+      }
+      return false;
+    };
 
     const prev = previousPlayersRef.current;
     if (prev.length > 0) {
@@ -209,7 +221,7 @@ export const useGamePageController = () => {
         result = detectAttackFromDiff(prevState, state);
       }
 
-      if (result) {
+      if (result && (isVisibleForAnim(result.attacker) || isVisibleForAnim(result.defender))) {
         attackAnimationIdRef.current += 1;
         setAttackAnimation({ id: attackAnimationIdRef.current, ...result });
       }
@@ -217,7 +229,7 @@ export const useGamePageController = () => {
 
     if (prevState && prevState.currentPhase === "FORTIFY") {
       const fortifyResult = detectFortifyFromDiff(prevState, state);
-      if (fortifyResult) {
+      if (fortifyResult && (isVisibleForAnim(fortifyResult.from) || isVisibleForAnim(fortifyResult.to))) {
         fortifyAnimationIdRef.current += 1;
         setFortifyAnimation({
           id: fortifyAnimationIdRef.current,
@@ -228,7 +240,7 @@ export const useGamePageController = () => {
 
     if (prevState && prevState.currentPhase === "DEPLOY") {
       const deployResult = detectDeployFromDiff(prevState, state);
-      if (deployResult) {
+      if (deployResult && isVisibleForAnim(deployResult.field)) {
         deployAnimationIdRef.current += 1;
         setDeployAnimation({
           id: deployAnimationIdRef.current,
@@ -372,7 +384,7 @@ export const useGamePageController = () => {
     ? playerStats.findIndex((p) => p.playerId === gameState.currentPlayerId)
     : 0;
 
-  const { territories, mapColors } = useMemo(() => {
+const { territories, mapColors } = useMemo(() => {
     if (!gameState) {
       return { territories: FALLBACK_TERRITORIES, mapColors: PLAYER_COLORS };
     }
@@ -380,21 +392,43 @@ export const useGamePageController = () => {
     gameState.players.forEach((p, i) => {
       playerIdToIndex[p.playerId] = i;
     });
+    
     const neutralIndex = gameState.players.length;
+    const fogIndex = gameState.players.length + 1; // Create an index for hidden territories
+
+    // Fog of war logic -> Determine visible fields
+    const visibleFields = new Set<string>();
+    if (gameState.fogOfWarEnabled && myPlayerId !== null) {
+      for (const f of gameState.fields) {
+        if (f.ownerPlayerId === myPlayerId) {
+          visibleFields.add(f.fieldName);
+          for (const neighbor of ADJACENCY[f.fieldName] || []) {
+            visibleFields.add(neighbor);
+          }
+        }
+      }
+    }
 
     const terr: Record<string, TerritoryState> = {};
     for (const f of gameState.fields) {
+      const isVisible = !gameState.fogOfWarEnabled || myPlayerId === null || visibleFields.has(f.fieldName);
+      
       terr[f.fieldName] = {
-        owner:
-          f.ownerPlayerId != null
-            ? (playerIdToIndex[f.ownerPlayerId] ?? neutralIndex)
-            : neutralIndex,
-        troops: f.troops,
+        owner: isVisible
+          ? (f.ownerPlayerId != null
+              ? (playerIdToIndex[f.ownerPlayerId] ?? neutralIndex)
+              : neutralIndex)
+          : fogIndex, // Assign the dark gray fogIndex instead of the standard neutralIndex
+        troops: isVisible ? f.troops : 0,
+        visible: isVisible,
       };
     }
-    const colors = [...playerStats.map((p) => p.color), NEUTRAL_COLOR];
+    
+    // Fog of war Color #222222
+    const colors = [...playerStats.map((p) => p.color), NEUTRAL_COLOR, "#222222"];
+    
     return { territories: terr, mapColors: colors };
-  }, [gameState, playerStats]);
+  }, [gameState, playerStats, myPlayerId]);
 
   const myOwnerIndex = gameState
     ? playerStats.findIndex((p) => p.playerId === myPlayerId)

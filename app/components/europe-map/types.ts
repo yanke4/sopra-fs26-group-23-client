@@ -5,6 +5,7 @@ import type { DeployAnimationData } from "./DeployAnimation";
 export interface TerritoryState {
   owner: number;
   troops: number;
+  visible?: boolean;
 }
 
 export interface EuropeMapProps {

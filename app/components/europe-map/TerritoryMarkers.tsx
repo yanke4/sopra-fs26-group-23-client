@@ -22,6 +22,7 @@ const TerritoryMarkers: React.FC<Props> = ({
     {Object.entries(territories).map(([name, territory]) => {
       const center = COUNTRY_CENTERS[name];
       if (!center) return null;
+      if (territory.visible === false) return null;
 
       const isSelected = name === selectedTerritory;
       const isTarget = name === targetTerritory;
