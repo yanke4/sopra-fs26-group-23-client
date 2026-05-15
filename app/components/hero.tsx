@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Swords, Shield, Crown } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Swords, Shield, Crown, UserX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
@@ -27,7 +27,19 @@ const features = [
 
 export default function Hero() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [kickedNotice, setKickedNotice] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("kicked") === "1") {
+      setKickedNotice(true);
+      params.delete("kicked");
+      const qs = params.toString();
+      window.history.replaceState({}, "", qs ? `/?${qs}` : "/");
+    }
+  }, []);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen text-center gap-10 px-6 py-5 -mt-14">
@@ -98,6 +110,39 @@ export default function Hero() {
           </Card>
         ))}
       </div>
+
+      {kickedNotice && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            onClick={() => setKickedNotice(false)}
+          />
+          <div className="relative z-10 bg-[#0f0d0b] border border-red-500/40 rounded-xl shadow-2xl shadow-black/80 px-7 py-6 w-[22rem] flex flex-col items-center gap-4 text-center">
+            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-red-900/40 border border-red-500/40">
+              <UserX size={22} className="text-red-400" />
+            </div>
+            <div className="flex flex-col gap-1">
+              <span className="font-audiowide text-[10px] tracking-[0.3em] text-red-400/70 uppercase">
+                Removed from Lobby
+              </span>
+              <span className="font-audiowide text-lg tracking-widest text-white uppercase">
+                You were kicked
+              </span>
+            </div>
+            <p className="text-white/55 text-xs leading-relaxed">
+              The host has removed you from the lobby. You can join another
+              campaign or start your own.
+            </p>
+            <div className="h-px w-full bg-[#FFD900]/15" />
+            <button
+              onClick={() => setKickedNotice(false)}
+              className="px-5 py-1.5 rounded font-audiowide text-[10px] tracking-widest uppercase border border-[#FFD900]/40 bg-[#FFD900]/10 text-[#FFD900] hover:bg-[#FFD900]/20 transition-all cursor-pointer"
+            >
+              Dismiss
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

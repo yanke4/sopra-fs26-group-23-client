@@ -126,8 +126,8 @@ export default function JoinLobbyPage() {
               disabled={loading || pin.length < 6}
               className={`h-14 font-audiowide tracking-[0.2em] transition-all cursor-pointer ${
                 pin.length === 6 && !loading
-                  ? "bg-[#FFD900] text-[#0e0c06] shadow-[0_0_20px_rgba(255,217,0,0.2)] hover:shadow-[0_0_30px_rgba(255,217,0,0.4)]"
-                  : "bg-white/5 text-white/20 border border-white/10"
+                  ? "bg-[#FFD900] text-[#0e0c06] shadow-[0_0_20px_rgba(255,217,0,0.2)] hover:bg-[#ffe44d] hover:shadow-[0_0_30px_rgba(255,217,0,0.4)]"
+                  : "bg-white/5 text-white/20 border border-white/10 hover:bg-white/5"
               }`}
             >
               {loading ? "VERIFYING..." : "INITIALIZE JOIN"}
