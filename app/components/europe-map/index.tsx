@@ -55,6 +55,12 @@ const EuropeMap: React.FC<EuropeMapProps> = ({
     (name: string) => {
       const territory = territories[name];
       if (!territory) return "#2a2a2a";
+
+      // --- Fog of War effect---
+      if (territory.visible === false) {
+        return "url(#fog-pattern)";
+      }
+
       const baseColor = playerColors[territory.owner] || "#2a2a2a";
       if (name === selectedTerritory) return darkenColor(baseColor, 12);
       if (name === inspectedTerritory) return darkenColor(baseColor, 8);
@@ -100,6 +106,28 @@ const EuropeMap: React.FC<EuropeMapProps> = ({
         className="risk-map w-full h-full relative z-1 mt-5 ml-15"
         style={{ transform: "scaleX(1.15)", transformOrigin: "center center" }}
       >
+        {/* ---Fog of war Animation --- */}
+        <defs>
+          <pattern
+            id="fog-pattern"
+            width="20"
+            height="20"
+            patternUnits="userSpaceOnUse"
+            patternTransform="rotate(45)"
+          >
+            <rect width="20" height="20" fill="#141414" /> 
+
+            <rect y="0" width="10" height="20" fill="#1f1f1f">
+              <animate attributeName="x" values="0; 20" dur="2.5s" repeatCount="indefinite" />
+            </rect>
+
+            {/* Stripe 2: Follows seamlessly to create a perfect infinite loop */}
+            <rect y="0" width="10" height="20" fill="#1f1f1f">
+              <animate attributeName="x" values="-20; 0" dur="2.5s" repeatCount="indefinite" />
+            </rect>
+          </pattern>
+        </defs>
+        {/* -------------------------------------- */}
         <SeaConnections />
 
         <TerritoryGeographies
