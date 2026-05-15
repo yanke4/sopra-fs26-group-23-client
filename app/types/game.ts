@@ -51,4 +51,5 @@ export interface GameStateDTO {
   turnTimerSeconds?: number | null;
   turnStartedAtMillis?: number | null;
   timedOutPlayerId?: number | null;
+  fogOfWarEnabled: boolean;
 }

@@ -7,6 +7,7 @@ import {
   Swords,
   LogOut,
   Timer,
+  ChevronDown,
   Infinity as InfinityIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -30,6 +31,7 @@ interface LobbyGetDTO {
   jointUsers: { id: number; username: string }[];
   turnTimerSeconds: number | null;
   colorPreferences: Record<number, string>;
+  fogOfWarEnabled: boolean;
 }
 
 const TIMER_OPTIONS: { label: string; value: number | null }[] = [
@@ -72,6 +74,7 @@ function LobbyContent() {
   const [gameStarting, setGameStarting] = useState(false);
   const [savingSettings, setSavingSettings] = useState(false);
   const [savingColor, setSavingColor] = useState(false);
+  const [settingsExpanded, setSettingsExpanded] = useState(false);
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -226,64 +229,8 @@ function LobbyContent() {
               </p>
             </div>
 
-            <div className="flex flex-col gap-2 p-4 rounded border border-[#FFD900]/25 bg-[rgba(255,217,0,0.04)]">
-              <div className="flex items-center gap-2">
-                <Timer size={13} className="text-[#FFD900]/70" />
-                <span className="font-audiowide text-[10px] tracking-[0.25em] text-[#FFD900]/70 uppercase">
-                  Turn Timer
-                </span>
-                {!isHost && (
-                  <span className="ml-auto text-[9px] text-white/30 italic">
-                    host only
-                  </span>
-                )}
-              </div>
-              <div className="grid grid-cols-3 gap-2">
-                {TIMER_OPTIONS.map((opt) => {
-                  const active = lobby.turnTimerSeconds === opt.value;
-                  return (
-                    <button
-                      key={String(opt.value)}
-                      disabled={!isHost || savingSettings || active}
-                      onClick={async () => {
-                        try {
-                          setSavingSettings(true);
-                          await apiService.put<LobbyGetDTO>(
-                            `/lobbies/${lobby.lobbyId}/settings`,
-                            {
-                              userId: currentUserId,
-                              turnTimerSeconds: opt.value,
-                            },
-                          );
-                        } catch (err) {
-                          console.error("Failed to update timer:", err);
-                        } finally {
-                          setSavingSettings(false);
-                        }
-                      }}
-                      className={`flex items-center justify-center gap-1.5 h-12 rounded-md font-audiowide text-xs tracking-[0.2em] uppercase border transition-all ${
-                        active
-                          ? "bg-[#FFD900] text-[#0e0c06] border-[#FFD900] shadow-[0_0_18px_rgba(255,217,0,0.45)]"
-                          : isHost
-                            ? "bg-white/5 text-white/70 border-[#FFD900]/15 hover:border-[#FFD900]/50 hover:text-[#FFD900] hover:bg-[#FFD900]/5 cursor-pointer"
-                            : "bg-white/5 text-white/30 border-white/10 cursor-not-allowed"
-                      } ${savingSettings && !active ? "opacity-60" : ""}`}
-                    >
-                      {opt.value == null ? (
-                        <InfinityIcon size={14} />
-                      ) : (
-                        <Timer size={13} />
-                      )}
-                      {opt.label}
-                    </button>
-                  );
-                })}
-              </div>
-              <p className="text-[10px] text-white/35 italic">
-                When time runs out, the turn auto-passes to the next player.
-              </p>
-            </div>
-
+            
+            {/* --- ACCESS CODE --- */}
             <div className="flex items-center justify-between gap-4 p-4 rounded border border-[#FFD900]/25 bg-[rgba(255,217,0,0.05)]">
               <div className="flex flex-col">
                 <span className="font-audiowide text-[10px] tracking-widest text-[#FFD900]/50 uppercase">
@@ -305,6 +252,130 @@ function LobbyContent() {
               </Button>
             </div>
 
+        {/* --- GAME SETTINGS PANEL --- */}
+            <div className="flex flex-col gap-2 p-4 rounded border border-[#FFD900]/25 bg-[rgba(255,217,0,0.04)]">
+              {/* Clickable Header for Toggling */}
+              <div 
+                className="flex items-center gap-2 border-b border-[#FFD900]/10 pb-2 cursor-pointer hover:bg-white/5 p-1 -m-1 rounded transition-colors"
+                onClick={() => setSettingsExpanded(!settingsExpanded)}
+              >
+                <span className="font-audiowide text-[10px] tracking-[0.25em] text-[#FFD900]/70 uppercase flex-1">
+                    Game Settings
+                </span>
+                {!isHost && (
+                  <span className="ml-auto text-[9px] text-white/30 italic">
+                    host only
+                  </span>
+                )}
+                <ChevronDown 
+                  size={16} 
+                  className={`text-[#FFD900]/70 transition-transform duration-200 ${
+                    settingsExpanded ? "rotate-0" : "-rotate-90"
+                  }`} 
+                />
+              </div>
+              {/* Collapsible Content */ }
+              {settingsExpanded && (
+                <div className="flex flex-col gap-4 mt-2 transition-all">
+                  {/* --- Timer Settings --- */}
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                      <Timer size={13} className="text-white/50" />
+                      <span className="font-audiowide text-[9px] tracking-[0.15em] text-white/50 uppercase">
+                        Turn Timer
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
+                      {TIMER_OPTIONS.map((opt) => {
+                        const active = lobby.turnTimerSeconds === opt.value;
+                        return (
+                          <button
+                            key={String(opt.value)}
+                            disabled={!isHost || savingSettings || active}
+                            onClick={async () => {
+                              try {
+                                setSavingSettings(true);
+                                await apiService.put<LobbyGetDTO>(
+                                  `/lobbies/${lobby.lobbyId}/settings`,
+                                  {
+                                    userId: currentUserId,
+                                    turnTimerSeconds: opt.value,
+                                    fogOfWarEnabled: lobby.fogOfWarEnabled,
+                                  },
+                                );
+                              } catch (err) {
+                                console.error("Failed to update timer:", err);
+                              } finally {
+                                setSavingSettings(false);
+                              }
+                            }}
+                            className={`flex items-center justify-center gap-1.5 h-12 rounded-md font-audiowide text-xs tracking-[0.2em] uppercase border transition-all ${active
+                              ? "bg-[#FFD900] text-[#0e0c06] border-[#FFD900] shadow-[0_0_18px_rgba(255,217,0,0.45)]"
+                              : isHost
+                                ? "bg-white/5 text-white/70 border-[#FFD900]/15 hover:border-[#FFD900]/50 hover:text-[#FFD900] hover:bg-[#FFD900]/5 cursor-pointer"
+                                : "bg-white/5 text-white/30 border-white/10 cursor-not-allowed"
+                              } ${savingSettings && !active ? "opacity-60" : ""}`}
+                          >
+                            {opt.value == null ? (
+                              <InfinityIcon size={14} />
+                            ) : (
+                              <Timer size={13} />
+                            )}
+                            {opt.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <p className="text-[10px] text-white/35 italic">
+                      When time runs out, the turn auto-passes to the next player.
+                    </p>
+                  </div>
+
+                  {/* --- Fog of War Settings --- */}
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className="font-audiowide text-[9px] tracking-[0.15em] text-white/50 uppercase">
+                        Fog of War
+                      </span>
+                    </div>
+                    <button
+                      disabled={!isHost || savingSettings}
+                      onClick={async () => {
+                        try {
+                          setSavingSettings(true);
+                          await apiService.put<LobbyGetDTO>(
+                            `/lobbies/${lobby.lobbyId}/settings`,
+                            {
+                              userId: currentUserId,
+                              turnTimerSeconds: lobby.turnTimerSeconds,
+                              fogOfWarEnabled: !lobby.fogOfWarEnabled,
+                            },
+                          );
+                        } catch (err) {
+                          console.error("Failed to update fog of war:", err);
+                        } finally {
+                          setSavingSettings(false);
+                        }
+                      }}
+                      className={`flex items-center justify-center gap-1.5 h-12 rounded-md font-audiowide text-xs tracking-[0.2em] uppercase border transition-all ${lobby.fogOfWarEnabled
+                        ? "bg-[#FFD900] text-[#0e0c06] border-[#FFD900] shadow-[0_0_18px_rgba(255,217,0,0.45)]"
+                        : isHost
+                          ? "bg-white/5 text-white/70 border-[#FFD900]/15 hover:border-[#FFD900]/50 hover:text-[#FFD900] hover:bg-[#FFD900]/5 cursor-pointer"
+                          : "bg-white/5 text-white/30 border-white/10 cursor-not-allowed"
+                        } ${savingSettings ? "opacity-60" : ""}`}
+                    >
+                      {lobby.fogOfWarEnabled ? "Enabled" : "Disabled"}
+                    </button>
+                    <p className="text-[10px] text-white/35 italic">
+                      Your vision is restricted to territories you control and their immediate borders.
+                    </p>
+                  </div>
+                </div>
+              )}
+          </div>
+
+
+        {/* --- Players panel --- */}
             <div className="flex flex-col gap-2">
               <div className="flex justify-between items-end px-1">
                 <h2 className="font-audiowide text-xs tracking-widest text-white/80 uppercase">
