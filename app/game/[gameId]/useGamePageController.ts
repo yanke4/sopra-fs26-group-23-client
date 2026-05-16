@@ -706,9 +706,6 @@ const { territories, mapColors } = useMemo(() => {
       });
 
       setDeployTroops(1);
-      if (reinforcements - troops === 0) {
-        advancePhase();
-      }
     } catch (e) {
       console.error("Deploy failed:", e);
     }
