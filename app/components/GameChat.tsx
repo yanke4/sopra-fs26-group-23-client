@@ -139,7 +139,7 @@ function SystemMessage({ text }: { text: string }) {
   );
 }
 
-const EMOTES = ["😂", "😎", "😢", "😡", "👍", "👎", "🤝", "💀", "🔥"];
+const EMOTES = ["😂", "🥱", "😢", "🤬", "👍", "👎", "🤝", "💀", "🔥", "🖕", "🦅", "🧠","🤪", "🫨", "🤌"];
 
 function EmotePicker({ onSelect }: { onSelect: (emote: string) => void }) {
   return (
