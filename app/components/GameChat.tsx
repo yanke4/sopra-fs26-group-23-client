@@ -58,12 +58,12 @@ interface GameChatProps {
 
 const COLOR_MAP: Record<string, { bg: string; light: string }> = {
   red:    { bg: "#b91c1c", light: "#fee2e2" },
-  blue:   { bg: "#1d4ed8", light: "#dbeafe" },
+  blue:   { bg: "#4361EE", light: "#dbeafe" },
   green:  { bg: "#15803d", light: "#dcfce7" },
-  yellow: { bg: "#a16207", light: "#fef9c3" },
-  black:  { bg: "#1c1917", light: "#e7e5e4" },
-  purple: { bg: "#7e22ce", light: "#f3e8ff" },
+  yellow: { bg: "#FFD60A", light: "#fef9c3" },
+  purple: { bg: "#bc12df", light: "#f3e8ff" },
   gray:   { bg: "#374151", light: "#f3f4f6" },
+  orange: { bg: "#f37005", light: "#fff4e1" },
 };
 
 function getColor(color: string) {

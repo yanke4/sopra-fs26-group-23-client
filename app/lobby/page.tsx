@@ -42,10 +42,12 @@ const TIMER_OPTIONS: { label: string; value: number | null }[] = [
 ];
 
 const PLAYER_COLORS: { key: string; hex: string; label: string }[] = [
-  { key: "RED",    hex: "#E63946", label: "Red"    },
+  { key: "RED",    hex: "#b91c1c", label: "Red"    },
   { key: "BLUE",   hex: "#4361EE", label: "Blue"   },
-  { key: "GREEN",  hex: "#2D6A4F", label: "Green"  },
+  { key: "GREEN",  hex: "#15803d", label: "Green"  },
   { key: "YELLOW", hex: "#FFD60A", label: "Yellow" },
+  { key: "PURPLE",   hex: "#bc12df", label: "Purple"},
+  { key: "ORANGE",   hex: "#f37005", label: "Orange"   },
 ];
 
 const apiService = new ApiService();

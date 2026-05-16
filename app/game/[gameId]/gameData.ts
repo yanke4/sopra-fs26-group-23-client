@@ -3,14 +3,16 @@ import type { TerritoryState } from "@/components/europe-map";
 export const PHASES = ["Deploy", "Attack", "Fortify"] as const;
 export type Phase = (typeof PHASES)[number];
 
-export const PLAYER_COLORS = ["#E63946", "#4361EE", "#2D6A4F", "#FFD60A"];
+export const PLAYER_COLORS = ["#b91c1c", "#4361EE", "#15803d", "#FFD60A", "#bc12df","#f37005"];
 export const PLAYER_NAMES = ["You", "Player 2", "Player 3", "Player 4"];
 
 export const COLOR_MAP: Record<string, string> = {
-  RED: "#E63946",
+  RED: "#b91c1c",
   BLUE: "#4361EE",
-  GREEN: "#2D6A4F",
+  GREEN: "#15803d",
   YELLOW: "#FFD60A",
+  PURPLE: "#bc12df",
+  ORANGE: "#f37005",
 };
 
 export const NEUTRAL_COLOR = "#555555";
