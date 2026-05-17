@@ -195,7 +195,7 @@ export default function HowToPlay() {
               <span className="text-white/85"> EUROPE</span>
             </h1>
             <p className="text-base text-white/55 max-w-lg leading-relaxed">
-              Five chapters separate a recruit from a ruler. Read fast — your
+              Six chapters separate a recruit from a ruler. Read fast — your
               rivals already are.
             </p>
             <div className="flex flex-wrap gap-2 mt-2">
@@ -228,7 +228,7 @@ export default function HowToPlay() {
         {/* ============ STEP 01 — PLAYERS ============ */}
         <section className="mb-24">
           <div className="flex items-end justify-between flex-wrap gap-4 mb-6 border-b border-[#FFD900]/15 pb-4">
-            <StepLabel n={1} total={5} />
+            <StepLabel n={1} total={6} />
             <span className="font-audiowide text-[10px] tracking-[0.3em] uppercase text-[#FFD900]/50">
               Gather the Generals
             </span>
@@ -289,7 +289,7 @@ export default function HowToPlay() {
         {/* ============ STEP 02 — SETUP ============ */}
         <section className="mb-24">
           <div className="flex items-end justify-between flex-wrap gap-4 mb-6 border-b border-[#FFD900]/15 pb-4">
-            <StepLabel n={2} total={5} />
+            <StepLabel n={2} total={6} />
             <span className="font-audiowide text-[10px] tracking-[0.3em] uppercase text-[#FFD900]/50">
               Stake Your Claim
             </span>
@@ -350,7 +350,7 @@ export default function HowToPlay() {
         {/* ============ STEP 03 — REINFORCEMENTS ============ */}
         <section className="mb-24">
           <div className="flex items-end justify-between flex-wrap gap-4 mb-6 border-b border-[#FFD900]/15 pb-4">
-            <StepLabel n={3} total={5} />
+            <StepLabel n={3} total={6} />
             <span className="font-audiowide text-[10px] tracking-[0.3em] uppercase text-[#FFD900]/50">
               Round Reinforcements
             </span>
@@ -437,7 +437,7 @@ export default function HowToPlay() {
         {/* ============ STEP 04 — DICE COMBAT ============ */}
         <section className="mb-24">
           <div className="flex items-end justify-between flex-wrap gap-4 mb-6 border-b border-[#FFD900]/15 pb-4">
-            <StepLabel n={4} total={5} />
+            <StepLabel n={4} total={6} />
             <span className="font-audiowide text-[10px] tracking-[0.3em] uppercase text-[#FFD900]/50">
               Roll for War
             </span>
@@ -523,10 +523,48 @@ export default function HowToPlay() {
           </div>
         </section>
 
-        {/* ============ STEP 05 — VICTORY ============ */}
+        {/* ============ STEP 05 — Missions ============ */}
         <section className="mb-20">
           <div className="flex items-end justify-between flex-wrap gap-4 mb-6 border-b border-[#FFD900]/15 pb-4">
-            <StepLabel n={5} total={5} />
+            <StepLabel n={5} total={6} />
+            <span className="font-audiowide text-[10px] tracking-[0.3em] uppercase text-[#FFD900]/50">
+              Mission rewardss
+            </span>
+          </div>
+
+          <div className="relative rounded-md border border-[#FFD900]/25 bg-linear-to-br from-[rgba(28,24,8,0.7)] to-[rgba(14,12,6,0.6)] backdrop-blur-sm p-8 sm:p-12 overflow-hidden">
+            <div className="absolute -top-20 -right-20 w-80 h-80 rounded-full bg-[radial-gradient(circle,rgba(255,217,0,0.12)_0%,transparent_70%)] pointer-events-none" />
+
+            <div className="relative grid grid-cols-1 md:grid-cols-[auto_1fr] gap-8 items-center">
+              <div className="flex flex-col items-center gap-3">
+                <div className="w-28 h-28 rounded-full border-2 border-[#FFD900] shadow-[0_0_36px_rgba(255,217,0,0.45),inset_0_0_24px_rgba(255,217,0,0.18)] flex items-center justify-center">
+                  <span className="text-5xl font-bold leading-none text-[#FFD900] [filter:drop-shadow(0_0_10px_rgba(255,217,0,0.6))] relative bottom-0.5 right-0.5">
+                    +2
+                  </span>
+                </div>
+              </div>
+
+              <div>
+                <h2 className="font-audiowide text-3xl sm:text-4xl tracking-wide text-white mb-3">
+                  Complete missions for <span className="text-[#FFD900]">reinforcements</span>.
+                </h2>
+                <p className="text-white/60 leading-relaxed text-[15px] max-w-xl">
+                  By completing assigned missions every third round, you can earn reinforcements for the next turn.
+                  These will give you an {" "}
+                  <span className="text-[#FFD900]/90">
+                    advantage over your opponents
+                  </span>
+                  .
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ============ STEP 06 — VICTORY ============ */}
+        <section className="mb-20">
+          <div className="flex items-end justify-between flex-wrap gap-4 mb-6 border-b border-[#FFD900]/15 pb-4">
+            <StepLabel n={6} total={6} />
             <span className="font-audiowide text-[10px] tracking-[0.3em] uppercase text-[#FFD900]/50">
               Last One Standing
             </span>
