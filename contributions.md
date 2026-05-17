@@ -174,3 +174,20 @@ reason).
 |                    | 03/05/2026 | [Link to Commit 2](https://github.com/yanke4/sopra-fs26-group-23-server/commit/fa7b9b4cb9b25727fe4eff595fc6191f6f683fc0) | Change Sorting of leaderbord client side logic | A more natural way of sorting the leaderbords |
 |                    | 10/05/2026 | [Link to Commit 3](https://github.com/yanke4/sopra-fs26-group-23-client/commit/78b30c7a88201b93f7330ec2dfeeb6b99f662d8a) | Lobby Action bugfix | Immidiate redirect to login page |
 
+
+## Contributions Week 7 - 11/05/2026 to 18/05/2026
+
+| **Student**        | **Date** | **Link to Commit** | **Description**                 | **Relevance**                       |
+| ------------------ | -------- | ------------------ | ------------------------------- | ----------------------------------- |
+| **Linu5Frick** | 14/05/2026   | [Link to Commmit 1](https://github.com/yanke4/sopra-fs26-group-23-client/commit/dd151839cfff2bd02e8e84d35d78af9f79970ad0) | Fixed the lobby page in place | Players dont need to scroll to see the chat and the players list is scrollable |
+|                    | 16/05/2026   | [Link to Commit 2](https://github.com/yanke4/sopra-fs26-group-23-client/commit/1a908d48a336522ea832922c21003ce3d7fcb5a7) | Updated the color options in the lobby and game | Players now have a bigger variety of colors |
+|                    | 16/05/2026   | [Link to Commit 3](https://github.com/yanke4/sopra-fs26-group-23-client/commit/26f19ee820cecf27a35ba317184c49af88a4bc81) | Changed the emoji panel | Players can now choose from more emojis. Adjusted according to evaluation of players |
+| **devnida** | 08/05/2026   | [[Link to Commit 1]](https://github.com/yanke4/sopra-fs26-group-23-client/commit/d763a0d87ee54de9622aa2b4ff6f7448543d4f16) | Add game hints| Now users see during each turn an explanation of what they are able to do |
+|                    | 08/05/2026    | [[Link to Commit 2]](https://github.com/yanke4/sopra-fs26-group-23-client/commit/674e3bc1d71a7c725493dde443c89deaf405d929) | Add loading screen | A loading screen is rendered when the host starts the game |
+|                    | 08/05/2026    | [[Link to Commit 3]](https://github.com/yanke4/sopra-fs26-group-23-client/commit/f99d736a522e1410f1a67397f15c20ffbe3e1b4b) | Add timer during turns | The host is now able to select between 30s,60s or no timer per turn |
+| **yanke4** | 09/05/2026  | [[Link to Commit 1]](https://github.com/yanke4/sopra-fs26-group-23-client/commit/ff16233c7677b048b6a8bb294a1ab70ba04196cf) | pop up for each phase | its now clearer for the player in which phase he is currently |
+|                    | 09/05/2026 | [[Link to Commit 2]](https://github.com/yanke4/sopra-fs26-group-23-server/commit/3151582b4ba29be784418bf7f225e2572dd94dd4) | color selection in lobby | players can choose prefered color in lobby |
+| **MatteoLozano** | 03/05/2026 | [Link to Commit 1](https://github.com/yanke4/sopra-fs26-group-23-client/commit/a0f2c19fc8675af2098cfd3c938b3985d25a570f) |Change Sorting of leaderbord client side logic | A more natural way of sorting the leaderbords |
+|                    | 03/05/2026 | [Link to Commit 2](https://github.com/yanke4/sopra-fs26-group-23-server/commit/fa7b9b4cb9b25727fe4eff595fc6191f6f683fc0) | Change Sorting of leaderbord client side logic | A more natural way of sorting the leaderbords |
+|                    | 10/05/2026 | [Link to Commit 3](https://github.com/yanke4/sopra-fs26-group-23-client/commit/78b30c7a88201b93f7330ec2dfeeb6b99f662d8a) | Lobby Action bugfix | Immidiate redirect to login page |
+
