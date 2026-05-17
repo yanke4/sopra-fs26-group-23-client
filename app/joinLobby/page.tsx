@@ -81,9 +81,10 @@ export default function JoinLobbyPage() {
           </div>
           <button
             onClick={() => router.push("/")}
-            className="text-white/40 hover:text-[#FFD900] transition-colors"
+            className="flex items-center gap-2 text-sm text-white/40 hover:text-white transition-colors cursor-pointer"
           >
-            <ArrowLeft size={16} />
+            <ArrowLeft size={16} /> 
+            Go Back
           </button>
         </div>
 

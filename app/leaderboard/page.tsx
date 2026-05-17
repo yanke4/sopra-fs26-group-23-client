@@ -157,7 +157,7 @@ export default function Leaderboard() {
       <div className="w-full max-w-4xl">
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-2 text-sm text-white/50 hover:text-white transition-colors mb-6"
+          className="flex items-center gap-2 text-sm text-white/50 hover:text-white transition-colors mb-6 cursor-pointer"
         >
           <ArrowLeft size={16} />
           Go Back

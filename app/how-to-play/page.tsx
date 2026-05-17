@@ -176,7 +176,7 @@ export default function HowToPlay() {
           onClick={() => router.back()}
           className="flex items-center gap-2 text-sm text-white/50 hover:text-white transition-colors mb-6 cursor-pointer"
         >
-          <ArrowLeft size={16} />
+          <ArrowLeft size={16} /> 
           Go Back
         </button>
 

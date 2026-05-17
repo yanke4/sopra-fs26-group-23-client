@@ -8,6 +8,7 @@ import {
   Swords,
   Trophy,
   Percent,
+  ArrowLeft
 } from "lucide-react";
 import { User as UserType } from "@/types/user";
 import { useRouter } from "next/navigation";
@@ -141,6 +142,13 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-6 py-16 gap-8">
+      <button
+          onClick={() => router.back()}
+          className="fixed top-30 left-80 flex items-center gap-2 text-sm text-white/50 hover:text-white transition-colors mb-6 cursor-pointer"
+        >
+          <ArrowLeft size={16} />
+          Go Back
+        </button>
       <div className="flex flex-col items-center gap-3">
         <div className="p-4 rounded-full border border-[#FFD900]/30 text-[#FFD900]/70 shadow-[0_0_20px_rgba(255,217,0,0.1)]">
           <User size={32} />
